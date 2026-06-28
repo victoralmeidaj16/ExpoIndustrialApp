@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -48,6 +48,10 @@ function standNumber(stand: string) {
 }
 
 export default function MapScreen() {
+  return <Redirect href="/map-3d" />;
+}
+
+function Map2DScreen() {
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ search?: string }>();
   const { exhibitors, source } = useExhibitors();

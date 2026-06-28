@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 
@@ -55,7 +55,7 @@ export default function Map3DScreen() {
   const [query, setQuery] = useState(() => (typeof params.search === 'string' ? params.search : ''));
   const [category, setCategory] = useState<CategoryFilter>(ALL_CATEGORIES);
   const [selectedBoothId, setSelectedBoothId] = useState<string | undefined>();
-  const webViewRef = useRef<WebView>(null);
+  const mapRef = useRef<WebView | HTMLIFrameElement | null>(null);
 
   const categories = useMemo<CategoryFilter[]>(
     () => [ALL_CATEGORIES, ...Array.from(new Set(exhibitors.map((booth) => booth.category)))],
@@ -69,6 +69,19 @@ export default function Map3DScreen() {
     exhibitors.find((booth) => booth.id === selectedBoothId) ??
     (query || category !== ALL_CATEGORIES ? filteredBooths[0] : undefined);
 
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+    const onMessage = (event: MessageEvent) => {
+      try {
+        handleMapMessage(event.data);
+      } catch {
+        // Ignora mensagens de extensões/devtools que não sejam da ponte do mapa.
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  });
+
   function selectCategory(nextCategory: CategoryFilter) {
     setCategory(nextCategory);
     setSelectedBoothId(undefined);
@@ -77,42 +90,51 @@ export default function Map3DScreen() {
   function handleBoothSelect(boothId: string) {
     setSelectedBoothId(boothId);
     const booth = exhibitors.find((b) => b.id === boothId);
-    if (booth && webViewRef.current) {
-      webViewRef.current.postMessage(
-        JSON.stringify({
-          type: 'SELECT_STAND',
-          standNumber: standNumber(booth.stand),
-        })
-      );
+    if (booth) {
+      postMapMessage({
+        type: 'SELECT_STAND',
+        standNumber: standNumber(booth.stand),
+      });
     }
   }
 
   function handleRoutePress() {
-    if (selectedBooth && webViewRef.current) {
-      webViewRef.current.postMessage(
-        JSON.stringify({
-          type: 'ROUTE_TO_STAND',
-          standNumber: standNumber(selectedBooth.stand),
-        })
+    if (selectedBooth) {
+      postMapMessage({
+        type: 'ROUTE_TO_STAND',
+        standNumber: standNumber(selectedBooth.stand),
+      });
+    }
+  }
+
+  function postMapMessage(message: { type: string; standNumber?: string }) {
+    const payload = JSON.stringify(message);
+    if (Platform.OS === 'web') {
+      (mapRef.current as HTMLIFrameElement | null)?.contentWindow?.postMessage(payload, '*');
+      return;
+    }
+    (mapRef.current as WebView | null)?.postMessage(payload);
+  }
+
+  function handleMapMessage(rawData: unknown) {
+    const data = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+    if (data.type === 'BOOTH_SELECTED') {
+      const booth = exhibitors.find(
+        (item) =>
+          item.id === data.id ||
+          standNumber(item.stand) === standNumber(data.number || '')
       );
+      if (booth) {
+        setSelectedBoothId(booth.id);
+      }
+    } else if (data.type === 'BOOTH_DESELECTED') {
+      setSelectedBoothId(undefined);
     }
   }
 
   function handleWebViewMessage(event: any) {
     try {
-      const data = JSON.parse(event.nativeEvent.data);
-      if (data.type === 'BOOTH_SELECTED') {
-        const booth = exhibitors.find(
-          (item) =>
-            item.id === data.id ||
-            standNumber(item.stand) === standNumber(data.number || '')
-        );
-        if (booth) {
-          setSelectedBoothId(booth.id);
-        }
-      } else if (data.type === 'BOOTH_DESELECTED') {
-        setSelectedBoothId(undefined);
-      }
+      handleMapMessage(event.nativeEvent.data);
     } catch (err) {
       console.error('Error parsing message from WebView:', err);
     }
@@ -234,17 +256,30 @@ export default function Map3DScreen() {
 
         {/* 3D WebView Container */}
         <View style={styles.mapContainer}>
-          <WebView
-            ref={webViewRef}
-            originWhitelist={['*']}
-            source={{ html: htmlSource }}
-            style={styles.webview}
-            onMessage={handleWebViewMessage}
-            javaScriptEnabled={true}
-            domStorageEnabled={true}
-            scrollEnabled={false}
-            bounces={false}
-          />
+          {Platform.OS === 'web' ? (
+            <iframe
+              ref={(node) => {
+                mapRef.current = node;
+              }}
+              srcDoc={htmlSource}
+              title="Mapa 3D real da Expoindustrial Sul"
+              style={styles.webIframe as any}
+            />
+          ) : (
+            <WebView
+              ref={(node) => {
+                mapRef.current = node;
+              }}
+              originWhitelist={['*']}
+              source={{ html: htmlSource }}
+              style={styles.webview}
+              onMessage={handleWebViewMessage}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              scrollEnabled={false}
+              bounces={false}
+            />
+          )}
         </View>
 
         {selectedBooth ? (
@@ -457,6 +492,11 @@ const styles = StyleSheet.create({
   webview: {
     backgroundColor: '#07090e',
     flex: 1,
+  },
+  webIframe: {
+    borderWidth: 0,
+    height: '100%',
+    width: '100%',
   },
   detailsCard: {
     alignItems: 'center',
