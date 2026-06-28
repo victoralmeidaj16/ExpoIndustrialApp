@@ -73,16 +73,19 @@ export default function HomeScreen() {
   const { sponsors } = useSponsors();
   const { event } = useEventConfig();
   const { materials } = useMaterials();
-  const { user, configured } = useAuth();
+  const { user, configured, initializing } = useAuth();
   const { profile, loading: profileLoading } = useVisitorProfile();
 
   useEffect(() => {
-    if (configured && user && !profileLoading && profile) {
-      if (!profile.onboardingCompleted && !profile.onboardingSkipped) {
-        router.replace('/onboarding');
-      }
+    if (!configured || initializing) return;
+    if (!user) {
+      router.replace('/profile');
+      return;
     }
-  }, [user, configured, profile, profileLoading]);
+    if (!profileLoading && (!profile || (!profile.onboardingCompleted && !profile.onboardingSkipped))) {
+      router.replace('/onboarding');
+    }
+  }, [user, configured, initializing, profile, profileLoading]);
 
   return (
     <View style={styles.screen}>

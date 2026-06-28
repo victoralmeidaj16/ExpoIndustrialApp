@@ -18,6 +18,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Brand, Radius, Spacing } from '@/constants/theme';
+import { AuthForm } from '@/features/auth/auth-form';
 import { useAuth } from '@/features/auth/use-auth';
 import {
   BOTTLENECK_OPTIONS,
@@ -35,7 +36,7 @@ import {
 
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
-  const { user, configured } = useAuth();
+  const { user, configured, initializing } = useAuth();
   const { profile, loading } = useVisitorProfile();
 
   const [step, setStep] = useState(1);
@@ -44,8 +45,8 @@ export default function OnboardingScreen() {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    if (!loading && profile && !initialized) {
-      setForm(profile);
+    if (!loading && !initialized) {
+      setForm(profile ?? { ...EMPTY_VISITOR_PROFILE });
       setInitialized(true);
     }
   }, [profile, loading, initialized]);
@@ -136,6 +137,31 @@ export default function OnboardingScreen() {
       <View style={styles.centerScreen}>
         <ActivityIndicator color={Brand.gold} />
       </View>
+    );
+  }
+
+  if (configured && !initializing && !user) {
+    return (
+      <KeyboardAvoidingView
+        style={styles.screen}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.content,
+            { paddingTop: insets.top + Spacing.five, paddingBottom: insets.bottom + Spacing.four },
+          ]}
+          keyboardShouldPersistTaps="handled">
+          <AuthForm
+            title="Cadastro do visitante"
+            icon="person-add"
+            subtitle={{
+              login: 'Entre para continuar seu onboarding e acessar seu crachá.',
+              signup: 'Crie sua conta para gerar seu crachá, matches e recomendações.',
+            }}
+            onSuccess={() => setInitialized(false)}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
     );
   }
 

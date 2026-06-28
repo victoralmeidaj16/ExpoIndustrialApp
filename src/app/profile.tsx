@@ -141,7 +141,7 @@ export default function ProfileScreen() {
               login: 'Acesse para ver seu crachá, matches e contatos.',
               signup: 'Crie sua conta de visitante para participar do evento.',
             }}
-            onSuccess={() => setHydrated(false)}
+            onSuccess={() => router.replace('/onboarding')}
           />
         </ScrollView>
       </KeyboardAvoidingView>
