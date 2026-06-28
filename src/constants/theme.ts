@@ -1,11 +1,43 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Tema da marca Expo Industrial Sul.
+ * Paleta industrial dark com acentos em dourado executivo e azul tecnológico,
+ * extraída do board de design do app.
  */
 
 import '@/global.css';
 
 import { Platform } from 'react-native';
+
+/** Paleta principal da marca (usada nas telas customizadas). */
+export const Brand = {
+  // Fundos
+  bgPrimary: '#050816',
+  bgSecondary: '#071A33',
+  bgCard: '#0A1021',
+  bgElevated: '#111827',
+
+  // Acentos
+  gold: '#C9A24C',
+  goldSoft: 'rgba(201, 162, 76, 0.14)',
+  techBlue: '#2F6BFF',
+  blueSoft: 'rgba(47, 107, 255, 0.14)',
+  cyan: '#00C8FF',
+
+  // Texto
+  textPrimary: '#FFFFFF',
+  textSecondary: '#B0B4BA',
+  textMuted: '#6B7280',
+
+  // Bordas / linhas
+  border: 'rgba(255, 255, 255, 0.08)',
+  borderHover: 'rgba(255, 255, 255, 0.18)',
+  borderGold: 'rgba(201, 162, 76, 0.4)',
+
+  // Estados
+  success: '#22C55E',
+  warning: '#F59E0B',
+  danger: '#EF4444',
+} as const;
 
 export const Colors = {
   light: {
@@ -16,11 +48,11 @@ export const Colors = {
     textSecondary: '#60646C',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: Brand.textPrimary,
+    background: Brand.bgPrimary,
+    backgroundElement: Brand.bgCard,
+    backgroundSelected: Brand.bgElevated,
+    textSecondary: Brand.textSecondary,
   },
 } as const;
 
@@ -28,13 +60,9 @@ export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {
@@ -59,6 +87,13 @@ export const Spacing = {
   four: 24,
   five: 32,
   six: 64,
+} as const;
+
+export const Radius = {
+  sm: 12,
+  md: 18,
+  lg: 24,
+  pill: 999,
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;

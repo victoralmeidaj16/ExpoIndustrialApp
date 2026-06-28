@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "ExpoIndustrialApp",
-    "slug": "ExpoIndustrialApp",
+    "name": "Expo Industrial Sul",
+    "slug": "expo-industrial-sul",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "expoindustrialapp",
-    "userInterfaceStyle": "automatic",
+    "scheme": "expoindustrialsul",
+    "userInterfaceStyle": "dark",
     "ios": {
       "icon": "./assets/expo.icon"
     },
@@ -28,13 +28,14 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#050816",
           "android": {
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,

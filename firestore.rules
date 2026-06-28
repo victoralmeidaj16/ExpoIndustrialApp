@@ -1,0 +1,111 @@
+rules_version = '2';
+
+// Regras do Firestore — auth por email/senha + cadastro self-service + admin.
+//
+// Modelo: cada expositor é dono do documento `exhibitors/{uid}` (id == uid).
+// Ele edita só os campos da empresa; `point` (posição no croqui), `fit` e
+// `status` (moderação) são do ORGANIZADOR. A moderação (publicar, posicionar no
+// croqui, definir score) é feita por um ADMIN — papel concedido pela coleção
+// `admins/{uid}` — tipicamente pelo painel match-web (mesmo Firestore).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // `true` quando o usuário logado é admin. O papel é um documento em
+    // `admins/{uid}` (qualquer conteúdo); criado/removido só pelo Console ou
+    // Admin SDK — nunca pelo cliente (ver `match /admins` abaixo).
+    function isAdmin() {
+      return request.auth != null
+             && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Lista de admins — gerenciada fora do app (Console/Admin SDK). O próprio
+    // admin pode ler para checar o papel; ninguém escreve pelo cliente.
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /exhibitors/{id} {
+      // Público lê só publicados; o dono lê o próprio rascunho; admin lê tudo.
+      allow read: if resource.data.status == 'published'
+                  || (request.auth != null && resource.data.ownerUid == request.auth.uid)
+                  || isAdmin();
+
+      // Admin cria/edita/remove sem restrição (moderação). Dono autenticado cria
+      // o próprio cadastro, sempre como rascunho e sem injetar campos do
+      // organizador (posição/score).
+      allow create: if isAdmin()
+                    || (request.auth != null
+                        && request.auth.uid == id
+                        && request.resource.data.ownerUid == request.auth.uid
+                        && request.resource.data.status == 'draft'
+                        && !request.resource.data.keys()
+                             .hasAny(['point', 'fit', 'stand', 'area', 'category']));
+
+      // Dono atualiza os campos da empresa, sem tocar nos campos do organizador
+      // (dono, moderação, posição, score). `diff()` é seguro p/ campos ausentes.
+      allow update: if isAdmin()
+                    || (request.auth != null
+                        && request.auth.uid == id
+                        && !request.resource.data.diff(resource.data).affectedKeys()
+                             .hasAny(['ownerUid', 'status', 'point', 'fit', 'stand', 'area', 'category']));
+
+      allow delete: if isAdmin();
+    }
+
+    // Perfil do visitante — leitura privada do dono, se o perfil for público (discoverable) ou se for admin; escrita privada do dono.
+    match /visitors/{id} {
+      allow read: if request.auth != null && (request.auth.uid == id || resource.data.discoverable == true || isAdmin());
+      allow write: if request.auth != null && request.auth.uid == id;
+    }
+
+    // Conexões/matchmaking entre pessoas.
+    match /connections/{id} {
+      allow read, update: if request.auth != null
+                          && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      allow create: if request.auth != null
+                    && request.resource.data.fromUid == request.auth.uid
+                    && request.resource.data.status == 'pending';
+      allow delete: if request.auth != null
+                    && resource.data.fromUid == request.auth.uid;
+    }
+
+    // Leads/contatos captados — privados de quem captou (`ownerUid`). Cada um lê,
+    // cria, atualiza e apaga somente os próprios; na criação não pode forjar o
+    // `ownerUid` de outra pessoa.
+    match /leads/{id} {
+      allow read, update, delete: if request.auth != null
+                                  && resource.data.ownerUid == request.auth.uid;
+      allow create: if request.auth != null
+                    && request.resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Agenda pública do evento. Leitura pública; escrita só por admin (painel) ou
+    // ferramenta de seed/console (Admin SDK ignora as rules).
+    match /sessions/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Patrocinadores — leitura pública; escrita só por admin (painel) ou seed.
+    match /sponsors/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Configuração do evento (nome, datas, local) — doc único `event/config`,
+    // gerido pelo painel do organizador (match-web). Leitura pública; escrita só
+    // por admin.
+    match /event/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Materiais para download (PDFs/arquivos) enviados pelo organizador e
+    // baixados pelos visitantes na home do app. Leitura pública; escrita admin.
+    match /materials/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
