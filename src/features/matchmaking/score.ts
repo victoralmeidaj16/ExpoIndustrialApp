@@ -137,6 +137,7 @@ export function isProfileUsable(profile: VisitorProfile | null): boolean {
 }
 
 const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 export async function computeFitWithGemini(
   profile: VisitorProfile | null,
@@ -176,7 +177,7 @@ Responda APENAS com o JSON, sem markdown ou formatações extras.
 `;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
