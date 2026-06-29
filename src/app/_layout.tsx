@@ -20,6 +20,9 @@ const TAB_ICONS: Record<string, { active: IconName; inactive: IconName }> = {
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
+  const activeRoute = state.routes[state.index]?.name;
+
+  if (activeRoute === 'preencher') return null;
 
   return (
     <View style={[styles.tabBar, { paddingBottom: Math.max(insets.bottom, 10) }]}>
