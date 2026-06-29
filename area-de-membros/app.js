@@ -9,7 +9,8 @@ const MOCK_EXHIBITORS = [
     tech: "iot",
     desc: "Líder global em motores elétricos, automação industrial e sistemas de energia. Apresentando soluções completas de Indústria 4.0.",
     tags: ["Motores", "IoT", "Eficiência Energética"],
-    products: ["WEG Motor Scan (Sensor IoT)", "Inversores de Frequência CWW900", "Plataforma WEG IoT"]
+    products: ["WEG Motor Scan (Sensor IoT)", "Inversores de Frequência CWW900", "Plataforma WEG IoT"],
+    logo: '<svg viewBox="0 0 100 100" style="width:100%; height:100%;"><rect width="100" height="100" fill="#00579F" rx="8"/><text x="50" y="65" font-family="sans-serif" font-weight="900" font-size="34" fill="white" text-anchor="middle">WEG</text></svg>'
   },
   {
     id: 2,
@@ -19,7 +20,8 @@ const MOCK_EXHIBITORS = [
     tech: "software",
     desc: "Pioneira em digitalização e automação para manufatura discreta e de processos. Gêmeos digitais e integração TI/TO.",
     tags: ["Gêmeos Digitais", "Sistemas MES", "CLPs"],
-    products: ["MindSphere (Industrial IoT)", "CLP Simatic S7-1500", "Software TIA Portal"]
+    products: ["MindSphere (Industrial IoT)", "CLP Simatic S7-1500", "Software TIA Portal"],
+    logo: '<svg viewBox="0 0 100 100" style="width:100%; height:100%;"><rect width="100" height="100" fill="#00797A" rx="8"/><text x="50" y="62" font-family="sans-serif" font-weight="800" font-size="18" fill="white" text-anchor="middle">SIEMENS</text></svg>'
   },
   {
     id: 3,
@@ -29,7 +31,8 @@ const MOCK_EXHIBITORS = [
     tech: "robotica",
     desc: "Especialista em robôs industriais e soluções inovadoras de automação para linhas de produção de alta velocidade.",
     tags: ["Robótica", "Braços Articulados", "Células de Solda"],
-    products: ["Robô Colaborativo LBR iisy", "Robô Industrial KR QUANTEC", "KUKA.Sim (Software Simulação)"]
+    products: ["Robô Colaborativo LBR iisy", "Robô Industrial KR QUANTEC", "KUKA.Sim (Software Simulação)"],
+    logo: '<svg viewBox="0 0 100 100" style="width:100%; height:100%;"><rect width="100" height="100" fill="#ED7A1C" rx="8"/><text x="50" y="65" font-family="sans-serif" font-weight="800" font-size="26" fill="white" text-anchor="middle">KUKA</text></svg>'
   },
   {
     id: 4,
@@ -39,7 +42,8 @@ const MOCK_EXHIBITORS = [
     tech: "manutencao",
     desc: "Soluções inteligentes de acionamento e controle hidráulico, pneumático e elétrico para máquinas industriais.",
     tags: ["Hidráulica", "Pneumática", "Manutenção Preditiva"],
-    products: ["CytroBox (Unidade Hidráulica IoT)", "Sensores Digitais Proximidade", "Guias Lineares Inteligentes"]
+    products: ["CytroBox (Unidade Hidráulica IoT)", "Sensores Digitais Proximidade", "Guias Lineares Inteligentes"],
+    logo: '<svg viewBox="0 0 100 100" style="width:100%; height:100%;"><rect width="100" height="100" fill="#1C1F2A" rx="8"/><text x="50" y="62" font-family="sans-serif" font-weight="800" font-size="24" fill="#00CCFF" text-anchor="middle">Bosch</text></svg>'
   },
   {
     id: 5,
@@ -49,7 +53,8 @@ const MOCK_EXHIBITORS = [
     tech: "maquinas",
     desc: "Líder mundial em tecnologia pneumática para automação industrial e controle de fluidos.",
     tags: ["Pneumática", "Válvulas", "Eficiência de Ar"],
-    products: ["Garras Pneumáticas de Precisão", "Coletores de Válvulas Serial", "Sensores de Fluxo de Ar"]
+    products: ["Garras Pneumáticas de Precisão", "Coletores de Válvulas Serial", "Sensores de Fluxo de Ar"],
+    logo: '<svg viewBox="0 0 100 100" style="width:100%; height:100%;"><rect width="100" height="100" fill="#005A9C" rx="8"/><text x="50" y="65" font-family="sans-serif" font-weight="900" font-size="30" fill="white" text-anchor="middle">SMC</text></svg>'
   }
 ];
 
@@ -328,8 +333,8 @@ function renderDashboard() {
     const item = document.createElement("div");
     item.className = "aside-item";
     item.innerHTML = `
-      <div class="user-avatar" style="border-radius:8px; font-weight:700; width:38px; height:38px; background-color: var(--gold-light); color: var(--gold-primary); font-size:12px;">
-        ${ex.name.substring(0, 2).toUpperCase()}
+      <div style="width: 38px; height: 38px; flex-shrink: 0;">
+        ${ex.logo}
       </div>
       <div class="aside-item-info">
         <span class="aside-item-title">${ex.name}</span>
@@ -540,7 +545,7 @@ function renderMarketplace(techFilter = "todos", categoryFilter = "todos") {
     card.innerHTML = `
       <div class="exhibitor-banner">
         <div class="exhibitor-logo-box">
-          <div style="font-weight: 800; color: var(--gold-primary); font-size:16px;">${ex.name.substring(0, 2).toUpperCase()}</div>
+          ${ex.logo}
         </div>
         <span class="exhibitor-stand">STAND ${ex.stand}</span>
       </div>
