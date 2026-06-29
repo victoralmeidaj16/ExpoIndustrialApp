@@ -8,7 +8,12 @@
 import {
   type FirestoreDataConverter,
   type QueryDocumentSnapshot,
+  doc,
+  updateDoc,
 } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+
+import { auth, db, storage } from '@/lib/firebase';
 
 export const SPONSORS_COLLECTION = 'sponsors';
 
@@ -20,6 +25,8 @@ export type Sponsor = {
   name: string;
   /** Texto exibido como "logo" no card (ex.: 'INTEL'). */
   logoText: string;
+  /** URL da logo enviada para o Firebase Storage. */
+  logoUrl?: string;
   tier: SponsorTier;
   /** Ordem dentro do mesmo tier (menor primeiro). */
   order: number;
@@ -59,8 +66,26 @@ export const sponsorConverter: FirestoreDataConverter<Sponsor> = {
       id: snapshot.id,
       name: data.name ?? '',
       logoText: data.logoText ?? '',
+      logoUrl: data.logoUrl ?? '',
       tier: (data.tier as SponsorTier) ?? 'SILVER',
       order: typeof data.order === 'number' ? data.order : 0,
     };
   },
 };
+
+export async function updateSponsorLogoUrl(id: string, logoUrl: string): Promise<void> {
+  if (!db) throw new Error('Firebase não configurado.');
+  await updateDoc(doc(db, SPONSORS_COLLECTION, id), { logoUrl });
+}
+
+export async function uploadSponsorLogo(sponsorId: string, uri: string): Promise<string> {
+  if (!storage || !auth?.currentUser) {
+    throw new Error('É preciso estar autenticado e o Firebase configurado.');
+  }
+  const uid = auth.currentUser.uid;
+  const response = await fetch(uri);
+  const blob = await response.blob();
+  const storageRef = ref(storage, `sponsors/${uid}/${sponsorId}-logo`);
+  await uploadBytes(storageRef, blob);
+  return getDownloadURL(storageRef);
+}

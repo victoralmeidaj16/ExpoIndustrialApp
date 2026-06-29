@@ -260,7 +260,11 @@ export default function HomeScreen() {
                   {sponsor.tier}
                 </Text>
               </View>
-              <Text style={styles.sponsorName}>{sponsor.logoText}</Text>
+              {sponsor.logoUrl ? (
+                <Image source={{ uri: sponsor.logoUrl }} style={styles.sponsorLogo} resizeMode="contain" />
+              ) : (
+                <Text style={styles.sponsorName}>{sponsor.logoText}</Text>
+              )}
             </View>
           ))}
         </ScrollView>
@@ -612,6 +616,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
     letterSpacing: 0.5,
+    marginTop: 10,
+  },
+  sponsorLogo: {
+    width: '100%',
+    height: 42,
     marginTop: 10,
   },
   onboardingBanner: {

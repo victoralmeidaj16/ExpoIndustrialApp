@@ -1,10 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import * as Linking from 'expo-linking';
 import { Redirect, router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -18,12 +21,13 @@ import { Brand, Radius, Spacing } from '@/constants/theme';
 import { useAdminExhibitors, useAdminRole, setExhibitorStatus, useAdminVisitors } from '@/features/admin/use-admin';
 import { useAuth } from '@/features/auth/use-auth';
 import { type Exhibitor } from '@/features/exhibitors/exhibitor';
-import { type VisitorProfile } from '@/features/visitor/visitor-profile';
 import { useSessions } from '@/features/agenda/use-sessions';
+import { updateSponsorLogoUrl, uploadSponsorLogo, type Sponsor } from '@/features/sponsors/sponsor';
 import { useSponsors } from '@/features/sponsors/use-sponsors';
 
 type StatusFilter = 'review' | 'published' | 'all';
 type QualityFilter = 'all' | 'missingStand' | 'missingLogo' | 'missingContact';
+type AdminTab = 'exhibitors' | 'visitors' | 'sponsors';
 
 const APPROVAL_ITEMS = [
   { key: 'logo', label: 'Logo' },
@@ -87,7 +91,7 @@ export default function PortalAdmin() {
   const { visitors, loading: visitorsLoading } = useAdminVisitors(isAdmin);
   const { sessions } = useSessions();
   const { sponsors } = useSponsors();
-  const [adminTab, setAdminTab] = useState<'exhibitors' | 'visitors'>('exhibitors');
+  const [adminTab, setAdminTab] = useState<AdminTab>('exhibitors');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('review');
   const [qualityFilter, setQualityFilter] = useState<QualityFilter>('all');
   const [search, setSearch] = useState('');
@@ -166,28 +170,34 @@ export default function PortalAdmin() {
     return haystack.includes(normalizedSearch);
   });
 
-  const filteredVisitors = useMemo(() => {
-    if (!normalizedSearch) return visitors;
-    return visitors.filter((item) => {
-      const haystack = normalizeSearch(
-        [
-          item.profile.name,
-          item.profile.role,
-          item.profile.company,
-          item.profile.marketRole,
-          item.profile.area,
-          ...(item.profile.sector ?? []),
-          ...(item.profile.objectives ?? []),
-          ...(item.profile.interests ?? []),
-          item.profile.email,
-          item.profile.phone,
-        ]
-          .filter(Boolean)
-          .join(' '),
-      );
-      return haystack.includes(normalizedSearch);
-    });
-  }, [visitors, normalizedSearch]);
+  const filteredVisitors = normalizedSearch
+    ? visitors.filter((item) => {
+        const haystack = normalizeSearch(
+          [
+            item.profile.name,
+            item.profile.role,
+            item.profile.company,
+            item.profile.marketRole,
+            item.profile.area,
+            ...(item.profile.sector ?? []),
+            ...(item.profile.objectives ?? []),
+            ...(item.profile.interests ?? []),
+            item.profile.email,
+            item.profile.phone,
+          ]
+            .filter(Boolean)
+            .join(' '),
+        );
+        return haystack.includes(normalizedSearch);
+      })
+    : visitors;
+
+  const filteredSponsors = normalizedSearch
+    ? sponsors.filter((sponsor) => {
+        const haystack = normalizeSearch([sponsor.name, sponsor.logoText, sponsor.tier].join(' '));
+        return haystack.includes(normalizedSearch);
+      })
+    : sponsors;
 
   async function changeStatus(item: Exhibitor, nextStatus: 'draft' | 'published') {
     if (nextStatus === 'published' && !isReadyForPublication(item)) {
@@ -202,6 +212,46 @@ export default function PortalAdmin() {
       await setExhibitorStatus(item.id, nextStatus);
     } catch (err) {
       Alert.alert('Erro', (err as Error).message);
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function pickSponsorLogo(sponsor: Sponsor) {
+    try {
+      if (Platform.OS !== 'web') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permissão necessária', 'Permita acesso à galeria para anexar a logo.');
+          return;
+        }
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [3, 2],
+        quality: 0.85,
+      });
+
+      if (result.canceled || !result.assets?.length) return;
+
+      setBusyId(sponsor.id);
+      const logoUrl = await uploadSponsorLogo(sponsor.id, result.assets[0].uri);
+      await updateSponsorLogoUrl(sponsor.id, logoUrl);
+    } catch (err) {
+      Alert.alert('Erro', (err as Error).message || 'Não foi possível enviar a logo.');
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function removeSponsorLogo(sponsor: Sponsor) {
+    setBusyId(sponsor.id);
+    try {
+      await updateSponsorLogoUrl(sponsor.id, '');
+    } catch (err) {
+      Alert.alert('Erro', (err as Error).message || 'Não foi possível remover a logo.');
     } finally {
       setBusyId(null);
     }
@@ -281,6 +331,21 @@ export default function PortalAdmin() {
             Visitantes ({visitors.length})
           </Text>
         </Pressable>
+        <Pressable
+          style={[styles.adminTabBtn, adminTab === 'sponsors' && styles.adminTabBtnActive]}
+          onPress={() => {
+            setAdminTab('sponsors');
+            setSearch('');
+          }}>
+          <Ionicons
+            name="ribbon-outline"
+            size={16}
+            color={adminTab === 'sponsors' ? Brand.gold : Brand.textMuted}
+          />
+          <Text style={[styles.adminTabBtnText, adminTab === 'sponsors' && styles.adminTabBtnTextActive]}>
+            Patrocinadores ({sponsors.length})
+          </Text>
+        </Pressable>
       </View>
 
       {adminTab === 'exhibitors' && missingStandCount > 0 && (
@@ -295,12 +360,18 @@ export default function PortalAdmin() {
       <View style={styles.sectionHeader}>
         <View>
           <Text style={styles.sectionTitle}>
-            {adminTab === 'exhibitors' ? 'Cadastros de expositores' : 'Cadastros de visitantes'}
+            {adminTab === 'exhibitors'
+              ? 'Cadastros de expositores'
+              : adminTab === 'visitors'
+                ? 'Cadastros de visitantes'
+                : 'Logos dos patrocinadores'}
           </Text>
           <Text style={styles.sectionMeta}>
             {adminTab === 'exhibitors'
               ? `${filtered.length} de ${exhibitors.length} cadastros · ${sessions.length} sessões · ${sponsors.length} patrocinadores`
-              : `${filteredVisitors.length} de ${visitors.length} visitantes cadastrados`}
+              : adminTab === 'visitors'
+                ? `${filteredVisitors.length} de ${visitors.length} visitantes cadastrados`
+                : `${filteredSponsors.length} de ${sponsors.length} patrocinadores · imagens exibidas na home`}
           </Text>
         </View>
         {(exhibitorsLoading || visitorsLoading) && <ActivityIndicator color={Brand.gold} />}
@@ -312,7 +383,13 @@ export default function PortalAdmin() {
           style={styles.searchInput}
           value={search}
           onChangeText={setSearch}
-          placeholder={adminTab === 'exhibitors' ? "Buscar por empresa, setor, status, contato ou estande" : "Buscar por nome, cargo, empresa, setor..."}
+          placeholder={
+            adminTab === 'exhibitors'
+              ? 'Buscar por empresa, setor, status, contato ou estande'
+              : adminTab === 'visitors'
+                ? 'Buscar por nome, cargo, empresa, setor...'
+                : 'Buscar por patrocinador, tier ou texto da logo'
+          }
           placeholderTextColor={Brand.textMuted}
           autoCapitalize="none"
         />
@@ -423,7 +500,7 @@ export default function PortalAdmin() {
               </View>
             );
           })
-        ) : (
+        ) : adminTab === 'visitors' ? (
           filteredVisitors.map((item) => (
             <View key={item.uid} style={styles.exhibitorCard}>
               <View style={styles.cardTop}>
@@ -539,6 +616,50 @@ export default function PortalAdmin() {
               </View>
             </View>
           ))
+        ) : (
+          filteredSponsors.map((sponsor) => (
+            <View key={sponsor.id} style={styles.exhibitorCard}>
+              <View style={styles.cardTop}>
+                <View style={styles.sponsorPreviewBox}>
+                  {sponsor.logoUrl ? (
+                    <Image source={{ uri: sponsor.logoUrl }} style={styles.sponsorPreviewImage} resizeMode="contain" />
+                  ) : (
+                    <Text style={styles.sponsorPreviewText}>{sponsor.logoText || sponsor.name}</Text>
+                  )}
+                </View>
+                <View style={styles.companyBlock}>
+                  <Text style={styles.companyName}>{sponsor.name}</Text>
+                  <Text style={styles.companyMeta}>
+                    {sponsor.tier} · ordem {sponsor.order} · {sponsor.logoUrl ? 'logo anexada' : 'sem imagem'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.cardFooter}>
+                <Text style={styles.ownerText} numberOfLines={1}>
+                  Fallback textual: {sponsor.logoText || sponsor.name}
+                </Text>
+                <View style={styles.sponsorActions}>
+                  {sponsor.logoUrl ? (
+                    <Pressable
+                      style={[styles.secondaryAction, busyId === sponsor.id && styles.actionDisabled]}
+                      disabled={busyId === sponsor.id}
+                      onPress={() => removeSponsorLogo(sponsor)}>
+                      <Text style={styles.secondaryActionText}>Remover</Text>
+                    </Pressable>
+                  ) : null}
+                  <Pressable
+                    style={[styles.primaryAction, busyId === sponsor.id && styles.actionDisabled]}
+                    disabled={busyId === sponsor.id}
+                    onPress={() => pickSponsorLogo(sponsor)}>
+                    <Text style={styles.primaryActionText}>
+                      {busyId === sponsor.id ? 'Enviando...' : sponsor.logoUrl ? 'Alterar logo' : 'Anexar logo'}
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          ))
         )}
 
         {adminTab === 'exhibitors' && !exhibitorsLoading && filtered.length === 0 && (
@@ -552,6 +673,13 @@ export default function PortalAdmin() {
           <View style={styles.emptyBox}>
             <Ionicons name="checkmark-circle-outline" size={24} color={Brand.success} />
             <Text style={styles.emptyText}>Nenhum visitante cadastrado ou correspondente à busca.</Text>
+          </View>
+        )}
+
+        {adminTab === 'sponsors' && filteredSponsors.length === 0 && (
+          <View style={styles.emptyBox}>
+            <Ionicons name="image-outline" size={24} color={Brand.textMuted} />
+            <Text style={styles.emptyText}>Nenhum patrocinador correspondente à busca.</Text>
           </View>
         )}
       </View>
@@ -794,6 +922,32 @@ const styles = StyleSheet.create({
   },
   adminTabBtnText: { color: Brand.textSecondary, fontSize: 13, fontWeight: '600' },
   adminTabBtnTextActive: { color: Brand.textPrimary, fontWeight: '700' },
+  sponsorPreviewBox: {
+    width: 86,
+    height: 58,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Brand.border,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.two,
+  },
+  sponsorPreviewImage: {
+    width: '100%',
+    height: '100%',
+  },
+  sponsorPreviewText: {
+    color: '#111827',
+    fontSize: 12,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  sponsorActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
   visitorDetails: {
     backgroundColor: Brand.bgPrimary,
     borderWidth: 1,

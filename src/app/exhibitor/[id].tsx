@@ -165,10 +165,6 @@ export default function ExhibitorScreen() {
           <Text style={styles.locText}>
             {booth.stand} · {booth.area}
           </Text>
-          <Pressable style={styles.locBtn} onPress={() => router.push('/map')}>
-            <Ionicons name="navigate" size={14} color={Brand.bgPrimary} />
-            <Text style={styles.locBtnText}>Como chegar</Text>
-          </Pressable>
         </View>
 
         {/* Sobre */}
@@ -464,16 +460,6 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
   },
   locText: { color: Brand.textPrimary, fontSize: 14, fontWeight: '600', flex: 1 },
-  locBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: Brand.gold,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: Radius.pill,
-  },
-  locBtnText: { color: Brand.bgPrimary, fontSize: 12.5, fontWeight: '800' },
 
   sectionTitle: { color: Brand.textPrimary, fontSize: 16, fontWeight: '700', marginTop: Spacing.one },
   about: { color: Brand.textSecondary, fontSize: 13.5, lineHeight: 20 },

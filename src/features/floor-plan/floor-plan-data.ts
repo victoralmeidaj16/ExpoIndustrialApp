@@ -314,3 +314,113 @@ export const getFloorObjects = (plan = expoIndustrialFloorPlan) => [...plan.zone
 
 export const getCommercialStands = (plan = expoIndustrialFloorPlan) =>
   plan.stands.filter((item) => item.category !== 'auditorium');
+
+export type FloorRoutePoint = { x: number; y: number };
+
+type WalkNode = FloorRoutePoint & { id: string };
+
+const WALKWAY_X = [155, 300, 500, 700, 845, 1020, 1120];
+const WALKWAY_Y = [100, 190, 325, 470, 575];
+
+const WALKWAY_NODES: WalkNode[] = [
+  { id: 'entrada', x: 568, y: 615 },
+  ...WALKWAY_Y.flatMap((y) => WALKWAY_X.map((x) => ({ id: `${x}:${y}`, x, y }))),
+];
+
+const EXTRA_WALKWAY_EDGES: [string, string][] = [
+  ['entrada', '500:575'],
+  ['entrada', '700:575'],
+];
+
+function pointDistance(a: FloorRoutePoint, b: FloorRoutePoint) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function nodeId(x: number, y: number) {
+  return `${x}:${y}`;
+}
+
+function buildWalkwayGraph() {
+  const edges = new Map<string, { id: string; cost: number }[]>();
+
+  function connect(a: string, b: string) {
+    const from = WALKWAY_NODES.find((node) => node.id === a);
+    const to = WALKWAY_NODES.find((node) => node.id === b);
+    if (!from || !to) return;
+    const cost = pointDistance(from, to);
+    edges.set(a, [...(edges.get(a) ?? []), { id: b, cost }]);
+    edges.set(b, [...(edges.get(b) ?? []), { id: a, cost }]);
+  }
+
+  for (const y of WALKWAY_Y) {
+    for (let idx = 0; idx < WALKWAY_X.length - 1; idx += 1) {
+      connect(nodeId(WALKWAY_X[idx], y), nodeId(WALKWAY_X[idx + 1], y));
+    }
+  }
+
+  for (const x of WALKWAY_X) {
+    for (let idx = 0; idx < WALKWAY_Y.length - 1; idx += 1) {
+      connect(nodeId(x, WALKWAY_Y[idx]), nodeId(x, WALKWAY_Y[idx + 1]));
+    }
+  }
+
+  EXTRA_WALKWAY_EDGES.forEach(([a, b]) => connect(a, b));
+  return edges;
+}
+
+const WALKWAY_GRAPH = buildWalkwayGraph();
+
+function nearestWalkwayNode(point: FloorRoutePoint) {
+  return WALKWAY_NODES.filter((node) => node.id !== 'entrada').reduce((best, node) =>
+    pointDistance(point, node) < pointDistance(point, best) ? node : best,
+  );
+}
+
+function shortestWalkwayPath(fromId: string, toId: string) {
+  const distances = new Map(WALKWAY_NODES.map((node) => [node.id, Number.POSITIVE_INFINITY]));
+  const previous = new Map<string, string | null>();
+  const pending = new Set(WALKWAY_NODES.map((node) => node.id));
+
+  distances.set(fromId, 0);
+
+  while (pending.size > 0) {
+    const current = [...pending].sort(
+      (a, b) => (distances.get(a) ?? Number.POSITIVE_INFINITY) - (distances.get(b) ?? Number.POSITIVE_INFINITY),
+    )[0];
+    if (!current || current === toId) break;
+    pending.delete(current);
+
+    for (const edge of WALKWAY_GRAPH.get(current) ?? []) {
+      if (!pending.has(edge.id)) continue;
+      const nextDistance = (distances.get(current) ?? Number.POSITIVE_INFINITY) + edge.cost;
+      if (nextDistance < (distances.get(edge.id) ?? Number.POSITIVE_INFINITY)) {
+        distances.set(edge.id, nextDistance);
+        previous.set(edge.id, current);
+      }
+    }
+  }
+
+  const path: string[] = [];
+  let current: string | null | undefined = toId;
+  while (current) {
+    path.unshift(current);
+    current = previous.get(current);
+  }
+
+  return path[0] === fromId ? path : [fromId, toId];
+}
+
+export function getRouteToFloorObject(target: FloorObject | null | undefined): FloorRoutePoint[] {
+  if (!target) return [];
+
+  const targetPoint = {
+    x: target.x + target.width / 2,
+    y: target.y + target.height / 2,
+  };
+  const nearest = nearestWalkwayNode(targetPoint);
+  const nodePath = shortestWalkwayPath('entrada', nearest.id)
+    .map((id) => WALKWAY_NODES.find((node) => node.id === id))
+    .filter((node): node is WalkNode => Boolean(node));
+
+  return [...nodePath.map(({ x, y }) => ({ x, y })), targetPoint];
+}

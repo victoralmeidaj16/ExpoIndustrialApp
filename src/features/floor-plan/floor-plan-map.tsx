@@ -1,11 +1,27 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import Svg, { Circle, G, Path, Rect, Text as SvgText } from 'react-native-svg';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
+import Svg, { Circle, G, Path, Polyline, Rect, Text as SvgText } from 'react-native-svg';
 
 import { Brand, Radius, Spacing } from '@/constants/theme';
 
-import { type FloorCategory, type FloorObject, expoIndustrialFloorPlan, getCommercialStands, getFloorObjects } from './floor-plan-data';
+import {
+  type FloorCategory,
+  type FloorObject,
+  expoIndustrialFloorPlan,
+  getCommercialStands,
+  getFloorObjects,
+  getRouteToFloorObject,
+} from './floor-plan-data';
 
 const PALETTE: Record<FloorCategory, string> = {
   standard: '#2F6BFF',
@@ -28,6 +44,11 @@ type FloorPlanMapProps = {
   onStandPress?: (standNumber: string) => void;
   /** Números de estande (normalizados) com expositor publicado — marca ocupação. */
   occupants?: Set<string>;
+  initialZoom?: number;
+  showDetails?: boolean;
+  style?: StyleProp<ViewStyle>;
+  mapCardStyle?: StyleProp<ViewStyle>;
+  zoomControlsStyle?: StyleProp<ViewStyle>;
 };
 
 function canShowLabel(item: FloorObject) {
@@ -38,14 +59,26 @@ function normalizeStandNumber(value: string | undefined) {
   return value?.replace(/\D/g, '').replace(/^0+/, '') ?? '';
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
 export function FloorPlanMap({
   highlightedStandNumber,
   highlightedTitle,
   highlightedSubtitle,
   onStandPress,
   occupants,
+  initialZoom = MAX_ZOOM,
+  showDetails = true,
+  style,
+  mapCardStyle,
+  zoomControlsStyle,
 }: FloorPlanMapProps) {
   const { width } = useWindowDimensions();
+  const horizontalRef = useRef<ScrollView>(null);
+  const verticalRef = useRef<ScrollView>(null);
+  const [viewport, setViewport] = useState({ width: 0, height: 0 });
   const plan = expoIndustrialFloorPlan;
   const objects = useMemo(() => {
     const categoryOrder: Record<FloorCategory, number> = {
@@ -69,15 +102,41 @@ export function FloorPlanMap({
     [commercialStands, highlightedStandNumber]
   );
   const [selectedFromMap, setSelectedFromMap] = useState<FloorObject | null>(null);
-  const selected = highlightedStand ?? selectedFromMap ?? commercialStands.find((item) => item.number === '86') ?? null;
-  const [zoom, setZoom] = useState(MAX_ZOOM);
+  const selected = highlightedStand ?? selectedFromMap;
+  const [zoom, setZoom] = useState(() => clamp(initialZoom, MIN_ZOOM, MAX_ZOOM));
   const mapWidth = Math.max(940, width * 2.25) * zoom;
   const mapHeight = (mapWidth / plan.hall.width) * plan.hall.height;
+  const routePoints = useMemo(() => getRouteToFloorObject(selected), [selected]);
+  const routePolyline = routePoints.map((point) => `${point.x},${point.y}`).join(' ');
+
+  useEffect(() => {
+    if (!selected || !viewport.width || !viewport.height) return;
+
+    const scale = mapWidth / plan.hall.width;
+    const targetX = (selected.x + selected.width / 2) * scale - viewport.width / 2;
+    const targetY = (selected.y + selected.height / 2) * scale - viewport.height / 2;
+
+    requestAnimationFrame(() => {
+      horizontalRef.current?.scrollTo({
+        x: clamp(targetX, 0, Math.max(0, mapWidth - viewport.width)),
+        animated: true,
+      });
+      verticalRef.current?.scrollTo({
+        y: clamp(targetY, 0, Math.max(0, mapHeight - viewport.height)),
+        animated: true,
+      });
+    });
+  }, [mapHeight, mapWidth, plan.hall.width, selected, viewport.height, viewport.width]);
 
   return (
-    <View style={styles.shell}>
-      <View style={styles.mapCard}>
-        <View style={styles.zoomControls}>
+    <View style={[styles.shell, style]}>
+      <View
+        style={[styles.mapCard, !showDetails && styles.mapCardFull, mapCardStyle]}
+        onLayout={(event) => {
+          const { width: nextWidth, height: nextHeight } = event.nativeEvent.layout;
+          setViewport({ width: nextWidth, height: nextHeight });
+        }}>
+        <View style={[styles.zoomControls, zoomControlsStyle]}>
           <Pressable
             accessibilityLabel="Aumentar zoom"
             style={styles.zoomButton}
@@ -96,8 +155,8 @@ export function FloorPlanMap({
             <Ionicons name="scan-outline" size={17} color={Brand.textPrimary} />
           </Pressable>
         </View>
-        <ScrollView horizontal bounces={false} showsHorizontalScrollIndicator>
-          <ScrollView bounces={false} showsVerticalScrollIndicator>
+        <ScrollView ref={horizontalRef} horizontal bounces={false} showsHorizontalScrollIndicator={false}>
+          <ScrollView ref={verticalRef} bounces={false} showsVerticalScrollIndicator={false}>
             <Svg width={mapWidth} height={mapHeight} viewBox={`0 0 ${plan.hall.width} ${plan.hall.height}`}>
               <Rect x={0} y={0} width={plan.hall.width} height={plan.hall.height} rx={16} fill="#141923" />
               <Path
@@ -107,6 +166,27 @@ export function FloorPlanMap({
                 strokeLinecap="round"
                 strokeDasharray="2 18"
               />
+
+              {routePoints.length > 1 ? (
+                <>
+                  <Polyline
+                    points={routePolyline}
+                    fill="none"
+                    stroke="rgba(14, 165, 233, 0.24)"
+                    strokeWidth={18}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <Polyline
+                    points={routePolyline}
+                    fill="none"
+                    stroke={Brand.cyan}
+                    strokeWidth={7}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </>
+              ) : null}
 
               {objects.map((item) => {
                 const isSelected = selected?.id === item.id;
@@ -136,6 +216,16 @@ export function FloorPlanMap({
                     {isOccupied ? (
                       <Circle cx={item.x + item.width - 5} cy={item.y + 5} r={3} fill={Brand.gold} />
                     ) : null}
+                    {isSelected ? (
+                      <Circle
+                        cx={item.x + item.width / 2}
+                        cy={item.y + item.height / 2}
+                        r={Math.max(12, item.width / 2 + 5)}
+                        fill="none"
+                        stroke="rgba(0, 200, 255, 0.34)"
+                        strokeWidth={4}
+                      />
+                    ) : null}
                     {label ? (
                       <SvgText
                         x={item.x + item.width / 2}
@@ -155,6 +245,7 @@ export function FloorPlanMap({
         </ScrollView>
       </View>
 
+      {showDetails ? (
       <View style={styles.detailsCard}>
         <View style={styles.detailIcon}>
           <Ionicons
@@ -174,6 +265,7 @@ export function FloorPlanMap({
           </Text>
         </View>
       </View>
+      ) : null}
     </View>
   );
 }
@@ -197,6 +289,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     maxHeight: 470,
     overflow: 'hidden',
+  },
+  mapCardFull: {
+    borderRadius: 0,
+    borderWidth: 0,
+    flex: 1,
+    maxHeight: 9999,
   },
   zoomControls: {
     backgroundColor: 'rgba(5, 8, 22, 0.88)',
