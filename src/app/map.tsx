@@ -1,16 +1,126 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
 
 import { Brand, Radius, Spacing } from '@/constants/theme';
 import { useExhibitors } from '@/features/exhibitors/use-exhibitors';
-import { FloorPlanMap } from '@/features/floor-plan/floor-plan-map';
+import { htmlSource } from '@/features/floor-plan/floor-plan-html';
 import { CATEGORY_COLOR, type Booth, type BoothCategory } from '@/features/venue/venue';
 
 const ALL_CATEGORIES = 'Todos';
 type CategoryFilter = typeof ALL_CATEGORIES | BoothCategory;
+
+type MapBridgeMessage = {
+  type: 'SELECT_STAND' | 'ROUTE_TO_STAND' | 'RESET_VIEW';
+  standNumber?: string;
+};
+
+type MapSelection = {
+  number?: string;
+  name?: string;
+  zone?: string;
+};
+
+const EMBEDDED_DETECTION_SOURCE =
+  'const isEmbedded = window.ReactNativeWebView !== undefined || navigator.userAgent.includes("ReactNativeWebView");';
+const EMBEDDED_DETECTION_TARGET =
+  'window.ReactNativeWebView = window.ReactNativeWebView || { postMessage: (payload) => window.parent && window.parent.postMessage(payload, "*") }; const isEmbedded = true;';
+const ROUTE_POINTS_SOURCE = `const points = [
+                start,
+                new THREE.Vector3(start.x, 0.2, end.z),
+                end
+            ];`;
+const ROUTE_POINTS_TARGET = `const points = criarRotaCorredores(start, end);
+
+            function criarRotaCorredores(startPoint, endPoint) {
+                const walkwayX = [155, 300, 500, 700, 845, 1020, 1120];
+                const walkwayY = [100, 190, 325, 470, 575];
+                const nodes = [{ id: 'entrada', x: startPoint.x, z: startPoint.z }];
+
+                walkwayY.forEach(y => {
+                    walkwayX.forEach(x => {
+                        const point = to3D(x, y, 0, 0);
+                        nodes.push({ id: x + ':' + y, x: point.x, z: point.z });
+                    });
+                });
+
+                const edges = new Map();
+                const nodeById = new Map(nodes.map(node => [node.id, node]));
+                const connect = (a, b) => {
+                    const from = nodeById.get(a);
+                    const to = nodeById.get(b);
+                    if (!from || !to) return;
+                    const cost = Math.hypot(from.x - to.x, from.z - to.z);
+                    edges.set(a, [...(edges.get(a) || []), { id: b, cost }]);
+                    edges.set(b, [...(edges.get(b) || []), { id: a, cost }]);
+                };
+
+                walkwayY.forEach(y => {
+                    for (let idx = 0; idx < walkwayX.length - 1; idx += 1) {
+                        connect(walkwayX[idx] + ':' + y, walkwayX[idx + 1] + ':' + y);
+                    }
+                });
+                walkwayX.forEach(x => {
+                    for (let idx = 0; idx < walkwayY.length - 1; idx += 1) {
+                        connect(x + ':' + walkwayY[idx], x + ':' + walkwayY[idx + 1]);
+                    }
+                });
+                connect('entrada', '500:575');
+                connect('entrada', '700:575');
+
+                const nearest = nodes
+                    .filter(node => node.id !== 'entrada')
+                    .reduce((best, node) =>
+                        Math.hypot(node.x - endPoint.x, node.z - endPoint.z) <
+                        Math.hypot(best.x - endPoint.x, best.z - endPoint.z) ? node : best
+                    );
+                const distances = new Map(nodes.map(node => [node.id, Number.POSITIVE_INFINITY]));
+                const previous = new Map();
+                const pending = new Set(nodes.map(node => node.id));
+                distances.set('entrada', 0);
+
+                while (pending.size > 0) {
+                    const current = Array.from(pending).sort(
+                        (a, b) => (distances.get(a) || Number.POSITIVE_INFINITY) -
+                        (distances.get(b) || Number.POSITIVE_INFINITY)
+                    )[0];
+                    if (!current || current === nearest.id) break;
+                    pending.delete(current);
+
+                    (edges.get(current) || []).forEach(edge => {
+                        if (!pending.has(edge.id)) return;
+                        const nextDistance = (distances.get(current) || Number.POSITIVE_INFINITY) + edge.cost;
+                        if (nextDistance < (distances.get(edge.id) || Number.POSITIVE_INFINITY)) {
+                            distances.set(edge.id, nextDistance);
+                            previous.set(edge.id, current);
+                        }
+                    });
+                }
+
+                const path = [];
+                let current = nearest.id;
+                while (current) {
+                    path.unshift(current);
+                    current = previous.get(current);
+                }
+
+                if (path[0] !== 'entrada') return [startPoint, endPoint];
+                return path
+                    .map(id => nodeById.get(id))
+                    .filter(Boolean)
+                    .map(node => new THREE.Vector3(node.x, 0.2, node.z))
+                    .concat(endPoint);
+            }`;
+
+function createEmbeddedMapHtml() {
+  return htmlSource
+    .replace('<body>', '<body class="embedded">')
+    .replace(EMBEDDED_DETECTION_SOURCE, EMBEDDED_DETECTION_TARGET)
+    .replace(ROUTE_POINTS_SOURCE, ROUTE_POINTS_TARGET);
+}
 
 function normalizeSearch(value: string) {
   return value
@@ -22,6 +132,10 @@ function normalizeSearch(value: string) {
 
 function standNumber(stand: string | undefined) {
   return stand?.replace(/\D/g, '') ?? '';
+}
+
+function normalizedStand(stand: string | undefined) {
+  return standNumber(stand).replace(/^0+/, '');
 }
 
 function matchesBooth(booth: Booth, query: string, category: CategoryFilter) {
@@ -50,71 +164,177 @@ export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ search?: string; stand?: string }>();
   const { exhibitors, source } = useExhibitors();
-  const [query, setQuery] = useState(() => (typeof params.search === 'string' ? params.search : ''));
+  const mapRef = useRef<WebView | HTMLIFrameElement | null>(null);
+  const [query, setQuery] = useState('');
   const [category, setCategory] = useState<CategoryFilter>(ALL_CATEGORIES);
   const [selectedBoothId, setSelectedBoothId] = useState<string | undefined>();
+  const [selectedMapStand, setSelectedMapStand] = useState<MapSelection | null>(null);
+  const [mapReady, setMapReady] = useState(false);
+  const [clientReady, setClientReady] = useState(false);
 
-  const standParam = typeof params.stand === 'string' ? standNumber(params.stand) : '';
+  const embeddedMapHtml = useMemo(createEmbeddedMapHtml, []);
+  const visibleExhibitors = clientReady ? exhibitors : [];
+  const standParam = clientReady && typeof params.stand === 'string' ? normalizedStand(params.stand) : '';
   const normalizedQuery = normalizeSearch(query);
 
   const categories = useMemo<CategoryFilter[]>(
-    () => [ALL_CATEGORIES, ...Array.from(new Set(exhibitors.map((booth) => booth.category)))],
-    [exhibitors],
+    () => [ALL_CATEGORIES, ...Array.from(new Set(visibleExhibitors.map((booth) => booth.category)))],
+    [visibleExhibitors],
   );
   const filteredBooths = useMemo(
-    () => exhibitors.filter((booth) => matchesBooth(booth, query, category)),
-    [category, exhibitors, query],
+    () => visibleExhibitors.filter((booth) => matchesBooth(booth, query, category)),
+    [category, query, visibleExhibitors],
   );
   const deepLinkedBooth = useMemo(
     () =>
       standParam
-        ? exhibitors.find((booth) => standNumber(booth.stand).replace(/^0+/, '') === standParam.replace(/^0+/, ''))
+        ? visibleExhibitors.find((booth) => normalizedStand(booth.stand) === standParam)
         : undefined,
-    [exhibitors, standParam],
+    [standParam, visibleExhibitors],
   );
   const selectedBooth =
-    exhibitors.find((booth) => booth.id === selectedBoothId) ??
+    visibleExhibitors.find((booth) => booth.id === selectedBoothId) ??
     deepLinkedBooth ??
     (normalizedQuery || category !== ALL_CATEGORIES ? filteredBooths[0] : undefined);
-  const highlightedStandNumber = selectedBooth ? standNumber(selectedBooth.stand) : standParam;
+  const highlightedStandNumber = selectedBooth
+    ? standNumber(selectedBooth.stand)
+    : selectedMapStand?.number ?? standParam;
   const resultPreview = normalizedQuery ? filteredBooths.slice(0, 5) : [];
-  const occupants = useMemo(
-    () =>
-      new Set(
-        exhibitors
-          .map((booth) => standNumber(booth.stand).replace(/^0+/, ''))
-          .filter(Boolean),
-      ),
-    [exhibitors],
+
+  const postMapMessage = useCallback((message: MapBridgeMessage) => {
+    const payload = JSON.stringify(message);
+
+    if (Platform.OS === 'web') {
+      (mapRef.current as HTMLIFrameElement | null)?.contentWindow?.postMessage(payload, '*');
+      return;
+    }
+
+    (mapRef.current as WebView | null)?.postMessage(payload);
+  }, []);
+
+  useEffect(() => {
+    setClientReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!clientReady || typeof params.search !== 'string') return;
+    setQuery(params.search);
+  }, [clientReady, params.search]);
+
+  const handleMapMessage = useCallback(
+    (rawData: unknown) => {
+      const data = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+      if (!data || typeof data !== 'object') return;
+
+      const message = data as { type?: string; number?: string; name?: string; zone?: string };
+      if (message.type === 'BOOTH_SELECTED') {
+        const stand = normalizedStand(message.number);
+        const booth = visibleExhibitors.find((item) => normalizedStand(item.stand) === stand);
+
+        setSelectedMapStand({
+          number: message.number ? standNumber(message.number) : undefined,
+          name: message.name,
+          zone: message.zone,
+        });
+
+        if (booth) {
+          setSelectedBoothId(booth.id);
+        } else {
+          setSelectedBoothId(undefined);
+        }
+      } else if (message.type === 'BOOTH_DESELECTED') {
+        setSelectedBoothId(undefined);
+        setSelectedMapStand(null);
+      }
+    },
+    [visibleExhibitors],
   );
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+
+    const onMessage = (event: MessageEvent) => {
+      if (event.source !== (mapRef.current as HTMLIFrameElement | null)?.contentWindow) return;
+
+      try {
+        handleMapMessage(event.data);
+      } catch {
+        // Ignore mensagens que nao pertencem a ponte do mapa.
+      }
+    };
+
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [handleMapMessage]);
+
+  useEffect(() => {
+    if (!mapReady || !highlightedStandNumber) return;
+
+    const timer = setTimeout(() => {
+      postMapMessage({
+        type: 'ROUTE_TO_STAND',
+        standNumber: highlightedStandNumber,
+      });
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [highlightedStandNumber, mapReady, postMapMessage]);
 
   function selectCategory(nextCategory: CategoryFilter) {
     setCategory(nextCategory);
     setSelectedBoothId(undefined);
+    setSelectedMapStand(null);
   }
 
   function selectBooth(booth: Booth) {
     setSelectedBoothId(booth.id);
+    setSelectedMapStand({
+      number: standNumber(booth.stand),
+      name: booth.company,
+      zone: booth.industry,
+    });
   }
 
-  function selectStandFromMap(nextStandNumber: string) {
-    const normalizedStand = standNumber(nextStandNumber).replace(/^0+/, '');
-    const booth = exhibitors.find((item) => standNumber(item.stand).replace(/^0+/, '') === normalizedStand);
-    if (booth) setSelectedBoothId(booth.id);
+  function handleWebViewMessage(event: any) {
+    try {
+      handleMapMessage(event.nativeEvent.data);
+    } catch (err) {
+      console.error('Error parsing message from map WebView:', err);
+    }
   }
 
   return (
     <View style={styles.screen}>
-      <FloorPlanMap
-        highlightedStandNumber={highlightedStandNumber}
-        onStandPress={selectStandFromMap}
-        occupants={occupants}
-        initialZoom={1.7}
-        showDetails={false}
-        style={StyleSheet.absoluteFill}
-        mapCardStyle={styles.fullMap}
-        zoomControlsStyle={styles.mapZoomControls}
-      />
+      <View style={styles.mapFrame}>
+        {!clientReady ? (
+          <View style={styles.mapPlaceholder} />
+        ) : Platform.OS === 'web' ? (
+          <iframe
+            ref={(node) => {
+              mapRef.current = node;
+            }}
+            srcDoc={embeddedMapHtml}
+            title="Mapa 3D real da Expo Industrial Sul"
+            style={styles.mapIframe as any}
+            onLoad={() => setMapReady(true)}
+          />
+        ) : (
+          <WebView
+            ref={(node) => {
+              mapRef.current = node;
+            }}
+            originWhitelist={['*']}
+            source={{ html: embeddedMapHtml }}
+            style={styles.webview}
+            onLoadEnd={() => setMapReady(true)}
+            onMessage={handleWebViewMessage}
+            javaScriptEnabled
+            domStorageEnabled
+            scrollEnabled={false}
+            bounces={false}
+          />
+        )}
+      </View>
 
       <View style={[styles.topOverlay, { paddingTop: insets.top + Spacing.two }]}>
         <View style={styles.searchRow}>
@@ -125,6 +345,7 @@ export default function MapScreen() {
               onChangeText={(value) => {
                 setQuery(value);
                 setSelectedBoothId(undefined);
+                setSelectedMapStand(null);
               }}
               placeholder="Buscar empresa, produto ou estande"
               placeholderTextColor={Brand.textMuted}
@@ -139,6 +360,8 @@ export default function MapScreen() {
                 onPress={() => {
                   setQuery('');
                   setSelectedBoothId(undefined);
+                  setSelectedMapStand(null);
+                  postMapMessage({ type: 'RESET_VIEW' });
                 }}>
                 <Ionicons name="close" size={16} color={Brand.textPrimary} />
               </Pressable>
@@ -216,13 +439,17 @@ export default function MapScreen() {
           </>
         ) : highlightedStandNumber ? (
           <>
-            <Text style={styles.bottomKicker}>Estande destacado</Text>
-            <Text style={styles.bottomTitle}>Estande {highlightedStandNumber}</Text>
+            <Text style={styles.bottomKicker}>{selectedMapStand?.zone ?? 'Estande destacado'}</Text>
+            <Text style={styles.bottomTitle} numberOfLines={1}>
+              {selectedMapStand?.name ?? `Estande ${highlightedStandNumber}`}
+            </Text>
             <Text style={styles.bottomText}>Rota sugerida pelos corredores a partir da entrada.</Text>
           </>
         ) : (
           <>
-            <Text style={styles.bottomKicker}>{source === 'firestore' ? 'Mapa sincronizado' : 'Mapa offline'}</Text>
+            <Text style={styles.bottomKicker}>
+              {clientReady && source === 'firestore' ? 'Mapa sincronizado' : 'Mapa offline'}
+            </Text>
             <Text style={styles.bottomTitle}>Toque em um estande</Text>
             <Text style={styles.bottomText}>Use a busca no topo ou aproxime o mapa para localizar empresas e serviços.</Text>
           </>
@@ -237,12 +464,22 @@ const styles = StyleSheet.create({
     backgroundColor: Brand.bgPrimary,
     flex: 1,
   },
-  fullMap: {
+  mapFrame: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: Brand.bgPrimary,
-    borderRadius: 0,
   },
-  mapZoomControls: {
-    top: 150,
+  webview: {
+    backgroundColor: Brand.bgPrimary,
+    flex: 1,
+  },
+  mapPlaceholder: {
+    backgroundColor: Brand.bgPrimary,
+    flex: 1,
+  },
+  mapIframe: {
+    borderWidth: 0,
+    height: '100%',
+    width: '100%',
   },
   topOverlay: {
     gap: Spacing.two,

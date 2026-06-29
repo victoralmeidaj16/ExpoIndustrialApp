@@ -35,7 +35,8 @@ const KPIS: { icon: IconName; value: string; label: string }[] = [
 const QUICK_ACTIONS: { icon: IconName; label: string; route?: string }[] = [
   { icon: 'qr-code-outline', label: 'Meu Crachá', route: '/profile' },
   { icon: 'map-outline', label: 'Mapa Smart', route: '/map' },
-  { icon: 'sparkles-outline', label: 'Matchmaking', route: '/matchmaking' },
+  { icon: 'sparkles-outline', label: 'Match IA', route: '/matchmaking' },
+  { icon: 'people-outline', label: 'Networking', route: '/connections' },
   { icon: 'calendar-outline', label: 'Agenda', route: '/agenda' },
 ];
 
@@ -229,7 +230,18 @@ export default function HomeScreen() {
         <SectionHeader title="Recomendado para hoje" actionLabel="Ver mais" />
         <View style={styles.recoList}>
           {RECOMMENDATIONS.map((item) => (
-            <Pressable key={item.title} style={styles.recoCard}>
+            <Pressable
+              key={item.title}
+              style={styles.recoCard}
+              onPress={() => {
+                if (item.tag === 'Match IA') {
+                  router.push('/matchmaking');
+                } else if (item.tag === 'Networking') {
+                  router.push('/connections');
+                } else if (item.tag === 'Palestra') {
+                  router.push('/agenda');
+                }
+              }}>
               <View style={[styles.recoAccent, { backgroundColor: item.accent }]} />
               <View style={styles.recoBody}>
                 <Text style={[styles.recoTag, { color: item.accent }]}>{item.tag.toUpperCase()}</Text>
@@ -508,8 +520,8 @@ const styles = StyleSheet.create({
   sectionAction: { color: Brand.gold, fontSize: 13, fontWeight: '600' },
 
   // Quick actions
-  quickRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  quickItem: { alignItems: 'center', gap: 8, width: 72 },
+  quickRow: { flexDirection: 'row', justifyContent: 'space-around', flexWrap: 'wrap', gap: 8 },
+  quickItem: { alignItems: 'center', gap: 8, width: 72, marginVertical: 4 },
   quickIcon: {
     width: 83,
     height: 83,
