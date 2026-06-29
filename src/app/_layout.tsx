@@ -81,6 +81,7 @@ export default function TabLayout() {
         <Tabs.Screen name="visitor" options={{ href: null }} />
         <Tabs.Screen name="assistant" options={{ href: null }} />
         <Tabs.Screen name="portal" options={{ href: null }} />
+        <Tabs.Screen name="preencher" options={{ href: null }} />
         <Tabs.Screen name="onboarding" options={{ href: null }} />
         <Tabs.Screen name="connections" options={{ href: null }} />
         </Tabs>
