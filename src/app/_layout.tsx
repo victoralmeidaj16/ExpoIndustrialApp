@@ -15,6 +15,7 @@ const TAB_ICONS: Record<string, { active: IconName; inactive: IconName }> = {
   map: { active: 'map', inactive: 'map-outline' },
   agenda: { active: 'calendar', inactive: 'calendar-outline' },
   exhibitors: { active: 'business', inactive: 'business-outline' },
+  connections: { active: 'people', inactive: 'people-outline' },
   profile: { active: 'person', inactive: 'person-outline' },
 };
 
@@ -76,6 +77,7 @@ export default function TabLayout() {
           <Tabs.Screen name="map" options={{ title: 'Mapa' }} />
           <Tabs.Screen name="agenda" options={{ title: 'Agenda' }} />
           <Tabs.Screen name="exhibitors" options={{ title: 'Expositores' }} />
+          <Tabs.Screen name="connections" options={{ title: 'Networking' }} />
           <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
           {/* Rotas acessíveis por navegação, mas fora da barra de abas */}
         <Tabs.Screen name="matchmaking" options={{ href: null }} />
@@ -86,7 +88,6 @@ export default function TabLayout() {
         <Tabs.Screen name="portal" options={{ href: null }} />
         <Tabs.Screen name="preencher" options={{ href: null }} />
         <Tabs.Screen name="onboarding" options={{ href: null }} />
-        <Tabs.Screen name="connections" options={{ href: null }} />
         </Tabs>
       </AuthProvider>
     </GestureHandlerRootView>

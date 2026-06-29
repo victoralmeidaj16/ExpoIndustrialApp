@@ -208,7 +208,7 @@ export default function ConnectionsScreen() {
         </Pressable>
         <Text style={styles.headerTitle}>Conectar Pessoas</Text>
         <Pressable onPress={startScanning} style={styles.backBtn}>
-          <Ionicons name="scan-outline" size={20} color={Brand.gold} />
+          <Ionicons name="qr-code-outline" size={20} color={Brand.gold} />
         </Pressable>
       </View>
 
