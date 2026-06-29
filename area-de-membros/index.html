@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área de Membros | Ápice Educação Executiva & Expo Industrial Sul</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar de Navegação Premium -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-wrapper">
+          <img src="../assets/cropped-apice-logo-menu-1-1 (1).png" alt="Ápice Educação Executiva" class="brand-logo-apice">
+          <div class="brand-divider"></div>
+          <img src="../assets/LOGO-EXPOINDUSTRIAL-2026-2048x310 (1).png" alt="Expo Industrial Sul" class="brand-logo-expo">
+        </div>
+        <span class="badge-365">COMUNIDADE 365</span>
+      </div>
+      
+      <nav class="sidebar-menu">
+        <a class="menu-item active" data-view="dashboard">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="menu-item" data-view="feed">
+          <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+          <span>Feed</span>
+        </a>
+        <a class="menu-item" data-view="community">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Comunidade</span>
+        </a>
+        <a class="menu-item" data-view="library">
+          <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span>Biblioteca</span>
+        </a>
+        <a class="menu-item" data-view="networking">
+          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Networking</span>
+        </a>
+        <a class="menu-item" data-view="marketplace">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>Marketplace</span>
+        </a>
+        <a class="menu-item" data-view="agenda">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Agenda Anual</span>
+        </a>
+        <a class="menu-item" data-view="ia">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+          <span>IA Assistente</span>
+        </a>
+        <a class="menu-item" data-view="profile">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Meu Perfil</span>
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="user-avatar" id="sidebarAvatar">VA</div>
+        <div class="user-info">
+          <span class="user-name" id="sidebarName">Victor Almeida</span>
+          <span class="user-role">Diretor Industrial</span>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Área de Conteúdo Principal -->
+    <main class="main-layout">
+      <header class="top-header">
+        <div class="search-bar-container">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Busque por soluções, especialistas, e-books..." class="search-input" id="globalSearch">
+        </div>
+        
+        <div class="header-actions">
+          <button class="action-btn-icon" id="openScannerBtn" title="Escanear QR Code de Visita">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="7" y1="7" x2="9" y2="7"/><line x1="7" y1="9" x2="7" y2="11"/><line x1="9" y1="11" x2="11" y2="11"/><rect x="13" y="13" width="4" height="4"/></svg>
+          </button>
+          
+          <button class="action-btn-icon" title="Notificações">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="badge-notification"></span>
+          </button>
+        </div>
+      </header>
+      
+      <div class="content-body" id="contentBody">
+        
+        <!-- PÁGINA 1: DASHBOARD -->
+        <section class="view-panel active" id="view-dashboard">
+          <!-- Hero Section Premium -->
+          <div class="dashboard-hero">
+            <div class="hero-text-content">
+              <span class="hero-tag">Ápice + Expo Industrial Sul</span>
+              <h2 class="hero-title">Hub Permanente da Indústria 4.0</h2>
+              <p class="hero-desc">Seja bem-vindo, Victor! Conecte-se com os maiores players do mercado, acesse materiais executivos e feche negócios durante os 365 dias do ano.</p>
+              <div style="display:flex; gap:12px; margin-top:8px;">
+                <button class="btn-primary" onclick="switchView('ia')" style="background-color:#ffffff; color:#09090b; border-color:#ffffff;">Falar com a IA</button>
+                <button class="btn-secondary" onclick="switchView('networking')" style="background:transparent; color:#ffffff; border-color:rgba(255,255,255,0.2);">Ver Especialistas</button>
+              </div>
+            </div>
+            <div class="hero-image-wrapper">
+              <img src="../assets/apice-e-expo (1).png" alt="Ápice & Expo Industrial" class="hero-image">
+            </div>
+          </div>
+          
+          <!-- Card de Insight de IA -->
+          <div class="ia-insight-card">
+            <div class="ia-insight-icon-big">
+              <svg viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            </div>
+            <div class="ia-insight-content">
+              <span class="ia-insight-tag">Recomendação IA de Matchmaking</span>
+              <p class="ia-insight-text" id="dashboardIaRecommendation">Identificamos que 3 novos expositores no Marketplace oferecem a tecnologia de "Manutenção Preditiva com IoT" que você marcou como interesse no seu perfil. Deseja iniciar uma conversa inteligente?</p>
+            </div>
+          </div>
+          
+          <!-- Row de KPIs -->
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Conexões Estabelecidas</span>
+                <div class="kpi-icon-wrapper gold">
+                  <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                </div>
+              </div>
+              <span class="kpi-value" id="kpiConexoes">24</span>
+              <span class="kpi-trend up">+3 esta semana</span>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Reuniões Agendadas</span>
+                <div class="kpi-icon-wrapper">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+                </div>
+              </div>
+              <span class="kpi-value" id="kpiReunioes">4</span>
+              <span class="kpi-trend up">Próxima em 2 dias</span>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Conteúdos Consumidos</span>
+                <div class="kpi-icon-wrapper">
+                  <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+              </div>
+              <span class="kpi-value">12 / 30</span>
+              <span class="kpi-trend up">60% da trilha atual</span>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Pontuação Geral</span>
+                <div class="kpi-icon-wrapper gold">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                </div>
+              </div>
+              <span class="kpi-value" id="kpiPontos">1,250 XP</span>
+              <span class="kpi-trend up">Nível 3 Bronze</span>
+            </div>
+          </div>
+          
+          <!-- Seção de Materiais, PDFs e Recursos Técnicos -->
+          <div class="materials-section">
+            <h3 class="section-title-premium">Recursos Técnicos & Materiais de Apoio</h3>
+            <div class="materials-grid">
+              <div class="material-card" onclick="watchContent('Guia de Eficiência Energética Industrial')">
+                <div class="material-icon-box">
+                  <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div class="material-info">
+                  <span class="material-name">Manual de Eficiência Energética</span>
+                  <span class="material-author">WEG Equipamentos</span>
+                  <div class="material-meta">
+                    <span class="material-badge">PDF</span>
+                    <span>4.2 MB</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="material-card" onclick="watchContent('Liderança Exponencial na Indústria 4.0')">
+                <div class="material-icon-box">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+                </div>
+                <div class="material-info">
+                  <span class="material-name">Slides: Liderança Exponencial</span>
+                  <span class="material-author">Ápice Educação Executiva</span>
+                  <div class="material-meta">
+                    <span class="material-badge">Slides</span>
+                    <span>8.5 MB</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="material-card" onclick="watchContent('Implementação Prática de Gêmeos Digitais')">
+                <div class="material-icon-box">
+                  <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div class="material-info">
+                  <span class="material-name">Whitepaper: Gêmeos Digitais</span>
+                  <span class="material-author">Siemens Brasil</span>
+                  <div class="material-meta">
+                    <span class="material-badge">PDF</span>
+                    <span>3.1 MB</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Duas Colunas do Dashboard -->
+          <div class="feed-layout">
+            <div>
+              <h2 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px;">Novidades da Comunidade</h2>
+              <div id="dashboardFeedContainer">
+                <!-- Posts recentes inseridos via JS -->
+              </div>
+            </div>
+            
+            <div class="feed-aside">
+              <div class="aside-card">
+                <h3 class="aside-card-title">Empresas em Destaque</h3>
+                <div class="aside-list" id="dashboardSponsors">
+                  <!-- Empresas patrocinadoras -->
+                </div>
+              </div>
+              
+              <div class="aside-card">
+                <h3 class="aside-card-title">Oportunidades de Negócios</h3>
+                <div class="opportunity-bar-chart">
+                  <div class="op-bar-item">
+                    <div class="op-bar-labels">
+                      <span class="op-bar-label">Automação de Linhas</span>
+                      <span class="op-bar-value">R$ 1.2M</span>
+                    </div>
+                    <div class="op-bar-container">
+                      <div class="op-bar-fill" style="width: 80%;"></div>
+                    </div>
+                  </div>
+                  <div class="op-bar-item">
+                    <div class="op-bar-labels">
+                      <span class="op-bar-label">Manutenção Industrial IoT</span>
+                      <span class="op-bar-value">R$ 750k</span>
+                    </div>
+                    <div class="op-bar-container">
+                      <div class="op-bar-fill" style="width: 55%;"></div>
+                    </div>
+                  </div>
+                  <div class="op-bar-item">
+                    <div class="op-bar-labels">
+                      <span class="op-bar-label">Eficiência Energética</span>
+                      <span class="op-bar-value">R$ 450k</span>
+                    </div>
+                    <div class="op-bar-container">
+                      <div class="op-bar-fill" style="width: 35%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- PÁGINA 2: FEED -->
+        <section class="view-panel" id="view-feed">
+          <div class="view-title-section">
+            <div>
+              <h1 class="view-title">Feed da Indústria</h1>
+              <p class="view-subtitle">Acompanhe cases de sucesso, novidades e lançamentos de expositores e membros.</p>
+            </div>
+          </div>
+          
+          <div class="feed-layout">
+            <div>
+              <!-- Compartilhamento de Posts -->
+              <div class="feed-creator-card">
+                <div class="feed-creator-input-row">
+                  <div class="user-avatar">VA</div>
+                  <input type="text" placeholder="Compartilhe um case de sucesso ou oportunidade industrial..." class="feed-creator-input" id="postInput">
+                </div>
+                <div class="feed-creator-actions">
+                  <button class="feed-creator-act-btn">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Imagem
+                  </button>
+                  <button class="feed-creator-act-btn">
+                    <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                    Vídeo
+                  </button>
+                  <button class="btn-primary" style="padding: 6px 16px; font-size: 13px;" id="publishPostBtn">Publicar</button>
+                </div>
+              </div>
+              
+              <!-- Feed de postagens -->
+              <div id="feedPostsContainer"></div>
+            </div>
+            
+            <div class="feed-aside">
+              <div class="aside-card">
+                <h3 class="aside-card-title">Vagas & Oportunidades</h3>
+                <div class="aside-list" id="feedJobsContainer">
+                  <!-- Vagas industriais -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- PÁGINA 3: COMUNIDADE -->
+        <section class="view-panel" id="view-community">
+          <div class="view-title-section">
+            <div>
+              <h1 class="view-title">Comunidade & Fóruns</h1>
+              <p class="view-subtitle">Participe de discussões técnicas, tire dúvidas de engenharia e faça networking focado.</p>
+            </div>
+            <button class="btn-primary">Criar Tópico</button>
+          </div>
+          
+          <div class="community-forum-grid" id="communityRoomsGrid">
+            <!-- Tópicos do Fórum inseridos por JS -->
+          </div>
+        </section>
+        
+        <!-- PÁGINA 4: BIBLIOTECA -->
+        <section class="view-panel" id="view-library">
+          <div class="view-title-section">
+            <div>
+              <h1 class="view-title">Biblioteca de Conhecimento</h1>
+              <p class="view-subtitle">Palestras exclusivas, workshops, e-books e artigos técnicos da Ápice e parceiros.</p>
+            </div>
+          </div>
+          
+          <div class="library-filters">
+            <button class="pill-filter active" data-lib-filter="todos">Todos</button>
+            <button class="pill-filter" data-lib-filter="palestra">Palestras</button>
+            <button class="pill-filter" data-lib-filter="workshop">Workshops</button>
+            <button class="pill-filter" data-lib-filter="ebook">E-books</button>
+            <button class="pill-filter" data-lib-filter="artigo">Artigos Técnicos</button>
+          </div>
+          
+          <div class="library-grid" id="libraryGrid">
+            <!-- Conteúdo da Biblioteca -->
+          </div>
+        </section>
+        
+        <!-- PÁGINA 5: NETWORKING -->
+        <section class="view-panel" id="view-networking">
+          <div class="view-title-section">
+            <div>
+              <h1 class="view-title">Networking Direcionado</h1>
+              <p class="view-subtitle">Encontre decisores, investidores, especialistas e compradores ativos no ecossistema.</p>
+            </div>
+          </div>
+          
+          <div class="filter-row-container">
+            <div class="filter-inputs-group">
+              <select class="filter-select" id="netFilterSegment">
+                <option value="todos">Todos os Segmentos</option>
+                <option value="automotivo">Automotivo</option>
+                <option value="automacao">Automação & IoT</option>
+                <option value="metalurgico">Metalúrgico</option>
+                <option value="quimico">Químico</option>
+                <option value="alimentos">Alimentos & Bebidas</option>
+              </select>
+              
+              <select class="filter-select" id="netFilterRole">
+                <option value="todos">Todos os Cargos</option>
+                <option value="ceo">CEO / Diretor</option>
+                <option value="engenheiro">Engenheiro / Técnico</option>
+                <option value="comprador">Comprador / Supply Chain</option>
+                <option value="especialista">Especialista Ápice</option>
+              </select>
+              
+              <select class="filter-select" id="netFilterState">
+                <option value="todos">Todos os Estados</option>
+                <option value="SC">Santa Catarina</option>
+                <option value="PR">Paraná</option>
+                <option value="RS">Rio Grande do Sul</option>
+                <option value="SP">São Paulo</option>
+              </select>
+            </div>
+            
+            <button class="btn-gold" id="clearNetFilters">Limpar Filtros</button>
+          </div>
+          
+          <div class="networking-grid" id="networkingGrid">
+            <!-- Usuários para networking -->
+          </div>
+        </section>
+        
+        <!-- PÁGINA 6: MARKETPLACE INDUSTRIAL -->
+        <section class="view-panel" id="view-marketplace">
+          <div class="view-title-section">
+            <div>
+              <h1 class="view-title">Marketplace & Catálogo de Expositores</h1>
+              <p class="view-subtitle">Pesquise por tecnologias inovadoras, catálogos de produtos e solicite cotações diretas.</p>
+            </div>
+          </div>
+          
+          <div class="filter-row-container">
+            <div class="filter-inputs-group">
+              <select class="filter-select" id="marketFilterTech">
+                <option value="todos">Todas as Tecnologias</option>
+                <option value="iot">Internet das Coisas (IoT)</option>
+                <option value="robotica">Robótica & Células</option>
+                <option value="manutencao">Manutenção Preditiva</option>
+                <option value="software">Sistemas MES / ERP</option>
+                <option value="maquinas">Máquinas & Equipamentos</option>
+              </select>
+              
+              <select class="filter-select" id="marketFilterCategory">
+                <option value="todos">Todas as Categorias</option>
+                <option value="patrocinador">Patrocinador Master</option>
+                <option value="expositor">Expositor Regular</option>
+              </select>
+            </div>
+            <button class="btn-gold" id="clearMarketFilters">Limpar Filtros</button>
+          </div>
+          
+          <div class="marketplace-grid" id="marketplaceGrid">
+            <!-- Cards de expositores -->
+          </div>
+        </section>
+        
+        <!-- PÁGINA 7: AGENDA ANUAL -->
+        <section class="view-panel" id="view-agenda">
+          <div class="view-title-section">
+            <div>
+              <h1 class="view-title">Agenda Anual de Eventos</h1>
+              <p class="view-subtitle">Fique por dentro das datas de feiras, lives, visitas técnicas e aulas magnas da Ápice.</p>
+            </div>
+          </div>
+          
+          <div class="agenda-layout">
+            <div class="calendar-wrapper">
+              <div class="calendar-header-row">
+                <span class="calendar-month-year">Novembro 2026</span>
+                <div class="calendar-nav-buttons">
+                  <button class="calendar-nav-btn">
+                    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                  </button>
+                  <button class="calendar-nav-btn">
+                    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="calendar-grid-days">
+                <span>DOM</span><span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span>
+              </div>
+              
+              <div class="calendar-grid-numbers" id="calendarGridNumbers">
+                <!-- Dias do calendário renderizados via JS -->
+              </div>
+            </div>
+            
+            <div class="event-details-panel">
+              <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px;">Próximos Eventos</h3>
+              <div class="agenda-list" id="agendaEventsList">
+                <!-- Lista de eventos no mês -->
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- PÁGINA 8: IA ASSISTENTE -->
+        <section class="view-panel" id="view-ia">
+          <div class="view-title-section">
+            <div>
+              <h1 class="view-title">IA Assistente Industrial</h1>
+              <p class="view-subtitle">Faça perguntas sobre tendências da indústria, recomende fornecedores ou crie trilhas de aprendizado.</p>
+            </div>
+          </div>
+          
+          <div class="ia-chat-layout">
+            <div class="ia-chat-sidebar">
+              <div class="ia-chat-sidebar-header">Conversas Recentes</div>
+              <div class="ia-chat-history-list">
+                <div class="ia-chat-history-item active">Matchmaking & Fornecedores</div>
+                <div class="ia-chat-history-item">Resumo da Palestra IoT</div>
+                <div class="ia-chat-history-item">Trilha de Liderança Indústria 4.0</div>
+              </div>
+            </div>
+            
+            <div class="ia-chat-main">
+              <div class="ia-chat-header">
+                <div class="ia-chat-bot-avatar">
+                  <svg viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                </div>
+                <div class="ia-chat-bot-info">
+                  <span class="ia-chat-bot-name">Ápice IA SmartMatch</span>
+                  <span class="ia-chat-bot-status">Disponível para negócios</span>
+                </div>
+              </div>
+              
+              <div class="ia-chat-messages-container" id="chatMessages">
+                <div class="ia-chat-message-bubble bot">
+                  Olá, Victor! Sou o assistente de IA oficial da Ápice & Expo Industrial Sul. Como posso ajudar o seu negócio hoje? Posso sugerir conexões de fornecedores, fazer resumos ou guiar você pelas palestras gravadas.
+                </div>
+              </div>
+              
+              <div class="ia-chat-input-area">
+                <form class="ia-chat-form" id="chatForm">
+                  <input type="text" placeholder="Pergunte sobre fornecedores, palestras ou conexões..." class="ia-chat-input" id="chatInput">
+                  <button type="submit" class="btn-primary">Enviar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- PÁGINA 9: MEU PERFIL -->
+        <section class="view-panel" id="view-profile">
+          <div class="view-title-section">
+            <div>
+              <h1 class="view-title">Meu Perfil Profissional</h1>
+              <p class="view-subtitle">Gerencie suas conquistas, credencial virtual, conexões e preferências de matchmaking.</p>
+            </div>
+          </div>
+          
+          <div class="profile-grid">
+            <div class="profile-card-left">
+              <div class="networking-avatar-big" style="width: 100px; height: 100px; font-size: 32px;">VA</div>
+              <h2 class="view-title" style="font-size: 20px;" id="profileName">Victor Almeida</h2>
+              <p class="view-subtitle" style="margin-bottom: 12px;">Diretor Industrial na SulMotores</p>
+              <span class="badge-exhibitor" style="background-color: var(--gold-light); color: var(--gold-primary); font-size: 11px;">Membro Premium</span>
+              
+              <div class="profile-xp-box">
+                <div class="profile-xp-header">
+                  <span>Progresso do Nível 3</span>
+                  <span id="profileXpText">1.250 / 2.000 XP</span>
+                </div>
+                <div class="profile-xp-bar-container">
+                  <div class="profile-xp-bar-fill" id="profileXpBar"></div>
+                </div>
+              </div>
+              
+              <!-- Crachá Virtual Oficial -->
+              <div class="profile-badge-digital">
+                <span class="profile-badge-header">Expo Industrial Sul</span>
+                <div class="profile-badge-qr">
+                  <!-- QR Code gerado por SVG inline para evitar quebra de imagens -->
+                  <svg viewBox="0 0 100 100" style="width:100%; height:100%;">
+                    <rect width="100" height="100" fill="white"/>
+                    <rect x="10" y="10" width="10" height="10" fill="black"/>
+                    <rect x="25" y="10" width="5" height="10" fill="black"/>
+                    <rect x="35" y="10" width="15" height="5" fill="black"/>
+                    <rect x="60" y="10" width="30" height="30" fill="black"/>
+                    <rect x="70" y="20" width="10" height="10" fill="white"/>
+                    <rect x="10" y="60" width="30" height="30" fill="black"/>
+                    <rect x="20" y="70" width="10" height="10" fill="white"/>
+                    <rect x="50" y="50" width="10" height="15" fill="black"/>
+                    <rect x="70" y="50" width="20" height="10" fill="black"/>
+                    <rect x="60" y="70" width="25" height="20" fill="black"/>
+                  </svg>
+                </div>
+                <span class="profile-badge-footer">CREDENCIAL VIRTUAL</span>
+              </div>
+            </div>
+            
+            <div class="profile-details-right">
+              <div class="profile-section-card">
+                <h3 class="profile-section-title">Minhas Conquistas (Badges)</h3>
+                <div class="achievements-grid">
+                  <div class="achievement-card">
+                    <div class="achievement-icon">
+                      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <div class="achievement-info">
+                      <span class="achievement-title">Visionário 365</span>
+                      <span class="achievement-desc">Primeiro acesso à Área</span>
+                    </div>
+                  </div>
+                  <div class="achievement-card">
+                    <div class="achievement-icon">
+                      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </div>
+                    <div class="achievement-info">
+                      <span class="achievement-title">Foco em IA</span>
+                      <span class="achievement-desc">Fez 5 perguntas à IA</span>
+                    </div>
+                  </div>
+                  <div class="achievement-card">
+                    <div class="achievement-icon">
+                      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div class="achievement-info">
+                      <span class="achievement-title">Conector B2B</span>
+                      <span class="achievement-desc">Estabeleceu 5 conexões</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="profile-section-card">
+                <h3 class="profile-section-title">Interesses e Tecnologias</h3>
+                <div class="exhibitor-tag-group">
+                  <span class="exhibitor-tag" style="background-color: var(--gold-light); color: var(--gold-primary); font-weight:600;">Internet das Coisas (IoT)</span>
+                  <span class="exhibitor-tag" style="background-color: var(--gold-light); color: var(--gold-primary); font-weight:600;">Manutenção Preditiva</span>
+                  <span class="exhibitor-tag">Robótica</span>
+                  <span class="exhibitor-tag">Eficiência Energética</span>
+                  <span class="exhibitor-tag">Gestão Industrial</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+      </div>
+    </main>
+  </div>
+
+  <!-- Dialog Nativo para Detalhes de Empresa (Marketplace) -->
+  <dialog id="exhibitorModal" class="premium-modal" closedby="any">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalExhibitorName">Nome do Expositor</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('exhibitorModal').close()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p id="modalExhibitorDesc" style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);"></p>
+      
+      <div style="margin-top: 12px;">
+        <h4 style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Tecnologias & Soluções</h4>
+        <div class="exhibitor-tag-group" id="modalExhibitorTags"></div>
+      </div>
+      
+      <div style="margin-top: 12px;" id="modalExhibitorProductsSection">
+        <h4 style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Produtos em Destaque</h4>
+        <ul id="modalExhibitorProducts" style="font-size: 13px; color: var(--text-secondary); padding-left: 20px; display: flex; flex-direction: column; gap: 4px;"></ul>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="document.getElementById('exhibitorModal').close()">Fechar</button>
+      <button class="btn-primary" id="modalMatchBtn">Matchmaking Direto</button>
+    </div>
+  </dialog>
+
+  <!-- Dialog Nativo para Scanner de QR Code -->
+  <dialog id="scannerModal" class="premium-modal" closedby="any">
+    <div class="modal-header">
+      <h3 class="modal-title">Escanear Crachá Virtual</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('scannerModal').close()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="align-items: center; justify-content: center; text-align: center; gap: 20px;">
+      <p style="font-size: 13px;">Aponte a câmera para o QR Code da credencial do visitante ou expositor para adicioná-lo à sua rede.</p>
+      
+      <!-- Simulação de Câmera/Scanner de Alta Qualidade -->
+      <div style="width: 240px; height: 240px; border: 2px dashed var(--gold-primary); border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #000;">
+        <div style="position: absolute; top:0; left:0; width:100%; height:2px; background-color: var(--gold-primary); animation: scannerAnimation 2s linear infinite;"></div>
+        <svg viewBox="0 0 100 100" style="width: 140px; height: 140px; opacity: 0.2;">
+          <rect width="100" height="100" fill="none" stroke="white" stroke-width="2"/>
+          <rect x="10" y="10" width="30" height="30" fill="white"/>
+        </svg>
+        <span style="color: #fff; font-size: 11px; font-weight: 500; position: absolute; bottom: 10px;">Simulador de Câmera Ativo</span>
+      </div>
+      
+      <div style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
+        <button class="btn-gold" id="triggerScanSim">Simular Scanner (Detectar Usuário)</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="document.getElementById('scannerModal').close()">Cancelar</button>
+    </div>
+  </dialog>
+
+  <style>
+    @keyframes scannerAnimation {
+      0% { top: 0; }
+      50% { top: 100%; }
+      100% { top: 0; }
+    }
+  </style>
+
+  <script src="app.js"></script>
+</body>
+</html>
