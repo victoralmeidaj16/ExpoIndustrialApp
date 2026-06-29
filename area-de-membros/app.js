@@ -1,6 +1,19 @@
-// DADOS MOCKADOS — ÁREA DE MEMBROS PREMIUM (ÁPICE + EXPO INDUSTRIAL SUL)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const MOCK_EXHIBITORS = [
+const firebaseConfig = {
+  apiKey: "AIzaSyAH39np25SikgJvUCdt8lXWqs03Ys-QS7A",
+  authDomain: "movie-app-ddda3.firebaseapp.com",
+  projectId: "movie-app-ddda3",
+  storageBucket: "movie-app-ddda3.firebasestorage.app",
+  messagingSenderId: "578798374943",
+  appId: "1:578798374943:web:befd055b267db581fa052a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let MOCK_EXHIBITORS = [
   {
     id: 1,
     name: "WEG Equipamentos",
@@ -58,7 +71,7 @@ const MOCK_EXHIBITORS = [
   }
 ];
 
-const MOCK_NETWORKING = [
+let MOCK_NETWORKING = [
   {
     id: 1,
     name: "Eduardo Santos",
@@ -116,7 +129,7 @@ const MOCK_NETWORKING = [
   }
 ];
 
-const MOCK_LIBRARY = [
+let MOCK_LIBRARY = [
   {
     id: 1,
     title: "Aula Magna: Liderança Exponencial na Indústria 4.0",
@@ -155,7 +168,7 @@ const MOCK_LIBRARY = [
   }
 ];
 
-const MOCK_FEED = [
+let MOCK_FEED = [
   {
     id: 1,
     author: "Eduardo Santos",
@@ -180,13 +193,13 @@ const MOCK_FEED = [
   }
 ];
 
-const MOCK_FORUMS = [
+let MOCK_FORUMS = [
   { id: 1, title: "Indústria 4.0 & Conectividade", desc: "Debates sobre infraestrutura industrial 5G, sensores IoT e integração de barramentos.", members: 142, topics: 34, icon: "iot" },
   { id: 2, title: "Liderança Executiva Industrial", desc: "Espaço dedicado a gestores, diretores e CEOs para compartilhar cases de gestão de times.", members: 98, topics: 18, icon: "ceo" },
   { id: 3, title: "Manutenção & Confiabilidade", desc: "Melhores práticas de manutenção preditiva, análise de vibração e automação de alertas.", members: 110, topics: 27, icon: "manutencao" }
 ];
 
-const MOCK_AGENDA = [
+let MOCK_AGENDA = [
   { id: 1, day: 16, month: "NOV", title: "Abertura Oficial da Expo Industrial Sul 2026", time: "09:00", type: "Feira" },
   { id: 2, day: 17, month: "NOV", title: "Painel Ápice: O Futuro da Indústria 4.0 no Sul", time: "14:00", type: "Palestra" },
   { id: 3, day: 18, month: "NOV", title: "Encontro Rodada de Negócios B2B", time: "10:00", type: "Matchmaking" },
@@ -212,6 +225,9 @@ document.addEventListener("DOMContentLoaded", () => {
   setupChat();
   setupPostCreation();
   setupQrScanner();
+  
+  // Sincroniza com o Firebase
+  syncWithFirestore();
 });
 
 function setupNavigation() {
@@ -914,3 +930,111 @@ function setupQrScanner() {
     }, 800);
   });
 }
+
+// SINCRONIZAÇÃO EM TEMPO REAL COM FIRESTORE REAL (movie-app-ddda3)
+async function syncWithFirestore() {
+  try {
+    // 1. Carrega Expositores do Firestore
+    const exhibitorsSnapshot = await getDocs(collection(db, "exhibitors"));
+    if (!exhibitorsSnapshot.empty) {
+      const list = [];
+      exhibitorsSnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        if (data.status === "published" || !data.status) {
+          let logoHtml = "";
+          if (data.logoUrl) {
+            logoHtml = `<img src="${data.logoUrl}" style="width:100%; height:100%; object-fit:contain;">`;
+          } else {
+            const initial = (data.name || "EX").substring(0, 2).toUpperCase();
+            logoHtml = `<svg viewBox="0 0 100 100" style="width:100%; height:100%;"><rect width="100" height="100" fill="var(--gold-light)" stroke="var(--gold-border)" stroke-width="2" rx="8"/><text x="50" y="62" font-family="sans-serif" font-weight="800" font-size="28" fill="var(--gold-primary)" text-anchor="middle">${initial}</text></svg>`;
+          }
+          list.push({
+            id: docSnap.id,
+            name: data.name || "Expositor",
+            stand: data.stand || "S-01",
+            category: data.category || "expositor",
+            tech: data.tech || "iot",
+            desc: data.desc || "Soluções e tecnologias industriais inovadoras.",
+            tags: data.tags || ["Indústria 4.0"],
+            products: data.products || ["Solução Integrada"],
+            logo: logoHtml,
+            logoUrl: data.logoUrl || ""
+          });
+        }
+      });
+      if (list.length > 0) {
+        MOCK_EXHIBITORS = list;
+      }
+    }
+
+    // 2. Carrega Patrocinadores do Firestore
+    const sponsorsSnapshot = await getDocs(collection(db, "sponsors"));
+    if (!sponsorsSnapshot.empty) {
+      sponsorsSnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const existing = MOCK_EXHIBITORS.find(ex => ex.id === docSnap.id || ex.name.toLowerCase() === (data.name || "").toLowerCase());
+        if (existing) {
+          existing.category = "patrocinador";
+          if (data.logoUrl) {
+            existing.logo = `<img src="${data.logoUrl}" style="width:100%; height:100%; object-fit:contain;">`;
+            existing.logoUrl = data.logoUrl;
+          }
+        } else {
+          let logoHtml = "";
+          if (data.logoUrl) {
+            logoHtml = `<img src="${data.logoUrl}" style="width:100%; height:100%; object-fit:contain;">`;
+          } else {
+            const logoText = data.logoText || (data.name || "SP").substring(0, 3).toUpperCase();
+            logoHtml = `<svg viewBox="0 0 100 100" style="width:100%; height:100%;"><rect width="100" height="100" fill="var(--text-primary)" rx="8"/><text x="50" y="60" font-family="sans-serif" font-weight="900" font-size="22" fill="white" text-anchor="middle">${logoText}</text></svg>`;
+          }
+          MOCK_EXHIBITORS.push({
+            id: docSnap.id,
+            name: data.name || "Patrocinador",
+            stand: "Patrocínio",
+            category: "patrocinador",
+            tech: "automacao",
+            desc: `Parceiro Diamante da Expo Industrial Sul.`,
+            tags: ["Patrocinador", data.tier || "GOLD"],
+            products: [],
+            logo: logoHtml,
+            logoUrl: data.logoUrl || ""
+          });
+        }
+      });
+    }
+
+    // 3. Carrega Agenda (Sessions) do Firestore
+    const sessionsSnapshot = await getDocs(collection(db, "sessions"));
+    if (!sessionsSnapshot.empty) {
+      const list = [];
+      sessionsSnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const dateObj = data.date ? new Date(data.date) : new Date("2026-11-16T09:00:00");
+        const day = dateObj.getDate() || 16;
+        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        const month = months[dateObj.getMonth()] || "NOV";
+        const time = dateObj.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) || "09:00";
+        list.push({
+          id: docSnap.id,
+          day: day,
+          month: month,
+          title: data.title || "Palestra",
+          time: time,
+          type: data.type || "Palestra"
+        });
+      });
+      if (list.length > 0) {
+        MOCK_AGENDA = list;
+      }
+    }
+
+    // Recarrega as views
+    renderDashboard();
+    renderMarketplace();
+    renderAgenda();
+    showNotification("Dados sincronizados com o Firestore real! ⚡");
+  } catch (err) {
+    console.warn("Usando fallback de dados locais offline:", err);
+  }
+}
+
