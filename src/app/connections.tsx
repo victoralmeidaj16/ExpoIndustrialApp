@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import { ScoreRing } from '@/components/score-ring';
 import { Brand, Radius, Spacing } from '@/constants/theme';
@@ -22,7 +24,7 @@ import {
 } from '@/features/connections/use-connections';
 import { rankPeople } from '@/features/matchmaking/people-score';
 import { exportLeadVCard, leadMessageUrl } from '@/features/visitor/leads';
-import { useVisitorProfile, type VisitorProfile } from '@/features/visitor/visitor-profile';
+import { useVisitorProfile, type VisitorProfile, getVisitorProfileByUid } from '@/features/visitor/visitor-profile';
 
 type TabType = 'suggestions' | 'requests' | 'connected';
 
@@ -43,6 +45,68 @@ export default function ConnectionsScreen() {
   } = useConnections();
 
   const [activeTab, setActiveTab] = useState<TabType>('suggestions');
+
+  const [hasPermission, requestPermission] = useCameraPermissions();
+  const [scannerVisible, setScannerVisible] = useState(false);
+  const [scanned, setScanned] = useState(false);
+
+  const startScanning = async () => {
+    if (!hasPermission || !hasPermission.granted) {
+      const result = await requestPermission();
+      if (!result.granted) {
+        Alert.alert('Câmera necessária', 'Permissão para usar a câmera é necessária para escanear.');
+        return;
+      }
+    }
+    setScanned(false);
+    setScannerVisible(true);
+  };
+
+  const handleBarcodeScanned = async ({ data }: { data: string }) => {
+    setScanned(true);
+    setScannerVisible(false);
+    try {
+      let visitorUid = '';
+      let isDeepLink = false;
+
+      // Suporta esquemas expoindustrialsul://, expoindustrial://, ou URLs web
+      if (data.startsWith('expoindustrialsul://visitor/') || data.startsWith('expoindustrial://visitor/')) {
+        visitorUid = data.split('/').pop() || '';
+        isDeepLink = true;
+      } else if (data.includes('/visitor/')) {
+        visitorUid = data.split('/visitor/')[1]?.split('?')[0] || '';
+        isDeepLink = true;
+      }
+
+      if (isDeepLink && visitorUid) {
+        if (visitorUid === user?.uid) {
+          Alert.alert('Atenção', 'Você escaneou o seu próprio QR Code.');
+          return;
+        }
+
+        const visitorInfo = await getVisitorProfileByUid(visitorUid);
+
+        if (visitorInfo) {
+          // Verifica se há alguma solicitação pendente recebida deste usuário
+          const pendingReq = pendingReceived.find((r) => r.fromUid === visitorUid);
+          if (pendingReq) {
+            await acceptConnection(pendingReq.id);
+            Alert.alert('Conectados! 🤝', `${visitorInfo.name} já tinha enviado um pedido. Agora vocês estão conectados e compartilham contatos!`);
+          } else {
+            const myName = profile?.name || user?.email || 'Visitante';
+            await requestConnection(visitorUid, visitorInfo.name, myName);
+            Alert.alert('Solicitação Enviada! ✉️', `Você solicitou conexão com ${visitorInfo.name}.`);
+          }
+        } else {
+          Alert.alert('Erro', 'Perfil do visitante não encontrado.');
+        }
+      } else {
+        Alert.alert('QR Code Inválido', 'Os dados do QR Code não estão no formato esperado.');
+      }
+    } catch (err) {
+      Alert.alert('Erro ao escanear', 'Não foi possível ler os dados do QR Code.');
+    }
+  };
 
   const loading = loadingVisitors || loadingConnections;
 
@@ -143,8 +207,31 @@ export default function ConnectionsScreen() {
           <Ionicons name="arrow-back" size={24} color={Brand.textPrimary} />
         </Pressable>
         <Text style={styles.headerTitle}>Conectar Pessoas</Text>
-        <View style={{ width: 40 }} />
+        <Pressable onPress={startScanning} style={styles.backBtn}>
+          <Ionicons name="scan-outline" size={20} color={Brand.gold} />
+        </Pressable>
       </View>
+
+      {/* Modal do Scanner */}
+      <Modal
+        visible={scannerVisible}
+        animationType="slide"
+        onRequestClose={() => setScannerVisible(false)}>
+        <View style={styles.scannerContainer}>
+          <CameraView
+            style={StyleSheet.absoluteFillObject}
+            facing="back"
+            onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
+          />
+          <View style={styles.scannerOverlay}>
+            <Text style={styles.scannerInstruction}>Aponte a câmera para o QR Code de outro usuário</Text>
+            <View style={styles.scannerTarget} />
+            <Pressable style={styles.closeScannerBtn} onPress={() => setScannerVisible(false)}>
+              <Text style={styles.closeScannerText}>Cancelar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
 
       {/* Tabs */}
       <View style={styles.tabsContainer}>
@@ -576,4 +663,49 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   actionBtnOutlineText: { color: Brand.gold, fontSize: 13, fontWeight: '800' },
+
+  // Scanner
+  scannerContainer: {
+    flex: 1,
+    backgroundColor: '#000000',
+  },
+  scannerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.four,
+  },
+  scannerInstruction: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: Spacing.six,
+    textShadowColor: 'rgba(0,0,0,0.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
+  },
+  scannerTarget: {
+    width: 250,
+    height: 250,
+    borderWidth: 2,
+    borderColor: Brand.gold,
+    borderRadius: Radius.md,
+    backgroundColor: 'transparent',
+    marginBottom: 40,
+  },
+  closeScannerBtn: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: Radius.pill,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  closeScannerText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '800',
+  },
 });
