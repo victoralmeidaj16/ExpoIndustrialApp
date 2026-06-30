@@ -16,6 +16,7 @@ import {
   TextInput,
   View,
   Switch,
+  Modal,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -58,6 +59,7 @@ export default function ProfileScreen() {
   const demoMode = !configured;
 
   const [activeTab, setActiveTab] = useState<'preferences' | 'leads' | 'saved'>('preferences');
+  const [zoomVisible, setZoomVisible] = useState(false);
   const [form, setForm] = useState<VisitorProfile>(EMPTY_VISITOR_PROFILE);
   const [hydrated, setHydrated] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -223,7 +225,7 @@ export default function ProfileScreen() {
             <Text style={styles.visitorCompany}>{form.company || 'Sua empresa'}</Text>
           </View>
 
-          <View style={styles.qrCodeContainer}>
+          <Pressable style={styles.qrCodeContainer} onPress={() => form.name && setZoomVisible(true)}>
             {form.name ? (
               <Image
                 source={{
@@ -236,18 +238,50 @@ export default function ProfileScreen() {
             ) : (
               <>
                 <Ionicons name="qr-code" size={50} color={Brand.bgPrimary} />
-                <Text style={styles.qrCodeText}>SCANNER</Text>
+                <Text style={styles.qrCodeText}>COMPLETAR PERFIL</Text>
               </>
             )}
-          </View>
+          </Pressable>
 
         </View>
 
         <View style={styles.badgeFooter}>
           <Ionicons name="sparkles" size={14} color={Brand.gold} />
-          <Text style={styles.badgeFooterText}>Aproxime nos estandes para compartilhar contato</Text>
+          <Text style={styles.badgeFooterText}>Clique para ampliar · Aproxime nos estandes</Text>
         </View>
       </LinearGradient>
+
+      {/* Modal de Zoom do QR Code */}
+      <Modal
+        visible={zoomVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setZoomVisible(false)}>
+        <Pressable style={styles.zoomOverlay} onPress={() => setZoomVisible(false)}>
+          <View style={styles.zoomContent} onStartShouldSetResponder={() => true} ResponderEventPlugin={() => {}}>
+            <Text style={styles.zoomTitle}>Meu Crachá Digital</Text>
+            <Text style={styles.zoomSubtitle}>Apresente este código para outros participantes ou expositores</Text>
+            
+            <View style={styles.zoomQrWrapper}>
+              <Image
+                source={{
+                  uri: `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(
+                    `expoindustrialsul://visitor/${user?.uid || 'demo-user'}`
+                  )}`,
+                }}
+                style={styles.zoomQrImage}
+              />
+            </View>
+
+            <Text style={styles.zoomName}>{form.name}</Text>
+            <Text style={styles.zoomMeta}>{form.role} · {form.company}</Text>
+
+            <Pressable style={styles.zoomCloseBtn} onPress={() => setZoomVisible(false)}>
+              <Text style={styles.zoomCloseText}>Fechar</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
 
       {/* Tabs */}
       <View style={styles.tabsContainer}>
@@ -986,4 +1020,80 @@ const styles = StyleSheet.create({
   },
   consentTitle: { color: Brand.textPrimary, fontSize: 15, fontWeight: '700' },
   consentDescription: { color: Brand.textSecondary, fontSize: 12.5, lineHeight: 18 },
+
+  // Zoom QR
+  zoomOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(9, 9, 11, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.four,
+  },
+  zoomContent: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: Brand.bgCard,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Brand.borderGold,
+    padding: Spacing.five,
+    alignItems: 'center',
+    gap: Spacing.three,
+  },
+  zoomTitle: {
+    color: Brand.textPrimary,
+    fontSize: 20,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  zoomSubtitle: {
+    color: Brand.textSecondary,
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: Spacing.one,
+  },
+  zoomQrWrapper: {
+    width: 240,
+    height: 240,
+    backgroundColor: '#FFFFFF',
+    borderRadius: Radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderWidth: 4,
+    borderColor: Brand.gold,
+  },
+  zoomQrImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+  },
+  zoomName: {
+    color: Brand.textPrimary,
+    fontSize: 18,
+    fontWeight: '800',
+    marginTop: Spacing.one,
+    textAlign: 'center',
+  },
+  zoomMeta: {
+    color: Brand.gold,
+    fontSize: 13,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  zoomCloseBtn: {
+    width: '100%',
+    height: 46,
+    backgroundColor: Brand.gold,
+    borderRadius: Radius.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Spacing.two,
+  },
+  zoomCloseText: {
+    color: Brand.bgPrimary,
+    fontSize: 15,
+    fontWeight: '800',
+  },
 });
