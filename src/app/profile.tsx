@@ -63,6 +63,45 @@ export default function ProfileScreen() {
   const [form, setForm] = useState<VisitorProfile>(EMPTY_VISITOR_PROFILE);
   const [hydrated, setHydrated] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  async function handleDeleteAccount() {
+    if (!configured) {
+      Alert.alert('Modo de Demonstração', 'A exclusão de conta não está disponível no modo offline de demonstração.');
+      return;
+    }
+
+    Alert.alert(
+      'Excluir Conta Permanentemente?',
+      'Esta ação é irreversível. Todos os seus dados de crachá, preferências de matchmaking e conexões serão excluídos permanentemente de nossos servidores.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir Permanentemente',
+          style: 'destructive',
+          onPress: async () => {
+            setSaving(true);
+            try {
+              const { deleteDoc, doc } = await import('firebase/firestore');
+              const { db, auth } = await import('@/lib/firebase');
+              if (auth?.currentUser) {
+                const uid = auth.currentUser.uid;
+                await deleteDoc(doc(db, 'visitors', uid));
+                await auth.currentUser.delete();
+                Alert.alert('Conta excluída', 'Sua conta e dados foram completamente removidos de nossa base.');
+              }
+            } catch (err) {
+              const errorMsg = (err as any).code === 'auth/requires-recent-login'
+                ? 'Para excluir sua conta, você precisa fazer login novamente para reautenticar sua sessão.'
+                : (err as Error).message;
+              Alert.alert('Erro ao excluir', errorMsg);
+            } finally {
+              setSaving(false);
+            }
+          }
+        }
+      ]
+    );
+  }
   const { leads: savedLeads } = useSavedLeads();
   const { savedIds, toggle: toggleSaved } = useSavedExhibitors();
   const { exhibitors } = useExhibitors();
@@ -578,6 +617,14 @@ export default function ProfileScreen() {
                 <Text style={styles.saveBtnText}>Salvar e Atualizar Matchmaking</Text>
               </>
             )}
+          </Pressable>
+
+          <Text style={[styles.sectionTitle, { marginTop: Spacing.four, color: Brand.danger }]}>
+            Zona de Risco
+          </Text>
+          <Pressable style={styles.deleteBtn} onPress={handleDeleteAccount} disabled={saving}>
+            <Ionicons name="trash-outline" size={16} color={Brand.danger} />
+            <Text style={styles.deleteBtnText}>Excluir Minha Conta</Text>
           </Pressable>
         </View>
       ) : activeTab === 'leads' ? (
@@ -1096,4 +1143,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '800',
   },
+  deleteBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: Brand.danger,
+    borderRadius: Radius.sm,
+    paddingVertical: 14,
+    marginTop: Spacing.one,
+  },
+  deleteBtnText: { color: Brand.danger, fontSize: 14.5, fontWeight: '700' },
 });
