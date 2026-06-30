@@ -46,10 +46,14 @@ export default function OnboardingScreen() {
 
   useEffect(() => {
     if (!loading && !initialized) {
-      setForm(profile ?? { ...EMPTY_VISITOR_PROFILE });
+      const initialForm = profile ?? { ...EMPTY_VISITOR_PROFILE };
+      if (!initialForm.email && user?.email) {
+        initialForm.email = user.email;
+      }
+      setForm(initialForm);
       setInitialized(true);
     }
-  }, [profile, loading, initialized]);
+  }, [profile, loading, initialized, user]);
 
   const set = <K extends keyof VisitorProfile>(key: K, value: VisitorProfile[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -68,8 +72,8 @@ export default function OnboardingScreen() {
   const handleNext = () => {
     if (step < 5) {
       // Validações básicas por passo
-      if (step === 1 && (!form.name.trim() || !form.role.trim() || !form.company.trim() || !form.roleType)) {
-        Alert.alert('Campos obrigatórios', 'Por favor, preencha nome, cargo, empresa e tipo de cargo.');
+      if (step === 1 && (!form.name.trim() || !form.phone?.trim() || !form.role.trim() || !form.company.trim() || !form.roleType)) {
+        Alert.alert('Campos obrigatórios', 'Por favor, preencha nome completo, whatsapp, cargo, empresa e tipo de cargo.');
         return;
       }
       if (step === 2 && ((form.sector ?? []).length === 0 || !form.marketRole)) {
@@ -118,9 +122,16 @@ export default function OnboardingScreen() {
   };
 
   const handleSkip = () => {
+    if (!form.name.trim() || !form.phone?.trim() || !form.role.trim() || !form.company.trim() || !form.roleType) {
+      Alert.alert(
+        'Informações obrigatórias',
+        'Para acessar o aplicativo, preencha as informações básicas do Passo 1 (Nome Completo, WhatsApp, Cargo, Empresa e Tipo de Cargo).'
+      );
+      return;
+    }
     Alert.alert(
       'Pular Onboarding?',
-      'Você pode completar seu perfil depois na aba de configurações para ativar o matchmaking.',
+      'Seu cadastro básico será salvo. Você pode completar o restante do perfil a qualquer momento para ativar o matchmaking.',
       [
         { text: 'Voltar', style: 'cancel' },
         {
@@ -203,7 +214,7 @@ export default function OnboardingScreen() {
           {step === 1 && (
             <View style={styles.stepContent}>
               <Text style={styles.stepTitle}>Quem é você?</Text>
-              <Text style={styles.stepSubtitle}>Dados para o crachá e perfil no evento.</Text>
+              <Text style={styles.stepSubtitle}>Dados obrigatórios para acesso ao app e crachá do evento.</Text>
 
               <Text style={styles.label}>Nome Completo</Text>
               <TextInput
@@ -212,6 +223,25 @@ export default function OnboardingScreen() {
                 placeholder="Nome Completo"
                 placeholderTextColor={Brand.textMuted}
                 style={styles.textInput}
+              />
+
+              <Text style={styles.label}>WhatsApp / Celular</Text>
+              <TextInput
+                value={form.phone}
+                onChangeText={(v) => set('phone', v)}
+                placeholder="DDD + Número (ex: 47 99999-9999)"
+                placeholderTextColor={Brand.textMuted}
+                keyboardType="phone-pad"
+                style={styles.textInput}
+              />
+
+              <Text style={styles.label}>E-mail</Text>
+              <TextInput
+                value={form.email}
+                editable={false}
+                placeholder="E-mail de cadastro"
+                placeholderTextColor={Brand.textMuted}
+                style={[styles.textInput, { opacity: 0.6 }]}
               />
 
               <Text style={styles.label}>Cargo</Text>
@@ -412,8 +442,8 @@ export default function OnboardingScreen() {
                   />
                 </View>
                 <Text style={styles.consentDescription}>
-                  Se ativado, outros participantes qualificados com alto fit comercial poderão ver
-                  seu perfil e enviar solicitações de conexão.
+                  Ative esta opção para habilitar o Matchmaking B2B inteligente com outros participantes do evento.
+                  Se preferir não habilitar o networking, você continuará recebendo apenas as recomendações personalizadas de estandes.
                 </Text>
               </View>
 

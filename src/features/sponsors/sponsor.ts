@@ -86,6 +86,8 @@ export async function uploadSponsorLogo(sponsorId: string, uri: string): Promise
   const response = await fetch(uri);
   const blob = await response.blob();
   const storageRef = ref(storage, `sponsors/${uid}/${sponsorId}-logo`);
-  await uploadBytes(storageRef, blob);
+  await uploadBytes(storageRef, blob, {
+    contentType: blob.type || 'image/jpeg',
+  });
   return getDownloadURL(storageRef);
 }

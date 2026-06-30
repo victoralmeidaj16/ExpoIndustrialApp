@@ -23,7 +23,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
   const activeRoute = state.routes[state.index]?.name;
 
-  if (activeRoute === 'preencher') return null;
+  if (activeRoute === 'preencher' || activeRoute === 'expositor') return null;
 
   return (
     <View style={[styles.tabBar, { paddingBottom: Math.max(insets.bottom, 10) }]}>
@@ -86,6 +86,7 @@ export default function TabLayout() {
         <Tabs.Screen name="visitor" options={{ href: null }} />
         <Tabs.Screen name="assistant" options={{ href: null }} />
         <Tabs.Screen name="portal" options={{ href: null }} />
+        <Tabs.Screen name="expositor" options={{ href: null }} />
         <Tabs.Screen name="preencher" options={{ href: null }} />
         <Tabs.Screen name="onboarding" options={{ href: null }} />
         </Tabs>

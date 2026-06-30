@@ -97,7 +97,7 @@ export default function PortalAdmin() {
   const [search, setSearch] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const portalUrl = useMemo(() => Linking.createURL('/portal'), []);
+  const portalUrl = useMemo(() => Linking.createURL('/expositor'), []);
   const adminUrl = useMemo(() => Linking.createURL('/portal/admin'), []);
 
   if (!initializing && !user) return <Redirect href="/portal/login" />;
