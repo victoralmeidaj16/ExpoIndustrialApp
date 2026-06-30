@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mapa 3D - Expo Industrial Sul 2026</title>
+
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0c1527;
+            --bg-card: rgba(13, 23, 42, 0.85);
+            --border-color: rgba(197, 168, 92, 0.15);
+            --gold: #c5a85c;
+            --gold-soft: rgba(197, 168, 92, 0.2);
+            --cyan: #0ea5e9;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        .app-header {
+            background: rgba(9, 13, 22, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50;
+            position: relative;
+        }
+
+        .app-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .app-title span {
+            color: var(--gold);
+        }
+
+        .icon-btn {
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Search Bar --- */
+        .search-bar {
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            background: #0d121f;
+            padding: 12px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 45;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-bar.active {
+            top: 71px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.03);
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--gold);
+        }
+
+        .search-results {
+            position: absolute;
+            top: calc(100% + 1px);
+            left: 0;
+            width: 100%;
+            max-height: min(420px, calc(100vh - 150px));
+            overflow-y: auto;
+            background: rgba(13, 18, 31, 0.96);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .result-item {
+            width: 100%;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .result-item:active,
+        .result-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .result-number {
+            min-width: 48px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gold-soft);
+            color: var(--gold);
+            font-size: 0.78rem;
+            font-weight: 900;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+        }
+
+        .result-name {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .result-zone {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            margin-top: 2px;
+        }
+
+        .result-empty {
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* --- 3D Canvas --- */
+        .map-container {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            background: #090c15;
+        }
+
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* --- Controls --- */
+        .map-controls {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .fab-btn {
+            background: rgba(17, 24, 39, 0.9);
+            color: var(--text-primary);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s;
+        }
+
+        .fab-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Bottom Sheet --- */
+        .bottom-sheet {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 20px 24px 32px 24px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            z-index: 60;
+        }
+
+        .bottom-sheet.active {
+            bottom: 0;
+        }
+
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 0 auto 16px auto;
+        }
+
+        .header-sheet {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .booth-tag {
+            display: inline-block;
+            background: var(--gold-soft);
+            color: var(--gold);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .company-name {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .company-category {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #d4af37 0%, #aa8412 100%);
+            color: #090d16;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            transition: all 0.2s;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .action-btn.navigating {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .info-badge {
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(17, 24, 39, 0.85);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 10;
+            pointer-events: none;
+            backdrop-filter: blur(10px);
+        }
+
+        /* --- Hide standard elements if embedded inside App --- */
+        body.embedded .app-header {
+            display: none;
+        }
+
+        body.embedded .bottom-sheet {
+            display: none;
+            /* Let React Native show its own BottomSheet */
+        }
+
+        body.embedded .info-badge {
+            top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header UI -->
+    <header class="app-header">
+        <button class="icon-btn" onclick="history.back()">←</button>
+        <div class="app-title">ExpoIndustrial <span>3D</span></div>
+        <button class="icon-btn" onclick="togglePesquisa()">🔍</button>
+    </header>
+
+    <div class="search-bar" id="searchBar">
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar estande ou empresa..."
+            oninput="filtrarEstandes()">
+        <button class="icon-btn" onclick="togglePesquisa()">✖</button>
+        <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <!-- Container 3D -->
+    <main class="map-container">
+        <div class="info-badge">Arraste para girar · Toque para interagir</div>
+        <canvas id="canvas3d"></canvas>
+
+        <div class="map-controls">
+            <button class="fab-btn" onclick="zoomIn()">+</button>
+            <button class="fab-btn" onclick="zoomOut()">-</button>
+            <button class="fab-btn" onclick="topView()" title="Visão superior">▣</button>
+            <button class="fab-btn" onclick="resetCamera()">🎯</button>
+        </div>
+    </main>
+
+    <!-- Bottom Sheet -->
+    <div class="bottom-sheet" id="boothSheet">
+        <div class="sheet-handle"></div>
+        <div class="header-sheet">
+            <div>
+                <div class="booth-tag" id="sheetBoothNum">Estande 86</div>
+                <h2 class="company-name" id="sheetCompanyName">Nome da Empresa</h2>
+            </div>
+            <button class="icon-btn" style="background: none; border: none; font-size: 1.8rem;"
+                onclick="fecharPainel()">×</button>
+        </div>
+        <p class="company-category" id="sheetCategory">Categoria</p>
+        <button class="action-btn" id="btnRota" onclick="tracarRota()">
+            <span>📍</span> <span id="txtBtnRota">Traçar rota até aqui</span>
+        </button>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURAÇÕES GERAIS E CONVERSÃO DE COORDENADAS
+        // ==========================================
+        const SCALE = 25; // Divide as coordenadas originais de 1300x650 por 25
+        const WIDTH_3D = 1300 / SCALE; // 52
+        const HEIGHT_3D = 650 / SCALE; // 26
+        const OFFSET_X = -WIDTH_3D / 2; // -26
+        const OFFSET_Z = -HEIGHT_3D / 2; // -13
+        const DEFAULT_STAND_HEIGHT = 1.5;
+
+        // Converte coordenadas 2D do plano para 3D (X e Z deitados no chão, Y é altura)
+        function to3D(x, y, w, h) {
+            return {
+                x: (x + w / 2) / SCALE + OFFSET_X,
+                z: (y + h / 2) / SCALE + OFFSET_Z,
+                w: w / SCALE,
+                d: h / SCALE
+            };
+        }
+
+        // Detectar se está rodando dentro do React Native WebView
+        const isEmbedded = window.ReactNativeWebView !== undefined || navigator.userAgent.includes("ReactNativeWebView");
+        if (isEmbedded) {
+            document.body.classList.add('embedded');
+        }
+
+        // ==========================================
+        // 1. CONFIGURAÇÃO BASE DO THREE.JS
+        // ==========================================
+        const canvas = document.getElementById('canvas3d');
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        renderer.setSize(window.innerWidth, canvas.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color('#0c1527'); // Fundo escuro da marca
+        scene.fog = new THREE.FogExp2('#0c1527', 0.018);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / canvas.clientHeight, 0.1, 1000);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2.05; // Não deixa descer abaixo do chão
+        controls.minDistance = 5;
+        controls.maxDistance = 80;
+
+        // ==========================================
+        // 2. ILUMINAÇÃO
+        // ==========================================
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        dirLight.position.set(10, 30, 15);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 100;
+        const d = 30;
+        dirLight.shadow.camera.left = -d;
+        dirLight.shadow.camera.right = d;
+        dirLight.shadow.camera.top = d;
+        dirLight.shadow.camera.bottom = -d;
+        dirLight.shadow.bias = -0.0005;
+        scene.add(dirLight);
+
+        // ==========================================
+        // 3. CONSTRUÇÃO DO PAVILHÃO
+        // ==========================================
+        const interactableObjects = [];
+        const estandesGlobais = [];
+        const PALETTE = {
+            standard: '#2563eb', // Royal Blue
+            mini: '#0ea5e9',     // Sky Blue
+            premium: '#c5a85c',  // Brand Gold
+            case: '#94a3b8',     // Steel Gray
+            auditorium: '#475569', // Dark Slate Gray
+            service: '#c5a85c',  // Brand Gold
+            circulation: '#0f172a'
+        };
+
+        // Chão Pavilhão
+        const floorGeo = new THREE.PlaneGeometry(WIDTH_3D + 4, HEIGHT_3D + 4);
+        const floorMat = new THREE.MeshStandardMaterial({
+            color: '#080d19',
+            roughness: 0.8,
+            metalness: 0.1
+        });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // Grelha decorativa
+        const gridHelper = new THREE.GridHelper(Math.max(WIDTH_3D, HEIGHT_3D) + 10, 40, 0xc5a85c, 0x162545);
+        gridHelper.position.y = 0.01;
+        scene.add(gridHelper);
+
+        // Entrada Principal (Ponto de Partida)
+        // 2D: x: 485, y: 606, w: 55, h: 18
+        const entradaInfo = to3D(485, 606, 55, 18);
+        window.pontoEntrada = new THREE.Vector3(entradaInfo.x, 0.5, entradaInfo.z);
+        const entradaGeo = new THREE.BoxGeometry(entradaInfo.w, 1.0, entradaInfo.d);
+        const entradaMat = new THREE.MeshStandardMaterial({
+            color: '#10b981',
+            emissive: '#10b981',
+            emissiveIntensity: 0.3
+        });
+        const entradaMesh = new THREE.Mesh(entradaGeo, entradaMat);
+        entradaMesh.position.copy(window.pontoEntrada);
+        entradaMesh.userData = {
+            id: 'entrada',
+            name: 'Entrada Principal',
+            category: 'service',
+            zone: 'Operacional Inferior'
+        };
+
+        // Label para a entrada
+        const labelEntrada = createTextSprite("ENTRADA");
+        labelEntrada.position.set(0, 1.1, 0);
+        entradaMesh.add(labelEntrada);
+
+        scene.add(entradaMesh);
+        interactableObjects.push(entradaMesh);
+
+        // Função para criar Labels flutuantes
+        function createTextSprite(text) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256; canvas.height = 64;
+            const context = canvas.getContext('2d');
+            context.font = "Bold 24px 'Outfit', sans-serif";
+            context.fillStyle = "#ffffff";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.fillText(text, 128, 32);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(4, 1, 1);
+            return sprite;
+        }
+
+        // Criação de Objetos 3D baseados na planta real
+        function criarEstandeReal(item) {
+            const pos = to3D(item.x, item.y, item.width, item.height);
+
+            // Altura uniforme para manter o mapa legível como planta 3D.
+            if (item.category === 'circulation') return; // não renderiza blocos de circulação
+            let h = DEFAULT_STAND_HEIGHT;
+
+            const geometry = new THREE.BoxGeometry(pos.w, h, pos.d);
+
+            // Material com reflexo e cores customizadas para banheiros
+            let color = PALETTE[item.category] || '#ffffff';
+            if (item.id.includes('bwc-fem')) {
+                color = '#db2777'; // Rosa brilhante
+            } else if (item.id.includes('bwc-masc')) {
+                color = '#2563eb'; // Azul brilhante
+            }
+
+            const material = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.2,
+                metalness: 0.1,
+                transparent: true,
+                opacity: 0.9
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(pos.x, h / 2, pos.z);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.userData = {
+                id: item.id,
+                number: item.number,
+                name: item.name,
+                category: item.category,
+                zone: item.zone || 'Pavilhão',
+                color: color,
+                searchVisible: true
+            };
+
+            // Determinar o texto do label flutuante
+            let labelText = '';
+            if (item.number && ['standard', 'mini', 'premium', 'auditorium'].includes(item.category)) {
+                labelText = item.number;
+            } else if (item.id.includes('bwc-fem')) {
+                labelText = "BWC FEM";
+            } else if (item.id.includes('bwc-masc')) {
+                labelText = "BWC MASC";
+            } else if (item.id === 'chapelaria' || item.id === 'sala-palestrantes') {
+                labelText = item.name;
+            }
+
+            if (labelText) {
+                const label = createTextSprite(labelText);
+                label.position.set(0, h / 2 + 0.6, 0);
+                mesh.add(label);
+            }
+
+            scene.add(mesh);
+            interactableObjects.push(mesh);
+            estandesGlobais.push({ mesh, originalMat: material });
+        }
+
+        // ==========================================
+        // DADOS REAIS - COPIADOS DO APP
+        // ==========================================
+        const createVerticalIsland = ({ id, startNumber, x, y, rows = 8, columns = 2, zone, palette = 'standard' }) => {
+            const stands = [];
+            const cellWidth = 28;
+            const cellHeight = 25;
+            const gapX = 8;
+            const gapY = 5;
+            let current = startNumber;
+
+            for (let row = 0; row < rows; row += 1) {
+                for (let col = 0; col < columns; col += 1) {
+                    const area = row < 2 ? 8 : row > 5 ? 4 : 6;
+                    stands.push({
+                        id: `${id}-${current}`,
+                        number: String(current).padStart(2, '0'),
+                        name: `Estande ${String(current).padStart(2, '0')}`,
+                        category: palette,
+                        zone,
+                        x: x + col * (cellWidth + gapX),
+                        y: y + row * (cellHeight + gapY),
+                        width: cellWidth,
+                        height: cellHeight,
+                    });
+                    current -= 1;
+                }
+            }
+            return stands;
+        };
+
+        const createCustomColumn = ({ startNumber, x, y, rows, colOffsetSign = 1, idPrefix, zone, palette = 'standard' }) => {
+            const stands = [];
+            const rowHeight = 25;
+            const standardWidth = 28;
+            const gapY = 5;
+            let current = startNumber;
+
+            for (let r = 0; r < rows; r += 1) {
+                let area = 6;
+
+                if (rows === 11) {
+                    if (r === 0) {
+                        area = 8;
+                    } else if (r === 1) {
+                        area = 6;
+                    } else if (r >= 2 && r <= 6) {
+                        area = 4;
+                    } else if (r === 7 || r === 8) {
+                        area = 6;
+                    } else {
+                        area = 8;
+                    }
+                } else {
+                    if (r >= 0 && r <= 6) {
+                        area = 6;
+                    } else {
+                        area = 8;
+                    }
+                }
+
+                stands.push({
+                    id: `${idPrefix}-${current}`,
+                    number: String(current).padStart(2, '0'),
+                    name: `Estande ${String(current).padStart(2, '0')}`,
+                    category: palette,
+                    zone,
+                    x: x,
+                    y: y + r * (rowHeight + gapY),
+                    width: standardWidth,
+                    height: rowHeight,
+                    area,
+                });
+                current -= 1;
+            }
+            return stands;
+        };
+
+        const createRightColumn = ({ startNumber, x, y, rows, idPrefix, zone, palette = 'standard' }) => {
+            const stands = [];
+            const rowHeight = 25;
+            const standardWidth = 28;
+            const gapY = 5;
+            let current = startNumber;
+
+            for (let r = 0; r < rows; r += 1) {
+                const isBottomTwo = (r === rows - 1 || r === rows - 2);
+                const area = isBottomTwo ? 8 : 6;
+
+                stands.push({
+                    id: `${idPrefix}-${current}`,
+                    number: String(current).padStart(2, '0'),
+                    name: `Estande ${String(current).padStart(2, '0')}`,
+                    category: palette,
+                    zone,
+                    x: x,
+                    y: y + r * (rowHeight + gapY),
+                    width: standardWidth,
+                    height: rowHeight,
+                    area,
+                });
+                current -= 1;
+            }
+            return stands;
+        };
+
+        const createAuditoriums = () => [
+            ...[1, 2, 3, 4].map((number, index) => ({
+                id: `auditorio-${number}`,
+                number: String(number),
+                name: `Auditório ${number}`,
+                category: 'auditorium',
+                zone: 'Auditórios Oeste',
+                x: 55, y: 130 + index * 105, width: 54, height: 48
+            })),
+            ...[5, 6, 7, 8].map((number, index) => ({
+                id: `auditorio-${number}`,
+                number: String(number),
+                name: `Auditório ${number}`,
+                category: 'auditorium',
+                zone: 'Auditórios Leste',
+                x: 1240, y: 130 + index * 105, width: 42, height: 50
+            })),
+        ];
+
+        const createPremiumBlocks = () => {
+            const numbers = [103, 97, 91, 102, 96, 90, 101, 95, 89, 100, 94, 88, 99, 93, 87, 98, 92, 86];
+            const premium12 = new Set([86, 87, 88, 89, 92, 93, 94, 95, 98, 99, 100, 101, 103]);
+            const columns = [520, 600, 680];
+            const rows = [170, 238, 312, 386, 470, 550];
+
+            return numbers.map((number, index) => {
+                const row = Math.floor(index / 3);
+                const col = index % 3;
+                const isLarge = premium12.has(number);
+                return {
+                    id: `premium-${number}`,
+                    number: String(number),
+                    name: `Estande ${number}`,
+                    category: 'premium',
+                    zone: 'Centro Premium',
+                    x: columns[col],
+                    y: rows[row],
+                    width: isLarge ? 46 : 42,
+                    height: isLarge ? 34 : 32,
+                };
+            });
+        };
+
+        // Renderiza tudo na cena
+        const zonesReal = [
+            { id: 'case-1', name: 'Cases de Excelência Operacional', category: 'case', zone: 'Topo', x: 360, y: 95, width: 95, height: 62 },
+            { id: 'case-2', name: 'Cases de Excelência Operacional', category: 'case', zone: 'Topo', x: 585, y: 95, width: 95, height: 62 },
+            { id: 'bwc-fem-1', name: 'BWC Feminino', category: 'service', zone: 'Operacional Inferior', x: 172, y: 582, width: 136, height: 28 },
+            { id: 'bwc-masc-1', name: 'BWC Masculino', category: 'service', zone: 'Operacional Superior', x: 172, y: 55, width: 136, height: 80 },
+            { id: 'chapelaria', name: 'Chapelaria', category: 'service', zone: 'Operacional Inferior', x: 332, y: 582, width: 42, height: 28 },
+            { id: 'sala-palestrantes', name: 'Sala de Palestrantes', category: 'service', zone: 'Operacional Inferior', x: 388, y: 582, width: 50, height: 28 },
+            { id: 'apice', name: 'Ápice', category: 'service', zone: 'Operacional Inferior', x: 440, y: 582, width: 30, height: 28 },
+        ];
+
+        zonesReal.forEach(criarEstandeReal);
+        createAuditoriums().forEach(criarEstandeReal);
+        createPremiumBlocks().forEach(criarEstandeReal);
+
+        // Renderiza ilhas da esquerda (172 a 104) com layout real
+        createCustomColumn({ idPrefix: 'ilha-a-1', startNumber: 172, x: 172, y: 165, rows: 11, colOffsetSign: 1, zone: 'Ilha A', palette: 'mini' }).forEach(criarEstandeReal);
+        createCustomColumn({ idPrefix: 'ilha-a-2', startNumber: 161, x: 252, y: 165, rows: 11, colOffsetSign: -1, zone: 'Ilha A', palette: 'mini' }).forEach(criarEstandeReal);
+        createCustomColumn({ idPrefix: 'ilha-a-3', startNumber: 150, x: 280, y: 165, rows: 11, colOffsetSign: 1, zone: 'Ilha A', palette: 'mini' }).forEach(criarEstandeReal);
+        createCustomColumn({ idPrefix: 'ilha-b-1', startNumber: 139, x: 332, y: 190, rows: 9, colOffsetSign: -1, zone: 'Ilha B', palette: 'standard' }).forEach(criarEstandeReal);
+        createCustomColumn({ idPrefix: 'ilha-b-2', startNumber: 130, x: 360, y: 190, rows: 9, colOffsetSign: 1, zone: 'Ilha B', palette: 'standard' }).forEach(criarEstandeReal);
+        createCustomColumn({ idPrefix: 'ilha-c-1', startNumber: 121, x: 412, y: 190, rows: 9, colOffsetSign: -1, zone: 'Ilha C', palette: 'standard' }).forEach(criarEstandeReal);
+        createCustomColumn({ idPrefix: 'ilha-c-2', startNumber: 112, x: 440, y: 190, rows: 9, colOffsetSign: 1, zone: 'Ilha C', palette: 'standard' }).forEach(criarEstandeReal);
+
+        // Renderiza ilhas da direita (85 a 1) baseadas na planta real
+        createRightColumn({ idPrefix: 'ilha-e-1', startNumber: 85, x: 760, y: 190, rows: 9, zone: 'Ilha E', palette: 'standard' }).forEach(criarEstandeReal);
+        createRightColumn({ idPrefix: 'ilha-e-2', startNumber: 76, x: 788, y: 190, rows: 9, zone: 'Ilha E', palette: 'standard' }).forEach(criarEstandeReal);
+        createRightColumn({ idPrefix: 'ilha-f-1', startNumber: 67, x: 840, y: 190, rows: 9, zone: 'Ilha F', palette: 'standard' }).forEach(criarEstandeReal);
+        createRightColumn({ idPrefix: 'ilha-f-2', startNumber: 58, x: 868, y: 190, rows: 9, zone: 'Ilha F', palette: 'standard' }).forEach(criarEstandeReal);
+        createRightColumn({ idPrefix: 'ilha-g-1', startNumber: 49, x: 920, y: 165, rows: 10, zone: 'Ilha G', palette: 'mini' }).forEach(criarEstandeReal);
+        createRightColumn({ idPrefix: 'ilha-g-2', startNumber: 39, x: 948, y: 165, rows: 10, zone: 'Ilha G', palette: 'mini' }).forEach(criarEstandeReal);
+        createRightColumn({ idPrefix: 'ilha-h-1', startNumber: 29, x: 1000, y: 165, rows: 10, zone: 'Ilha H', palette: 'standard' }).forEach(criarEstandeReal);
+        createRightColumn({ idPrefix: 'ilha-h-2', startNumber: 19, x: 1028, y: 165, rows: 10, zone: 'Ilha H', palette: 'standard' }).forEach(criarEstandeReal);
+        createRightColumn({ idPrefix: 'ilha-i-1', startNumber: 9, x: 1080, y: 195, rows: 9, zone: 'Ilha I', palette: 'standard' }).forEach(criarEstandeReal);
+
+        // ==========================================
+        // 4. RAYCASTER (CLIQUES E INTERAÇÕES)
+        // ==========================================
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let mouseDownTime = 0;
+
+        renderer.domElement.addEventListener('pointerdown', () => mouseDownTime = Date.now());
+
+        renderer.domElement.addEventListener('pointerup', (event) => {
+            if (Date.now() - mouseDownTime > 200) return; // Se arrastou, ignora o clique
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(interactableObjects);
+
+            if (intersects.length > 0) {
+                const target = intersects.find(hit => hit.object.userData.searchVisible !== false)?.object;
+                if (!target) return;
+                selecionarEstande(target);
+            } else {
+                fecharPainel();
+            }
+        });
+
+        // Câmera Reset
+        function resetCamera() {
+            fecharPainel();
+            new TWEEN.Tween(camera.position)
+                .to({ x: 0, y: 35, z: 28 }, 1000)
+                .easing(TWEEN.Easing.Cubic.Out).start();
+            new TWEEN.Tween(controls.target)
+                .to({ x: 0, y: 0, z: 0 }, 1000)
+                .easing(TWEEN.Easing.Cubic.Out).start();
+        }
+
+        // ==========================================
+        // 5. SELEÇÃO E AÇÕES
+        // ==========================================
+        let estandeAlvoAtual = null;
+        let routeLine, routeSphere, routeAnimationTween;
+
+        function selecionarEstande(mesh, skipPostMessage = false) {
+            const dados = mesh.userData;
+
+            // Preenche painel web se não estiver embarcado
+            document.getElementById('sheetBoothNum').textContent = `Estande ${dados.number || 'Serviço'}`;
+            document.getElementById('sheetCompanyName').textContent = dados.name;
+            document.getElementById('sheetCategory').textContent = dados.zone;
+
+            const btn = document.getElementById('btnRota');
+            btn.className = 'action-btn';
+            document.getElementById('txtBtnRota').textContent = 'Traçar rota até aqui';
+
+            estandeAlvoAtual = mesh;
+            document.getElementById('boothSheet').classList.add('active');
+
+            // Focar Câmera no estande selecionado
+            const targetPos = mesh.position.clone();
+            new TWEEN.Tween(controls.target)
+                .to({ x: targetPos.x, y: 0, z: targetPos.z }, 800)
+                .easing(TWEEN.Easing.Quadratic.Out).start();
+
+            new TWEEN.Tween(camera.position)
+                .to({ x: targetPos.x, y: targetPos.y + 12, z: targetPos.z + 14 }, 1000)
+                .easing(TWEEN.Easing.Cubic.Out).start();
+
+            // Pulo visual de feedback
+            const originalY = targetPos.y;
+            new TWEEN.Tween(mesh.position)
+                .to({ y: originalY + 1.2 }, 150)
+                .yoyo(true).repeat(1)
+                .easing(TWEEN.Easing.Quadratic.Out).start();
+
+            // Destacar o estande mudando material temporariamente
+            destacarEstandeUnico(mesh);
+
+            limparRota();
+
+            // Notifica React Native
+            if (isEmbedded && !skipPostMessage) {
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'BOOTH_SELECTED',
+                    id: dados.id,
+                    number: dados.number,
+                    name: dados.name,
+                    zone: dados.zone
+                }));
+            }
+        }
+
+        function destacarEstandeUnico(meshAlvo) {
+            estandesGlobais.forEach(item => {
+                if (item.mesh === meshAlvo) {
+                    item.mesh.material.emissive = new THREE.Color(0xd4af37);
+                    item.mesh.material.emissiveIntensity = 0.4;
+                } else {
+                    item.mesh.material.emissive = new THREE.Color(0x000000);
+                    item.mesh.material.emissiveIntensity = 0;
+                    item.mesh.material.opacity = 0.35; // Esmaece os outros
+                }
+            });
+        }
+
+        // Focar estande nativamente pelo número (chamado via bridge)
+        window.focarEstandePeloNumero = function (numString) {
+            const numClean = String(numString).replace(/^0+/, '');
+            const meshFound = interactableObjects.find(mesh => {
+                const n = mesh.userData.number ? String(mesh.userData.number).replace(/^0+/, '') : '';
+                return n === numClean;
+            });
+            if (meshFound) {
+                selecionarEstande(meshFound, true);
+            }
+        }
+
+        function fecharPainel(skipPostMessage = false) {
+            document.getElementById('boothSheet').classList.remove('active');
+            limparRota();
+
+            // Restaura opacidades
+            estandesGlobais.forEach(item => {
+                item.mesh.material.emissive = new THREE.Color(0x000000);
+                item.mesh.material.emissiveIntensity = 0;
+                item.mesh.material.opacity = 0.9;
+            });
+
+            if (isEmbedded && !skipPostMessage) {
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'BOOTH_DESELECTED'
+                }));
+            }
+        }
+
+        function zoomIn() {
+            const zoomTarget = camera.position.clone().lerp(controls.target, 0.3);
+            new TWEEN.Tween(camera.position).to(zoomTarget, 300).start();
+        }
+
+        function zoomOut() {
+            const dir = camera.position.clone().sub(controls.target).normalize().multiplyScalar(6);
+            const zoomTarget = camera.position.clone().add(dir);
+            new TWEEN.Tween(camera.position).to(zoomTarget, 300).start();
+        }
+
+        function topView() {
+            fecharPainel(true);
+            new TWEEN.Tween(camera.position)
+                .to({ x: 0, y: 62, z: 0.1 }, 900)
+                .easing(TWEEN.Easing.Cubic.Out).start();
+            new TWEEN.Tween(controls.target)
+                .to({ x: 0, y: 0, z: 0 }, 900)
+                .easing(TWEEN.Easing.Cubic.Out).start();
+        }
+
+        // ==========================================
+        // 6. NAVEGAÇÃO GPS 3D
+        // ==========================================
+        function limparRota() {
+            if (routeLine) scene.remove(routeLine);
+            if (routeSphere) scene.remove(routeSphere);
+            if (routeAnimationTween) routeAnimationTween.stop();
+            routeLine = null; routeSphere = null;
+        }
+
+        function tracarRota() {
+            if (!estandeAlvoAtual) return;
+            limparRota();
+
+            const btn = document.getElementById('btnRota');
+            btn.className = 'action-btn navigating';
+            document.getElementById('txtBtnRota').textContent = 'Seguindo a luz azul...';
+
+            const start = window.pontoEntrada.clone();
+            const end = estandeAlvoAtual.position.clone();
+            end.y = 0.2;
+
+            // Pontos da rota (Entrada -> Eixo Z central -> Eixo X do estande -> Estande)
+            // Dá um caminho realista pelos corredores
+            const points = [
+                start,
+                new THREE.Vector3(start.x, 0.2, end.z),
+                end
+            ];
+
+            const routeGeo = new THREE.BufferGeometry().setFromPoints(points);
+            const routeMat = new THREE.LineBasicMaterial({
+                color: 0x06b6d4,
+                linewidth: 4,
+                transparent: true,
+                opacity: 0.7
+            });
+            routeLine = new THREE.Line(routeGeo, routeMat);
+            scene.add(routeLine);
+
+            // Esfera de luz guia brilhante
+            const sphereGeo = new THREE.SphereGeometry(0.5, 16, 16);
+            const sphereMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+            routeSphere = new THREE.Mesh(sphereGeo, sphereMat);
+
+            const pointLight = new THREE.PointLight(0x00f0ff, 2, 8);
+            routeSphere.add(pointLight);
+            scene.add(routeSphere);
+
+            const path = new THREE.CatmullRomCurve3(points);
+            const data = { t: 0 };
+
+            routeAnimationTween = new TWEEN.Tween(data)
+                .to({ t: 1 }, 3200)
+                .onUpdate(() => {
+                    const pos = path.getPointAt(data.t);
+                    routeSphere.position.copy(pos);
+                })
+                .repeat(Infinity)
+                .start();
+        }
+
+        // ==========================================
+        // 7. PESQUISA E FILTROS
+        // ==========================================
+        function togglePesquisa() {
+            const barra = document.getElementById('searchBar');
+            barra.classList.toggle('active');
+            if (barra.classList.contains('active')) document.getElementById('searchInput').focus();
+            else {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('searchResults').classList.remove('active');
+                filtrarEstandes();
+            }
+        }
+
+        function filtrarEstandes() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            const matches = [];
+
+            estandesGlobais.forEach(item => {
+                const dados = item.mesh.userData;
+                const match = dados.name.toLowerCase().includes(termo) ||
+                    (dados.number && dados.number.includes(termo)) ||
+                    dados.zone.toLowerCase().includes(termo);
+                dados.searchVisible = match || termo === '';
+
+                if (match && termo !== '') {
+                    matches.push(item.mesh);
+                }
+
+                new TWEEN.Tween(item.mesh.material)
+                    .to({ opacity: (match || termo === '') ? 0.9 : 0.08 }, 200)
+                    .start();
+
+                // Esconde label
+                if (item.mesh.children.length > 0) {
+                    item.mesh.children[0].material.opacity = (match || termo === '') ? 1 : 0;
+                }
+            });
+
+            renderSearchResults(termo, matches);
+        }
+
+        function renderSearchResults(termo, matches) {
+            const results = document.getElementById('searchResults');
+            if (!termo) {
+                results.classList.remove('active');
+                results.innerHTML = '';
+                return;
+            }
+
+            results.classList.add('active');
+            const limited = matches.slice(0, 12);
+
+            if (limited.length === 0) {
+                results.innerHTML = '<div class="result-empty">Nenhum estande encontrado.</div>';
+                return;
+            }
+
+            results.innerHTML = limited.map(mesh => {
+                const dados = mesh.userData;
+                const number = dados.number || 'Info';
+                return `
+                    <button class="result-item" type="button" data-id="${dados.id}">
+                        <span class="result-number">${number}</span>
+                        <span>
+                            <span class="result-name">${dados.name}</span>
+                            <span class="result-zone">${dados.zone}</span>
+                        </span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('searchResults').addEventListener('click', (event) => {
+            const button = event.target.closest('.result-item');
+            if (!button) return;
+            const mesh = interactableObjects.find(obj => obj.userData.id === button.dataset.id);
+            if (!mesh) return;
+            selecionarEstande(mesh);
+            document.getElementById('searchResults').classList.remove('active');
+        });
+
+        // ==========================================
+        // 8. ESCUTA DE MENSAGENS DO APP NATIVO
+        // ==========================================
+        window.addEventListener('message', (event) => {
+            try {
+                const message = JSON.parse(event.data);
+                if (message.type === 'SELECT_STAND') {
+                    const standNum = String(message.standNumber).replace(/^0+/, '');
+                    const meshFound = interactableObjects.find(mesh => {
+                        const num = mesh.userData.number ? String(mesh.userData.number).replace(/^0+/, '') : '';
+                        return num === standNum;
+                    });
+                    if (meshFound) {
+                        selecionarEstande(meshFound, true);
+                    }
+                } else if (message.type === 'RESET_VIEW') {
+                    resetCamera();
+                } else if (message.type === 'ROUTE_TO_STAND') {
+                    const standNum = String(message.standNumber).replace(/^0+/, '');
+                    const meshFound = interactableObjects.find(mesh => {
+                        const num = mesh.userData.number ? String(mesh.userData.number).replace(/^0+/, '') : '';
+                        return num === standNum;
+                    });
+                    if (meshFound) {
+                        selecionarEstande(meshFound, true);
+                        setTimeout(tracarRota, 800);
+                    }
+                }
+            } catch (err) {
+                console.error("Erro ao receber mensagem na ponte da WebView:", err);
+            }
+        });
+
+        // ==========================================
+        // 9. LOOP DE RENDERIZAÇÃO
+        // ==========================================
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, canvas.clientHeight);
+        });
+
+        function animate(time) {
+            requestAnimationFrame(animate);
+            TWEEN.update(time);
+            controls.update();
+
+            // Rotação dos textos para olhar sempre para a câmera (Billboard)
+            interactableObjects.forEach(mesh => {
+                if (mesh.children.length > 0) {
+                    mesh.children[0].quaternion.copy(camera.quaternion);
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        resetCamera();
+        animate();
+    </script>
+</body>
+
+</html>

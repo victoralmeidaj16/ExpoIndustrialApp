@@ -43,3 +43,9 @@ example
 /ios
 /android
 .vercel
+
+# match-web (Next.js)
+match-web/.next/
+match-web/out/
+match-web/.env.local
+match-web/tsconfig.tsbuildinfo
