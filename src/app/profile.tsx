@@ -41,6 +41,7 @@ import {
 } from '@/features/visitor/visitor-profile';
 
 import {
+  exportLeadsCsv,
   exportLeadVCard,
   leadMessageUrl,
   removeSavedLead,
@@ -83,7 +84,7 @@ export default function ProfileScreen() {
             try {
               const { deleteDoc, doc } = await import('firebase/firestore');
               const { db, auth } = await import('@/lib/firebase');
-              if (auth?.currentUser) {
+              if (auth?.currentUser && db) {
                 const uid = auth.currentUser.uid;
                 await deleteDoc(doc(db, 'visitors', uid));
                 await auth.currentUser.delete();
@@ -111,15 +112,22 @@ export default function ProfileScreen() {
   // Preenche o formulário uma vez: demo, perfil salvo, ou vazio.
   useEffect(() => {
     if (hydrated) return;
-    if (demoMode) {
-      setForm(DEMO_VISITOR_PROFILE);
-      setHydrated(true);
-      return;
-    }
-    if (!loading && user) {
-      setForm(profile ?? { ...EMPTY_VISITOR_PROFILE });
-      setHydrated(true);
-    }
+    let active = true;
+    queueMicrotask(() => {
+      if (!active || hydrated) return;
+      if (demoMode) {
+        setForm(DEMO_VISITOR_PROFILE);
+        setHydrated(true);
+        return;
+      }
+      if (!loading && user) {
+        setForm(profile ?? { ...EMPTY_VISITOR_PROFILE });
+        setHydrated(true);
+      }
+    });
+    return () => {
+      active = false;
+    };
   }, [demoMode, loading, user, profile, hydrated]);
 
   const set = <K extends keyof VisitorProfile>(key: K, value: VisitorProfile[K]) =>
@@ -297,7 +305,7 @@ export default function ProfileScreen() {
         animationType="fade"
         onRequestClose={() => setZoomVisible(false)}>
         <Pressable style={styles.zoomOverlay} onPress={() => setZoomVisible(false)}>
-          <View style={styles.zoomContent} onStartShouldSetResponder={() => true} ResponderEventPlugin={() => {}}>
+          <View style={styles.zoomContent} onStartShouldSetResponder={() => true}>
             <Text style={styles.zoomTitle}>Meu Crachá Digital</Text>
             <Text style={styles.zoomSubtitle}>Apresente este código para outros participantes ou expositores</Text>
             
@@ -644,6 +652,18 @@ export default function ProfileScreen() {
             Contatos comerciais escaneados por QR Code nos estandes ou adicionados durante as rodadas
             de PPCP e S&OP.
           </Text>
+          {savedLeads.length > 0 ? (
+            <Pressable
+              style={styles.exportCsvBtn}
+              onPress={() =>
+                exportLeadsCsv(savedLeads, 'meus-leads').catch((err) =>
+                  Alert.alert('Exportar CSV', (err as Error).message),
+                )
+              }>
+              <Ionicons name="download-outline" size={16} color={Brand.bgPrimary} />
+              <Text style={styles.exportCsvText}>Exportar lista CSV</Text>
+            </Pressable>
+          ) : null}
 
           {savedLeads.length === 0 ? (
             <View style={styles.leadsEmpty}>
@@ -1061,6 +1081,17 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
   },
   leadActionText: { color: Brand.textPrimary, fontSize: 12.5, fontWeight: '700' },
+  exportCsvBtn: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Brand.gold,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: 10,
+  },
+  exportCsvText: { color: Brand.bgPrimary, fontSize: 12.5, fontWeight: '800' },
   consentCard: {
     backgroundColor: Brand.bgCard,
     borderWidth: 1,

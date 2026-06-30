@@ -27,6 +27,7 @@ import {
   uploadExhibitorLogo,
   type ExhibitorFormData,
 } from '@/features/exhibitors/my-exhibitor';
+import { exportLeadsCsv, useSavedLeads } from '@/features/visitor/leads';
 
 type ArrayFieldKey = 'products' | 'segments' | 'targetAudience' | 'lookingFor' | 'keywords';
 
@@ -109,10 +110,16 @@ function getFilledChecks(data: ExhibitorFormData) {
   });
 }
 
+function formatLeadDate(value?: number) {
+  if (!value) return 'Data não informada';
+  return new Date(value).toLocaleString('pt-BR');
+}
+
 export default function ExhibitorWebForm() {
   const insets = useSafeAreaInsets();
   const { user, initializing, signOut } = useAuth();
   const { exhibitor, loading } = useMyExhibitor();
+  const { leads, loading: leadsLoading } = useSavedLeads();
 
   const [form, setForm] = useState<ExhibitorFormData>(EMPTY_FORM);
   const [hydrated, setHydrated] = useState(false);
@@ -271,7 +278,7 @@ export default function ExhibitorWebForm() {
                 login: 'Entre com o e-mail da empresa para revisar o cadastro.',
                 signup: 'Crie o acesso da empresa para preencher o perfil público.',
               }}
-              onSuccess={() => router.replace('/expositor')}
+              onSuccess={() => router.replace('/')}
             />
           </View>
         </View>
@@ -360,7 +367,7 @@ export default function ExhibitorWebForm() {
                   style={styles.secondaryButton}
                   onPress={async () => {
                     await signOut();
-                    router.replace('/expositor');
+                    router.replace('/', { relativeToDirectory: true } as any);
                   }}
                   disabled={busy}>
                   <Ionicons name="log-out-outline" size={16} color={Brand.textSecondary} />
@@ -456,6 +463,68 @@ export default function ExhibitorWebForm() {
                 })}
               </View>
             </View>
+          </View>
+
+          <View style={styles.leadsPanel}>
+            <View style={styles.leadsHeader}>
+              <View>
+                <Text style={styles.panelKicker}>Leads em tempo real</Text>
+                <Text style={styles.leadsTitle}>{leads.length} contato(s) captado(s)</Text>
+                <Text style={styles.leadsSubtitle}>
+                  Lista dos visitantes escaneados pela equipe do estande com este acesso.
+                </Text>
+              </View>
+              {leads.length > 0 ? (
+                <Pressable
+                  style={styles.exportButton}
+                  onPress={() =>
+                    exportLeadsCsv(leads, 'leads-expositor').catch((err) =>
+                      setError((err as Error).message),
+                    )
+                  }>
+                  <Ionicons name="download-outline" size={16} color="#0A1021" />
+                  <Text style={styles.exportButtonText}>Exportar CSV</Text>
+                </Pressable>
+              ) : null}
+            </View>
+
+            {leadsLoading ? (
+              <ActivityIndicator color={GOLD} />
+            ) : leads.length === 0 ? (
+              <View style={styles.emptyLeads}>
+                <Ionicons name="qr-code-outline" size={24} color={TEXT_FAINT} />
+                <Text style={styles.emptyLeadsText}>
+                  Nenhum lead captado ainda. Use o perfil do expositor no app para escanear o QR Code
+                  do crachá do visitante.
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.leadsList}>
+                {leads.map((lead) => (
+                  <View key={lead.id} style={styles.leadCard}>
+                    <View style={styles.leadTop}>
+                      <View style={styles.leadAvatar}>
+                        <Text style={styles.leadAvatarText}>
+                          {(lead.name || 'LD').slice(0, 2).toUpperCase()}
+                        </Text>
+                      </View>
+                      <View style={styles.leadCopy}>
+                        <Text style={styles.leadName}>{lead.name || 'Contato sem nome'}</Text>
+                        <Text style={styles.leadMeta}>
+                          {lead.role || 'Cargo não informado'} · {lead.company || 'Empresa não informada'}
+                        </Text>
+                      </View>
+                      <Text style={styles.leadDate}>{formatLeadDate(lead.createdAt)}</Text>
+                    </View>
+                    <View style={styles.leadDetails}>
+                      <Text style={styles.leadDetailText}>{lead.email || 'Sem e-mail'}</Text>
+                      <Text style={styles.leadDetailText}>{lead.phone || 'Sem telefone'}</Text>
+                      <Text style={styles.leadDetailText}>{lead.source || 'Origem não informada'}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
 
           {error && (
@@ -1260,6 +1329,125 @@ const styles = StyleSheet.create({
   },
   checkTextDone: {
     color: TEXT_MUTED,
+  },
+  leadsPanel: {
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 8,
+    padding: Spacing.four,
+    gap: Spacing.three,
+  },
+  leadsHeader: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: Spacing.three,
+  },
+  leadsTitle: {
+    color: TEXT_DARK,
+    fontSize: 20,
+    fontWeight: '900',
+    marginTop: 4,
+  },
+  leadsSubtitle: {
+    color: TEXT_MUTED,
+    fontSize: 13.5,
+    lineHeight: 20,
+    marginTop: 4,
+  },
+  exportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: GOLD,
+    borderRadius: 8,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: 11,
+  },
+  exportButtonText: {
+    color: '#0A1021',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  emptyLeads: {
+    alignItems: 'center',
+    gap: Spacing.two,
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 8,
+    backgroundColor: SURFACE_MUTED,
+    padding: Spacing.four,
+  },
+  emptyLeadsText: {
+    color: TEXT_MUTED,
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: 'center',
+  },
+  leadsList: {
+    gap: Spacing.two,
+  },
+  leadCard: {
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 8,
+    backgroundColor: SURFACE,
+    padding: Spacing.three,
+    gap: Spacing.two,
+  },
+  leadTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.two,
+  },
+  leadAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: Radius.pill,
+    backgroundColor: GOLD_SOFT,
+    borderWidth: 1,
+    borderColor: GOLD_BORDER,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  leadAvatarText: {
+    color: GOLD,
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  leadCopy: {
+    flex: 1,
+    minWidth: 180,
+  },
+  leadName: {
+    color: TEXT_DARK,
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  leadMeta: {
+    color: TEXT_MUTED,
+    fontSize: 12.5,
+    lineHeight: 18,
+    marginTop: 2,
+  },
+  leadDate: {
+    color: TEXT_FAINT,
+    fontSize: 11.5,
+    fontWeight: '700',
+  },
+  leadDetails: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.two,
+    paddingTop: Spacing.two,
+    borderTopWidth: 1,
+    borderTopColor: BORDER,
+  },
+  leadDetailText: {
+    color: TEXT_MUTED,
+    fontSize: 12.5,
   },
   feedbackError: {
     flexDirection: 'row',

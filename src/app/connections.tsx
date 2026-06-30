@@ -219,7 +219,7 @@ export default function ConnectionsScreen() {
         onRequestClose={() => setScannerVisible(false)}>
         <View style={styles.scannerContainer}>
           <CameraView
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
             facing="back"
             onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
           />
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
   scannerOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',

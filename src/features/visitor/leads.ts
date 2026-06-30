@@ -27,12 +27,16 @@ import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 
 export type SavedLead = {
   id: string;
+  ownerUid?: string;
   name: string;
   role: string;
   company: string;
   source: string;
   email: string;
   phone?: string;
+  exhibitorId?: string;
+  exhibitorName?: string;
+  stand?: string;
   /** Epoch ms da captação — usado para ordenar (mais recentes primeiro). */
   createdAt?: number;
 };
@@ -84,7 +88,11 @@ function fromDoc(snap: QueryDocumentSnapshot): SavedLead {
     company: (data.company as string) ?? '',
     source: (data.source as string) ?? '',
     email: (data.email as string) ?? '',
+    ownerUid: data.ownerUid as string | undefined,
     phone: data.phone as string | undefined,
+    exhibitorId: data.exhibitorId as string | undefined,
+    exhibitorName: data.exhibitorName as string | undefined,
+    stand: data.stand as string | undefined,
     createdAt: typeof data.createdAt === 'number' ? data.createdAt : undefined,
   };
 }
@@ -144,7 +152,7 @@ export async function addSavedLead(lead: Omit<SavedLead, 'id' | 'createdAt'>): P
 
   const createdAt = Date.now();
   const created = await addDoc(collection(db!, LEADS_COLLECTION), { ...lead, ownerUid: uid, createdAt });
-  return { ...lead, id: created.id, createdAt };
+  return { ...lead, ownerUid: uid, id: created.id, createdAt };
 }
 
 /** Remove um lead do dono logado (no Firestore) ou do armazenamento local. */
@@ -197,6 +205,45 @@ export function useSavedLeads(): { leads: SavedLead[]; loading: boolean } {
 
     return unsubscribe;
   }, [uid]);
+
+  return { leads, loading };
+}
+
+/**
+ * Assina todos os leads em tempo real para o organizador/admin. As rules só
+ * liberam essa leitura quando o usuário atual existe em `admins/{uid}`.
+ */
+export function useAllLeads(enabled: boolean): { leads: SavedLead[]; loading: boolean } {
+  const [leads, setLeads] = useState<SavedLead[]>([]);
+  const [loading, setLoading] = useState(enabled);
+
+  useEffect(() => {
+    if (!enabled || !isFirebaseConfigured || !db) {
+      let active = true;
+      queueMicrotask(() => {
+        if (!active) return;
+        setLeads([]);
+        setLoading(false);
+      });
+      return () => {
+        active = false;
+      };
+    }
+
+    const unsubscribe = onSnapshot(
+      collection(db, LEADS_COLLECTION),
+      (snap) => {
+        setLeads(snap.docs.map(fromDoc).sort(byNewest));
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Erro ao assinar todos os leads:', err);
+        setLoading(false);
+      },
+    );
+
+    return unsubscribe;
+  }, [enabled]);
 
   return { leads, loading };
 }
@@ -255,5 +302,84 @@ export async function exportLeadVCard(lead: SavedLead): Promise<void> {
     mimeType: 'text/vcard',
     UTI: 'public.vcard',
     dialogTitle: `Exportar ${lead.name}`,
+  });
+}
+
+function escapeCsv(value: unknown): string {
+  const text = String(value ?? '');
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function formatCsvDate(value?: number): string {
+  if (!value) return '';
+  return new Date(value).toLocaleString('pt-BR');
+}
+
+function buildLeadsCsv(leads: SavedLead[]): string {
+  const header = [
+    'Nome',
+    'Cargo',
+    'Empresa',
+    'Email',
+    'Telefone',
+    'Origem',
+    'Expositor',
+    'Estande',
+    'UID do captador',
+    'Data de captacao',
+  ];
+  const rows = leads.map((lead) => [
+    lead.name,
+    lead.role,
+    lead.company,
+    lead.email,
+    lead.phone ?? '',
+    lead.source,
+    lead.exhibitorName ?? '',
+    lead.stand ?? '',
+    lead.ownerUid ?? '',
+    formatCsvDate(lead.createdAt),
+  ]);
+  return [header, ...rows].map((row) => row.map(escapeCsv).join(',')).join('\r\n');
+}
+
+function csvFilename(prefix: string) {
+  const stamp = new Date().toISOString().slice(0, 10);
+  return `${prefix}-${stamp}.csv`;
+}
+
+/**
+ * Exporta a lista detalhada em CSV. No web baixa o arquivo diretamente; no app
+ * nativo abre o compartilhamento do sistema.
+ */
+export async function exportLeadsCsv(leads: SavedLead[], filenamePrefix = 'leads'): Promise<void> {
+  const filename = csvFilename(filenamePrefix);
+  const csv = `\uFEFF${buildLeadsCsv(leads)}`;
+
+  if (typeof document !== 'undefined' && typeof URL !== 'undefined' && typeof Blob !== 'undefined') {
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    return;
+  }
+
+  if (!(await Sharing.isAvailableAsync())) {
+    throw new Error('Compartilhamento indisponível neste dispositivo.');
+  }
+
+  const file = new File(Paths.cache, filename);
+  if (file.exists) file.delete();
+  file.create();
+  file.write(csv);
+  await Sharing.shareAsync(file.uri, {
+    mimeType: 'text/csv',
+    UTI: 'public.comma-separated-values-text',
+    dialogTitle: 'Exportar leads em CSV',
   });
 }

@@ -70,12 +70,14 @@ service cloud.firestore {
                     && resource.data.fromUid == request.auth.uid;
     }
 
-    // Leads/contatos captados — privados de quem captou (`ownerUid`). Cada um lê,
-    // cria, atualiza e apaga somente os próprios; na criação não pode forjar o
-    // `ownerUid` de outra pessoa.
+    // Leads/contatos captados — privados de quem captou (`ownerUid`) e visíveis
+    // ao organizador/admin para consolidação operacional. Na criação o cliente
+    // não pode forjar o `ownerUid` de outra pessoa.
     match /leads/{id} {
-      allow read, update, delete: if request.auth != null
-                                  && resource.data.ownerUid == request.auth.uid;
+      allow read: if isAdmin()
+                  || (request.auth != null && resource.data.ownerUid == request.auth.uid);
+      allow update, delete: if request.auth != null
+                            && resource.data.ownerUid == request.auth.uid;
       allow create: if request.auth != null
                     && request.resource.data.ownerUid == request.auth.uid;
     }

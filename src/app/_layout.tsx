@@ -82,6 +82,9 @@ export default function TabLayout() {
           {/* Rotas acessíveis por navegação, mas fora da barra de abas */}
         <Tabs.Screen name="matchmaking" options={{ href: null }} />
         <Tabs.Screen name="map-skia" options={{ href: null }} />
+        <Tabs.Screen name="map-3d" options={{ href: null }} />
+        <Tabs.Screen name="privacy" options={{ href: null }} />
+        <Tabs.Screen name="terms" options={{ href: null }} />
         <Tabs.Screen name="exhibitor" options={{ href: null }} />
         <Tabs.Screen name="visitor" options={{ href: null }} />
         <Tabs.Screen name="assistant" options={{ href: null }} />

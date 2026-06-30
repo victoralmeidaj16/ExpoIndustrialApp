@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mapFrame: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: Brand.bgPrimary,
   },
   webview: {
@@ -706,7 +706,7 @@ const styles = StyleSheet.create({
   kicker: {
     color: Brand.gold,
     fontSize: 10,
-    fontWeight: '805',
+    fontWeight: '800',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },

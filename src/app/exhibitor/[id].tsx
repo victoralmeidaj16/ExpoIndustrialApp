@@ -75,6 +75,9 @@ export default function ExhibitorScreen() {
             email: visitorInfo.email || '',
             phone: visitorInfo.phone || '',
             source: `Estande: ${booth?.company ?? 'não identificado'}`,
+            exhibitorId: booth?.id,
+            exhibitorName: booth?.company,
+            stand: booth?.stand,
           });
           Alert.alert('Sucesso!', `Contato de ${visitorInfo.name} salvo com sucesso!`);
         } else {
@@ -91,6 +94,9 @@ export default function ExhibitorScreen() {
             email: visitorInfo.email,
             phone: visitorInfo.phone || '',
             source: `Estande: ${booth?.company ?? 'não identificado'}`,
+            exhibitorId: booth?.id,
+            exhibitorName: booth?.company,
+            stand: booth?.stand,
           });
           Alert.alert('Sucesso!', `Contato de ${visitorInfo.name} salvo com sucesso!`);
         } else {

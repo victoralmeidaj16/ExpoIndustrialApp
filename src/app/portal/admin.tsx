@@ -24,10 +24,11 @@ import { type Exhibitor } from '@/features/exhibitors/exhibitor';
 import { useSessions } from '@/features/agenda/use-sessions';
 import { updateSponsorLogoUrl, uploadSponsorLogo, type Sponsor } from '@/features/sponsors/sponsor';
 import { useSponsors } from '@/features/sponsors/use-sponsors';
+import { exportLeadsCsv, useAllLeads, type SavedLead } from '@/features/visitor/leads';
 
 type StatusFilter = 'review' | 'published' | 'all';
 type QualityFilter = 'all' | 'missingStand' | 'missingLogo' | 'missingContact';
-type AdminTab = 'exhibitors' | 'visitors' | 'sponsors';
+type AdminTab = 'exhibitors' | 'visitors' | 'leads' | 'sponsors';
 
 const APPROVAL_ITEMS = [
   { key: 'logo', label: 'Logo' },
@@ -83,12 +84,36 @@ function isReadyForPublication(item: Exhibitor) {
     .every((approvalItem) => approvalItem.done);
 }
 
+function formatLeadDate(value?: number) {
+  if (!value) return 'Data não informada';
+  return new Date(value).toLocaleString('pt-BR');
+}
+
+function leadSearchText(lead: SavedLead) {
+  return normalizeSearch(
+    [
+      lead.name,
+      lead.role,
+      lead.company,
+      lead.email,
+      lead.phone,
+      lead.source,
+      lead.exhibitorName,
+      lead.stand,
+      lead.ownerUid,
+    ]
+      .filter(Boolean)
+      .join(' '),
+  );
+}
+
 export default function PortalAdmin() {
   const insets = useSafeAreaInsets();
   const { user, initializing, signOut } = useAuth();
   const { isAdmin, loading: roleLoading } = useAdminRole();
   const { exhibitors, loading: exhibitorsLoading } = useAdminExhibitors(isAdmin);
   const { visitors, loading: visitorsLoading } = useAdminVisitors(isAdmin);
+  const { leads, loading: leadsLoading } = useAllLeads(isAdmin);
   const { sessions } = useSessions();
   const { sponsors } = useSponsors();
   const [adminTab, setAdminTab] = useState<AdminTab>('exhibitors');
@@ -199,6 +224,10 @@ export default function PortalAdmin() {
       })
     : sponsors;
 
+  const filteredLeads = normalizedSearch
+    ? leads.filter((lead) => leadSearchText(lead).includes(normalizedSearch))
+    : leads;
+
   async function changeStatus(item: Exhibitor, nextStatus: 'draft' | 'published') {
     if (nextStatus === 'published' && !isReadyForPublication(item)) {
       Alert.alert(
@@ -296,6 +325,7 @@ export default function PortalAdmin() {
         <Metric label="Em análise" value={draftCount} tone="warning" />
         <Metric label="Publicados" value={publishedCount} tone="success" />
         <Metric label="Total Visitantes" value={visitors.length} />
+        <Metric label="Leads captados" value={leads.length} tone="success" />
         <Metric label="Onboarding OK" value={completedOnboardingCount} tone="success" />
       </View>
 
@@ -346,6 +376,21 @@ export default function PortalAdmin() {
             Patrocinadores ({sponsors.length})
           </Text>
         </Pressable>
+        <Pressable
+          style={[styles.adminTabBtn, adminTab === 'leads' && styles.adminTabBtnActive]}
+          onPress={() => {
+            setAdminTab('leads');
+            setSearch('');
+          }}>
+          <Ionicons
+            name="id-card-outline"
+            size={16}
+            color={adminTab === 'leads' ? Brand.gold : Brand.textMuted}
+          />
+          <Text style={[styles.adminTabBtnText, adminTab === 'leads' && styles.adminTabBtnTextActive]}>
+            Leads ({leads.length})
+          </Text>
+        </Pressable>
       </View>
 
       {adminTab === 'exhibitors' && missingStandCount > 0 && (
@@ -364,18 +409,35 @@ export default function PortalAdmin() {
               ? 'Cadastros de expositores'
               : adminTab === 'visitors'
                 ? 'Cadastros de visitantes'
-                : 'Logos dos patrocinadores'}
+                : adminTab === 'leads'
+                  ? 'Leads captados'
+                  : 'Logos dos patrocinadores'}
           </Text>
           <Text style={styles.sectionMeta}>
             {adminTab === 'exhibitors'
               ? `${filtered.length} de ${exhibitors.length} cadastros · ${sessions.length} sessões · ${sponsors.length} patrocinadores`
               : adminTab === 'visitors'
                 ? `${filteredVisitors.length} de ${visitors.length} visitantes cadastrados`
-                : `${filteredSponsors.length} de ${sponsors.length} patrocinadores · imagens exibidas na home`}
+                : adminTab === 'leads'
+                  ? `${filteredLeads.length} de ${leads.length} contatos captados em tempo real`
+                  : `${filteredSponsors.length} de ${sponsors.length} patrocinadores · imagens exibidas na home`}
           </Text>
         </View>
-        {(exhibitorsLoading || visitorsLoading) && <ActivityIndicator color={Brand.gold} />}
+        {(exhibitorsLoading || visitorsLoading || leadsLoading) && <ActivityIndicator color={Brand.gold} />}
       </View>
+
+      {adminTab === 'leads' && leads.length > 0 ? (
+        <Pressable
+          style={styles.exportButton}
+          onPress={() =>
+            exportLeadsCsv(filteredLeads, 'leads-organizador').catch((err) =>
+              Alert.alert('Exportar CSV', (err as Error).message),
+            )
+          }>
+          <Ionicons name="download-outline" size={16} color={Brand.bgPrimary} />
+          <Text style={styles.exportButtonText}>Exportar CSV filtrado</Text>
+        </Pressable>
+      ) : null}
 
       <View style={styles.searchBox}>
         <Ionicons name="search-outline" size={18} color={Brand.textMuted} />
@@ -388,7 +450,9 @@ export default function PortalAdmin() {
               ? 'Buscar por empresa, setor, status, contato ou estande'
               : adminTab === 'visitors'
                 ? 'Buscar por nome, cargo, empresa, setor...'
-                : 'Buscar por patrocinador, tier ou texto da logo'
+                : adminTab === 'leads'
+                  ? 'Buscar por contato, empresa, expositor, estande ou e-mail'
+                  : 'Buscar por patrocinador, tier ou texto da logo'
           }
           placeholderTextColor={Brand.textMuted}
           autoCapitalize="none"
@@ -616,6 +680,48 @@ export default function PortalAdmin() {
               </View>
             </View>
           ))
+        ) : adminTab === 'leads' ? (
+          filteredLeads.map((lead) => (
+            <View key={lead.id} style={styles.exhibitorCard}>
+              <View style={styles.cardTop}>
+                <View style={styles.companyBlock}>
+                  <Text style={styles.companyName}>{lead.name || 'Contato sem nome'}</Text>
+                  <Text style={styles.companyMeta}>
+                    {lead.role || 'Cargo não informado'} ·{' '}
+                    <Text style={{ color: Brand.gold }}>{lead.company || 'Empresa não informada'}</Text>
+                  </Text>
+                </View>
+                <View style={styles.statusBadge}>
+                  <Text style={styles.statusText}>{formatLeadDate(lead.createdAt)}</Text>
+                </View>
+              </View>
+
+              <View style={styles.visitorDetails}>
+                <Text style={styles.visitorDetailsTitle}>Detalhes da captação</Text>
+                <Text style={styles.visitorText}>
+                  <Text style={styles.visitorTextLabel}>Expositor: </Text>
+                  {lead.exhibitorName || lead.source || 'Não informado'}
+                </Text>
+                <Text style={styles.visitorText}>
+                  <Text style={styles.visitorTextLabel}>Estande: </Text>
+                  {lead.stand || 'Não informado'}
+                </Text>
+                <Text style={styles.visitorText}>
+                  <Text style={styles.visitorTextLabel}>Origem: </Text>
+                  {lead.source || 'Não informada'}
+                </Text>
+              </View>
+
+              <View style={styles.cardFooter}>
+                <Text style={styles.ownerText} numberOfLines={1}>
+                  {lead.email || 'Sem e-mail'} {lead.phone ? `· ${lead.phone}` : ''}
+                </Text>
+                <Text style={styles.ownerText} numberOfLines={1}>
+                  Captador: {lead.ownerUid || 'não informado'}
+                </Text>
+              </View>
+            </View>
+          ))
         ) : (
           filteredSponsors.map((sponsor) => (
             <View key={sponsor.id} style={styles.exhibitorCard}>
@@ -673,6 +779,13 @@ export default function PortalAdmin() {
           <View style={styles.emptyBox}>
             <Ionicons name="checkmark-circle-outline" size={24} color={Brand.success} />
             <Text style={styles.emptyText}>Nenhum visitante cadastrado ou correspondente à busca.</Text>
+          </View>
+        )}
+
+        {adminTab === 'leads' && !leadsLoading && filteredLeads.length === 0 && (
+          <View style={styles.emptyBox}>
+            <Ionicons name="id-card-outline" size={24} color={Brand.textMuted} />
+            <Text style={styles.emptyText}>Nenhum lead captado ou correspondente à busca.</Text>
           </View>
         )}
 
@@ -783,6 +896,17 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   sectionTitle: { color: Brand.textPrimary, fontSize: 17, fontWeight: '900' },
   sectionMeta: { color: Brand.textMuted, fontSize: 12, marginTop: 3 },
+  exportButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Brand.gold,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: 10,
+  },
+  exportButtonText: { color: Brand.bgPrimary, fontSize: 12.5, fontWeight: '900' },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -899,6 +1023,8 @@ const styles = StyleSheet.create({
   uidText: { color: Brand.gold, fontSize: 12.5, fontWeight: '700' },
   adminTabs: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
     backgroundColor: Brand.bgCard,
     borderRadius: Radius.pill,
     borderWidth: 1,
@@ -908,6 +1034,7 @@ const styles = StyleSheet.create({
   },
   adminTabBtn: {
     flex: 1,
+    minWidth: 132,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
