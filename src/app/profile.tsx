@@ -619,6 +619,16 @@ export default function ProfileScreen() {
             )}
           </Pressable>
 
+          <Text style={[styles.sectionTitle, { marginTop: Spacing.four }]}>
+            Documentos Legais
+          </Text>
+          <Pressable
+            style={styles.legalBtn}
+            onPress={() => Linking.openURL('https://expo-industrial-sul.vercel.app/privacy')}>
+            <Ionicons name="document-text-outline" size={16} color={Brand.textSecondary} />
+            <Text style={styles.legalBtnText}>Política de Privacidade & Termos de Uso</Text>
+          </Pressable>
+
           <Text style={[styles.sectionTitle, { marginTop: Spacing.four, color: Brand.danger }]}>
             Zona de Risco
           </Text>
@@ -1155,4 +1165,17 @@ const styles = StyleSheet.create({
     marginTop: Spacing.one,
   },
   deleteBtnText: { color: Brand.danger, fontSize: 14.5, fontWeight: '700' },
+  legalBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Brand.bgCard,
+    borderWidth: 1,
+    borderColor: Brand.border,
+    borderRadius: Radius.sm,
+    paddingVertical: 12,
+    paddingHorizontal: Spacing.three,
+    marginTop: Spacing.one,
+  },
+  legalBtnText: { color: Brand.textSecondary, fontSize: 13.5, fontWeight: '600' },
 });

@@ -50,12 +50,15 @@ function standNumber(stand: string) {
 
 export default function Map3DScreen() {
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ search?: string }>();
+  const params = useLocalSearchParams<{ search?: string; stand?: string }>();
   const { exhibitors, source } = useExhibitors();
   const [query, setQuery] = useState(() => (typeof params.search === 'string' ? params.search : ''));
   const [category, setCategory] = useState<CategoryFilter>(ALL_CATEGORIES);
   const [selectedBoothId, setSelectedBoothId] = useState<string | undefined>();
+  const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef<WebView | HTMLIFrameElement | null>(null);
+
+  const standParam = typeof params.stand === 'string' ? standNumber(params.stand).replace(/^0+/, '') : '';
 
   const categories = useMemo<CategoryFilter[]>(
     () => [ALL_CATEGORIES, ...Array.from(new Set(exhibitors.map((booth) => booth.category)))],
@@ -65,9 +68,36 @@ export default function Map3DScreen() {
     () => exhibitors.filter((booth) => matchesBooth(booth, query, category)),
     [category, exhibitors, query]
   );
+
+  const deepLinkedBooth = useMemo(
+    () =>
+      standParam
+        ? exhibitors.find((booth) => standNumber(booth.stand).replace(/^0+/, '') === standParam)
+        : undefined,
+    [standParam, exhibitors]
+  );
+
   const selectedBooth =
     exhibitors.find((booth) => booth.id === selectedBoothId) ??
+    deepLinkedBooth ??
     (query || category !== ALL_CATEGORIES ? filteredBooths[0] : undefined);
+
+  const highlightedStandNumber = selectedBooth
+    ? standNumber(selectedBooth.stand)
+    : standParam;
+
+  useEffect(() => {
+    if (!mapReady || !highlightedStandNumber) return;
+
+    const timer = setTimeout(() => {
+      postMapMessage({
+        type: 'SELECT_STAND',
+        standNumber: highlightedStandNumber,
+      });
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [highlightedStandNumber, mapReady, postMapMessage]);
 
   useEffect(() => {
     if (Platform.OS !== 'web' || typeof window === 'undefined') return;
@@ -264,6 +294,7 @@ export default function Map3DScreen() {
               srcDoc={htmlSource}
               title="Mapa 3D real da Expoindustrial Sul"
               style={styles.webIframe as any}
+              onLoad={() => setMapReady(true)}
             />
           ) : (
             <WebView
@@ -273,6 +304,7 @@ export default function Map3DScreen() {
               originWhitelist={['*']}
               source={{ html: htmlSource }}
               style={styles.webview}
+              onLoadEnd={() => setMapReady(true)}
               onMessage={handleWebViewMessage}
               javaScriptEnabled={true}
               domStorageEnabled={true}
@@ -283,21 +315,28 @@ export default function Map3DScreen() {
         </View>
 
         {selectedBooth ? (
-          <View style={styles.detailsCard}>
-            <View style={styles.detailIcon}>
-              <Ionicons name="cube" size={22} color={Brand.gold} />
+          <Pressable
+            style={styles.detailsCard}
+            onPress={() => router.push(`/exhibitor/${selectedBooth.id}`)}>
+            <View style={styles.detailLogoWrapper}>
+              {selectedBooth.logoUrl ? (
+                <ExhibitorLogo
+                  logoUrl={selectedBooth.logoUrl}
+                  logo={selectedBooth.logo}
+                  style={styles.detailLogoImg}
+                  textSize={12}
+                />
+              ) : (
+                <Text style={styles.detailLogoText}>{selectedBooth.logo}</Text>
+              )}
             </View>
             <View style={styles.detailCopy}>
-              <Text style={styles.kicker}>{selectedBooth.category} · {selectedBooth.stand}</Text>
-              <Text style={styles.detailTitle}>{selectedBooth.company}</Text>
-              <Text style={styles.detailText}>{selectedBooth.industry}</Text>
+              <Text style={styles.kicker}>Estande {selectedBooth.stand} · {selectedBooth.category}</Text>
+              <Text style={styles.detailTitle} numberOfLines={1}>{selectedBooth.company}</Text>
+              <Text style={styles.detailText} numberOfLines={2}>{selectedBooth.about || selectedBooth.industry}</Text>
             </View>
-            <Pressable
-              style={styles.routeBtn}
-              onPress={handleRoutePress}>
-              <Ionicons name="navigate-circle" size={32} color={Brand.gold} />
-            </Pressable>
-          </View>
+            <Ionicons name="chevron-forward" size={20} color={Brand.textMuted} style={{ marginLeft: 4 }} />
+          </Pressable>
         ) : null}
       </ScrollView>
     </View>
@@ -507,38 +546,48 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.three,
     padding: Spacing.three,
+    marginTop: Spacing.two,
   },
-  detailIcon: {
-    alignItems: 'center',
-    backgroundColor: Brand.goldSoft,
+  detailLogoWrapper: {
+    width: 56,
+    height: 56,
+    backgroundColor: Brand.bgElevated,
     borderRadius: Radius.md,
-    height: 46,
+    alignItems: 'center',
     justifyContent: 'center',
-    width: 46,
+    borderWidth: 1,
+    borderColor: Brand.border,
+    overflow: 'hidden',
+  },
+  detailLogoImg: {
+    width: '100%',
+    height: '100%',
+  },
+  detailLogoText: {
+    color: Brand.gold,
+    fontSize: 16,
+    fontWeight: '900',
   },
   detailCopy: {
     flex: 1,
   },
   kicker: {
     color: Brand.gold,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   detailTitle: {
     color: Brand.textPrimary,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '900',
-    marginTop: 3,
+    marginTop: 2,
   },
   detailText: {
     color: Brand.textSecondary,
-    fontSize: 14,
-    marginTop: 3,
-  },
-  routeBtn: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    fontSize: 12.5,
+    marginTop: 2,
+    lineHeight: 16,
   },
 });

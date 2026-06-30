@@ -31,7 +31,9 @@ function MatchCard({ ranked, highlight }: { ranked: RankedExhibitor; highlight?:
         <ExhibitorLogo logoUrl={exhibitor.logoUrl} logo={exhibitor.logo} style={styles.logo} textSize={11} />
         <View style={styles.cardInfo}>
           <Text style={styles.companyName}>{exhibitor.company}</Text>
-          <Text style={styles.companyIndustry}>{exhibitor.industry}</Text>
+          <Text style={styles.companyIndustry}>
+            {exhibitor.industry} · <Text style={{ color: Brand.gold, fontWeight: '700' }}>Estande {exhibitor.stand}</Text>
+          </Text>
         </View>
         <ScoreRing score={fit.score} />
       </View>
@@ -55,6 +57,10 @@ function MatchCard({ ranked, highlight }: { ranked: RankedExhibitor; highlight?:
         <Pressable style={styles.btnPrimary} onPress={() => router.push(`/exhibitor/${exhibitor.id}`)}>
           <Ionicons name="open-outline" size={15} color={Brand.bgPrimary} />
           <Text style={styles.btnPrimaryText}>Ver expositor</Text>
+        </Pressable>
+        <Pressable style={styles.btnSecondary} onPress={() => router.push(`/map?stand=${exhibitor.stand}`)}>
+          <Ionicons name="map-outline" size={15} color={Brand.gold} />
+          <Text style={styles.btnSecondaryText}>Ver no Mapa</Text>
         </Pressable>
         <Pressable style={styles.btnGhost}>
           <Ionicons name="bookmark-outline" size={16} color={Brand.gold} />
@@ -337,6 +343,19 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
   },
   btnPrimaryText: { color: Brand.bgPrimary, fontSize: 14, fontWeight: '800' },
+  btnSecondary: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+    backgroundColor: Brand.goldSoft,
+    borderWidth: 1,
+    borderColor: Brand.borderGold,
+    paddingVertical: 12,
+    borderRadius: Radius.sm,
+  },
+  btnSecondaryText: { color: Brand.gold, fontSize: 14, fontWeight: '800' },
   btnGhost: {
     width: 46,
     alignItems: 'center',

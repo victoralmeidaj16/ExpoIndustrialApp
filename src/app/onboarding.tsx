@@ -14,6 +14,7 @@ import {
   TextInput,
   View,
   Switch,
+  Linking,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -464,8 +465,18 @@ export default function OnboardingScreen() {
               </View>
 
               <Text style={styles.termsText}>
-                Ao concluir, você concorda com o compartilhamento de seus dados profissionais
-                estruturados apenas com parceiros aprovados em conexões bidirecionais.
+                Ao concluir, você concorda com a nossa{' '}
+                <Text
+                  style={{ color: Brand.gold, textDecorationLine: 'underline' }}
+                  onPress={() => Linking.openURL('https://expo-industrial-sul.vercel.app/privacy')}>
+                  Política de Privacidade
+                </Text>{' '}
+                e os nossos{' '}
+                <Text
+                  style={{ color: Brand.gold, textDecorationLine: 'underline' }}
+                  onPress={() => Linking.openURL('https://expo-industrial-sul.vercel.app/terms')}>
+                  Termos de Uso
+                </Text>.
               </Text>
             </View>
           )}

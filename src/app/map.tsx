@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 
 import { Brand, Radius, Spacing } from '@/constants/theme';
+import { ExhibitorLogo } from '@/components/exhibitor-logo';
 import { useExhibitors } from '@/features/exhibitors/use-exhibitors';
 import { htmlSource } from '@/features/floor-plan/floor-plan-html';
 import { CATEGORY_COLOR, type Booth, type BoothCategory } from '@/features/venue/venue';
@@ -272,7 +273,7 @@ export default function MapScreen() {
 
     const timer = setTimeout(() => {
       postMapMessage({
-        type: 'ROUTE_TO_STAND',
+        type: 'SELECT_STAND',
         standNumber: highlightedStandNumber,
       });
     }, 300);
@@ -423,36 +424,54 @@ export default function MapScreen() {
       <View style={[styles.bottomSheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) }]}>
         <View style={styles.bottomHandle} />
         {selectedBooth ? (
-          <>
-            <View style={styles.bottomTop}>
-              <View style={[styles.categoryDot, { backgroundColor: CATEGORY_COLOR[selectedBooth.category] }]} />
-              <Text style={styles.bottomKicker}>
-                {selectedBooth.category} · {selectedBooth.stand}
-              </Text>
+          <Pressable
+            style={styles.cardPressable}
+            onPress={() => router.push(`/exhibitor/${selectedBooth.id}`)}>
+            <View style={styles.detailLogoWrapper}>
+              {selectedBooth.logoUrl ? (
+                <ExhibitorLogo
+                  logoUrl={selectedBooth.logoUrl}
+                  logo={selectedBooth.logo}
+                  style={styles.detailLogoImg}
+                  textSize={12}
+                />
+              ) : (
+                <Text style={styles.detailLogoText}>{selectedBooth.logo}</Text>
+              )}
             </View>
-            <Text style={styles.bottomTitle} numberOfLines={1}>
-              {selectedBooth.company}
-            </Text>
-            <Text style={styles.bottomText} numberOfLines={2}>
-              {selectedBooth.industry} · rota sugerida pelos corredores a partir da entrada.
-            </Text>
-          </>
+            <View style={styles.detailCopy}>
+              <Text style={styles.kicker}>Estande {selectedBooth.stand} · {selectedBooth.category}</Text>
+              <Text style={styles.detailTitle} numberOfLines={1}>{selectedBooth.company}</Text>
+              <Text style={styles.detailText} numberOfLines={2}>{selectedBooth.about || selectedBooth.industry}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={Brand.textMuted} style={{ marginLeft: 4 }} />
+          </Pressable>
         ) : highlightedStandNumber ? (
-          <>
-            <Text style={styles.bottomKicker}>{selectedMapStand?.zone ?? 'Estande destacado'}</Text>
-            <Text style={styles.bottomTitle} numberOfLines={1}>
-              {selectedMapStand?.name ?? `Estande ${highlightedStandNumber}`}
-            </Text>
-            <Text style={styles.bottomText}>Rota sugerida pelos corredores a partir da entrada.</Text>
-          </>
+          <View style={styles.cardPressable}>
+            <View style={styles.detailLogoWrapper}>
+              <Ionicons name="cube-outline" size={24} color={Brand.gold} />
+            </View>
+            <View style={styles.detailCopy}>
+              <Text style={styles.kicker}>{selectedMapStand?.zone ?? 'Estande destacado'}</Text>
+              <Text style={styles.detailTitle} numberOfLines={1}>
+                {selectedMapStand?.name ?? `Estande ${highlightedStandNumber}`}
+              </Text>
+              <Text style={styles.detailText}>Estande físico mapeado no pavilhão da feira.</Text>
+            </View>
+          </View>
         ) : (
-          <>
-            <Text style={styles.bottomKicker}>
-              {clientReady && source === 'firestore' ? 'Mapa sincronizado' : 'Mapa offline'}
-            </Text>
-            <Text style={styles.bottomTitle}>Toque em um estande</Text>
-            <Text style={styles.bottomText}>Use a busca no topo ou aproxime o mapa para localizar empresas e serviços.</Text>
-          </>
+          <View style={styles.cardPressable}>
+            <View style={styles.detailLogoWrapper}>
+              <Ionicons name="map-outline" size={24} color={Brand.textMuted} />
+            </View>
+            <View style={styles.detailCopy}>
+              <Text style={styles.kicker}>
+                {clientReady && source === 'firestore' ? 'Mapa Sincronizado' : 'Mapa Offline'}
+              </Text>
+              <Text style={styles.detailTitle}>Toque em um estande</Text>
+              <Text style={styles.detailText}>Busque pelo menu superior ou aproxime o mapa para selecionar.</Text>
+            </View>
+          </View>
         )}
       </View>
     </View>
@@ -653,5 +672,54 @@ const styles = StyleSheet.create({
     color: Brand.textSecondary,
     fontSize: 13,
     lineHeight: 18,
+  },
+  cardPressable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.three,
+    width: '100%',
+    paddingBottom: Spacing.two,
+  },
+  detailLogoWrapper: {
+    width: 52,
+    height: 52,
+    backgroundColor: Brand.bgElevated,
+    borderRadius: Radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Brand.border,
+    overflow: 'hidden',
+  },
+  detailLogoImg: {
+    width: '100%',
+    height: '100%',
+  },
+  detailLogoText: {
+    color: Brand.gold,
+    fontSize: 16,
+    fontWeight: '900',
+  },
+  detailCopy: {
+    flex: 1,
+  },
+  kicker: {
+    color: Brand.gold,
+    fontSize: 10,
+    fontWeight: '805',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  detailTitle: {
+    color: Brand.textPrimary,
+    fontSize: 16,
+    fontWeight: '900',
+    marginTop: 2,
+  },
+  detailText: {
+    color: Brand.textSecondary,
+    fontSize: 12.5,
+    marginTop: 2,
+    lineHeight: 16,
   },
 });
