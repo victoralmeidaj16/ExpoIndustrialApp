@@ -190,7 +190,7 @@ export default function PresentationPage() {
             </a>
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-[11px] font-mono text-slate-500 leading-relaxed mb-6 mt-auto">
               <span className="font-bold text-slate-700 block mb-1 text-[11px]">CREDENCIAIS DE TESTE (Portal):</span>
-              E-mail: <span className="text-slate-800 font-semibold select-all">expositor.teste.20260629@expoindustrialsul.com.br</span><br />
+              E-mail: <span className="text-slate-800 font-semibold select-all">expositor@expoindustrialsul.com</span><br />
               Senha: <span className="text-slate-800 font-semibold select-all">ExpositorExpo2026!</span>
             </div>
             <div className="border-t border-slate-50 pt-4 mt-auto">
