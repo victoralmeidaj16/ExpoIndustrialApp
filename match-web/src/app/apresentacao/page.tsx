@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
 
 // Inline SVG Icon components to avoid external dependencies
@@ -116,7 +117,7 @@ export default function PresentationPage() {
             O Futuro da Expo Industrial Sul é <span className="bg-gradient-to-r from-[#0c1527] to-[#c5a85c] bg-clip-text text-transparent">Digital & Conectado</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto mb-10">
-            Conheça o ecossistema integrado que une o Aplicativo do Evento, o Portal do Expositor e o Painel Administrativo Match365 para potencializar a geração de negócios e a coleta estratégica de dados na feira.
+            Conheça o ecossistema integrado que une o Aplicativo do Evento, o Portal do Expositor e o Painel do Organizador para potencializar a geração de negócios e a coleta estratégica de dados durante a feira.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
             <a 
@@ -141,7 +142,7 @@ export default function PresentationPage() {
           <h2 className="text-xs font-bold uppercase tracking-widest text-[#c5a85c] mb-2">Visão Geral</h2>
           <h3 className="text-3xl font-extrabold text-[#0c1527]">Integração Inteligente de Ponta a Ponta</h3>
           <p className="text-slate-500 mt-4">
-            Todas as frentes compartilham o mesmo banco de dados Firestore. Qualquer alteração ou interação de dados é propagada em tempo real para os celulares e telas da feira.
+            As frentes operacionais compartilham o mesmo banco de dados Firestore. Atualizações de expositores, agenda, patrocinadores e dados do evento são refletidas no app e no painel conectado.
           </p>
         </div>
 
@@ -179,7 +180,7 @@ export default function PresentationPage() {
             </div>
             <h4 className="text-xl font-bold text-[#0c1527] mb-3">2. Portal do Expositor (Web)</h4>
             <p className="text-slate-500 text-sm leading-relaxed mb-4">
-              Acesso exclusivo para as marcas cadastrarem seus perfis, logotipos, contatos comerciais, baixarem seu QR Code físico e visualizarem em tempo real os leads que passam pelo estande.
+              Acesso exclusivo para as marcas cadastrarem seus perfis, logotipos, contatos comerciais, emitirem o QR Code do estande e acompanharem os leads captados no evento.
             </p>
             <a 
               href="/portal/expositor/login" 
@@ -202,9 +203,9 @@ export default function PresentationPage() {
             <div className="h-12 w-12 rounded-xl bg-[#0c1527]/5 flex items-center justify-center text-[#0c1527] mb-6">
               <ShieldCheck className="h-6 w-6" />
             </div>
-            <h4 className="text-xl font-bold text-[#0c1527] mb-3">3. Admin Match365 (Organização)</h4>
+            <h4 className="text-xl font-bold text-[#0c1527] mb-3">3. Painel do Organizador</h4>
             <p className="text-slate-500 text-sm leading-relaxed mb-4">
-              A cabine de controle administrativo da organização. Permite moderar perfis de expositores, acompanhar o preenchimento de estandes, realizar o controle de patrocinadores, expositores e dados do evento, e auditar dados gerais.
+              A cabine de controle administrativo da organização. Permite revisar perfis de expositores, acompanhar o preenchimento de estandes, controlar patrocinadores, agenda, visitantes e dados gerais do evento.
             </p>
             <a 
               href="/login" 
@@ -288,15 +289,15 @@ export default function PresentationPage() {
                       <div className="h-6 w-6 rounded-full bg-amber-50 text-[#c5a85c] flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</div>
                       <div>
                         <h5 className="font-bold text-slate-800 text-sm">Adesão Física ao QR Code</h5>
-                        <p className="text-xs text-slate-500 mt-0.5">Se ele quiser, pode imprimir o QR Code exclusivo do estande físico no pavilhão da feira. Isso facilita para que o visitante do evento escaneie e salve as informações comerciais da empresa diretamente no seu perfil dentro do aplicativo da feira.</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Se ele quiser, pode imprimir o QR Code exclusivo do estande físico no pavilhão da feira. O código leva o visitante ao perfil da empresa no aplicativo, facilitando consulta, contato e salvamento da marca.</p>
                       </div>
                     </div>
 
                     <div className="flex gap-3">
                       <div className="h-6 w-6 rounded-full bg-amber-50 text-[#c5a85c] flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</div>
                       <div>
-                        <h5 className="font-bold text-slate-800 text-sm">Leads em Tempo Real</h5>
-                        <p className="text-xs text-slate-500 mt-0.5">Acompanha a lista detalhada de contatos que visitaram seu estande com opção de exportar tudo para arquivo CSV (Excel).</p>
+                        <h5 className="font-bold text-slate-800 text-sm">Leads do Evento</h5>
+                        <p className="text-xs text-slate-500 mt-0.5">Acompanha a lista detalhada de contatos captados pela equipe do estande com opção de exportar tudo para arquivo CSV (Excel).</p>
                       </div>
                     </div>
                   </div>
@@ -325,7 +326,7 @@ export default function PresentationPage() {
                 <div>
                   <h4 className="text-2xl font-black text-[#0c1527] mb-4">A Jornada do Visitante Dentro da Feira</h4>
                   <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                    O aplicativo atua como o mapa de navegação e assistente comercial do visitante. O cadastro e o uso das ferramentas seguem etapas estruturadas:
+                    O aplicativo atua como o mapa de navegação, credencial digital e assistente comercial do visitante. O cadastro e o uso das ferramentas seguem etapas estruturadas:
                   </p>
 
                   <div className="space-y-4">
@@ -357,7 +358,7 @@ export default function PresentationPage() {
                       <div className="h-6 w-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</div>
                       <div>
                         <h5 className="font-bold text-slate-800 text-sm">Coleta e Troca de Contatos</h5>
-                        <p className="text-xs text-slate-500 mt-0.5">Ele pode mostrar o QR Code de seu crachá digital para o expositor escanear, ou escanear códigos físicos e outros crachás para salvar sua lista de conexões no app.</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Ele pode mostrar o QR Code de seu crachá digital para o expositor escanear, escanear crachás de outros visitantes para conexão B2B e acessar perfis de empresas pelo QR Code do estande.</p>
                       </div>
                     </div>
                   </div>
@@ -395,7 +396,7 @@ export default function PresentationPage() {
                 <div>
                   <h4 className="text-2xl font-black text-[#0c1527] mb-4">Controle Total e Inteligência do Evento</h4>
                   <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                    A área administrativa Match365 permite monitorar o andamento das adesões, aprovar dados de expositores e moderar o fluxo de dados.
+                    O Painel do Organizador permite monitorar o andamento das adesões, revisar dados de expositores, posicionar estandes no croqui e gerenciar os dados oficiais da feira.
                   </p>
 
                   <div className="space-y-4">
@@ -419,7 +420,7 @@ export default function PresentationPage() {
                       <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
                       <div>
                         <h5 className="font-bold text-slate-800 text-sm">Moderação de Marcas e Logotipos</h5>
-                        <p className="text-xs text-slate-500 mt-0.5">Visualização imediata dos logotipos e informações enviadas pelos expositores no portal, podendo realizar edições e correções instantâneas.</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Visualização dos logotipos e informações enviadas pelos expositores no portal, com possibilidade de edição e correção pelo organizador.</p>
                       </div>
                     </div>
 
@@ -434,14 +435,14 @@ export default function PresentationPage() {
                 </div>
                 <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 flex flex-col gap-4">
                   <div className="bg-[#0c1527] text-white p-5 rounded-lg border border-white/5 shadow-md">
-                    <span className="text-xs font-bold text-[#c5a85c] block mb-2 uppercase tracking-wider">Painel Administrativo Match365</span>
+                    <span className="text-xs font-bold text-[#c5a85c] block mb-2 uppercase tracking-wider">Painel do Organizador</span>
                     <div className="space-y-2.5">
                       <div className="flex justify-between text-xs border-b border-white/10 pb-1.5">
                         <span className="text-slate-300">Estandes Reivindicados:</span>
                         <span className="font-bold text-white">82%</span>
                       </div>
                       <div className="flex justify-between text-xs border-b border-white/10 pb-1.5">
-                        <span className="text-slate-300">CPFs Importados:</span>
+                        <span className="text-slate-300">Visitantes Cadastrados:</span>
                         <span className="font-bold text-white">2.450 ativos</span>
                       </div>
                       <div className="flex justify-between text-xs">
@@ -481,12 +482,6 @@ export default function PresentationPage() {
             <Sparkles className="h-8 w-8 text-[#0c1527] mb-4" />
             <h5 className="font-bold text-[#0c1527] text-sm">Recomendações por IA</h5>
             <p className="text-xs text-slate-500 mt-2 leading-relaxed">Cruzamento de interesses para sugerir quais expositores o visitante deve conhecer e contatar no evento.</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-xs flex flex-col">
-            <UserCheck className="h-8 w-8 text-[#0c1527] mb-4" />
-            <h5 className="font-bold text-[#0c1527] text-sm">Exclusão LGPD</h5>
-            <p className="text-xs text-slate-500 mt-2 leading-relaxed">Zona de segurança no perfil para exclusão total de dados cadastrais conforme regras de privacidade exigidas pela App Store.</p>
           </div>
         </div>
       </section>
@@ -608,12 +603,12 @@ export default function PresentationPage() {
               </button>
               {openFaq === 2 && (
                 <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                  A captação ocorre de duas formas práticas:
+                  A captação ocorre de forma controlada pelo crachá digital:
                   <br />
-                  1. O visitante abre o leitor de câmera no aplicativo e escaneia o QR Code impresso no seu estande físico.
+                  1. O visitante apresenta o QR Code do seu crachá digital no app.
                   <br />
-                  2. O representante comercial da sua empresa abre o aplicativo e escaneia o crachá digital (QR Code) do visitante.
-                  Os dados do lead caem instantaneamente no seu portal de expositor.
+                  2. O representante comercial abre o perfil do expositor no app e usa o botão &quot;Captar lead&quot; para escanear o crachá do visitante.
+                  O contato fica associado ao expositor no Firestore e aparece na área de leads do Portal do Expositor.
                 </div>
               )}
             </div>
@@ -628,7 +623,7 @@ export default function PresentationPage() {
               </button>
               {openFaq === 3 && (
                 <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                  Toda a listagem de contatos coletados fica disponível em tempo real na aba "Leads" do Portal do Expositor. No final do evento, basta clicar no botão "Exportar Leads" para fazer o download de um arquivo CSV, pronto para importação em ferramentas de e-mail marketing ou sistemas de CRM.
+                  Toda a listagem de contatos coletados fica disponível na aba &quot;Leads&quot; do Portal do Expositor. No final do evento, basta clicar no botão &quot;Exportar Leads&quot; para fazer o download de um arquivo CSV, pronto para importação em ferramentas de e-mail marketing ou sistemas de CRM.
                 </div>
               )}
             </div>
@@ -650,7 +645,7 @@ export default function PresentationPage() {
               </button>
               {openFaq === 4 && (
                 <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                  A organização tem controle total de superusuário através do Painel Administrativo Match365. Você pode monitorar as fichas que estão sendo salvas, editar dados que contenham erros e remover logotipos inadequados instantaneamente sem depender do expositor.
+                  A organização tem controle administrativo através do Painel do Organizador. Você pode monitorar as fichas salvas, editar dados que contenham erros, publicar ou manter expositores em rascunho e ajustar informações do evento sem depender do expositor.
                 </div>
               )}
             </div>
@@ -665,7 +660,7 @@ export default function PresentationPage() {
               </button>
               {openFaq === 5 && (
                 <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                  Não. O aplicativo salva a planta de estandes (mapa 2D e 3D) e os dados dos expositores em cache local. A busca de estandes e a navegação funcionam 100% offline. O envio de leads captados por escaneamento de crachás é armazenado localmente e sincronizado de forma automática assim que o celular detectar internet novamente.
+                  O app tem dados locais de demonstração e mantém preferências simples no dispositivo, mas a operação oficial de expositores, leads, visitantes, agenda e painel depende do Firebase. Para a feira, a recomendação operacional é garantir internet estável no pavilhão para cadastro, atualização e captação de leads.
                 </div>
               )}
             </div>
@@ -680,7 +675,7 @@ export default function PresentationPage() {
               </button>
               {openFaq === 6 && (
                 <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                  Sim. A conta criada para o estande (ex: Estande 86) pode ser compartilhada por múltiplos representantes simultaneamente em seus próprios celulares. O Firestore integra os dados de forma transparente, reunindo todas as captações individuais no painel único de leads do expositor.
+                  Sim, desde que os representantes usem a conta do expositor vinculada ao estande. As captações gravadas com esse mesmo vínculo aparecem reunidas na área de leads do expositor.
                 </div>
               )}
             </div>
@@ -717,12 +712,12 @@ export default function PresentationPage() {
             >
               Acessar Portal do Expositor
             </a>
-            <a 
+            <Link 
               href="/" 
               className="px-6 py-3.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all"
             >
               Ver Painel Organizador
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -739,7 +734,7 @@ export default function PresentationPage() {
             <a href="/privacy" className="hover:text-white transition-colors">Política de Privacidade</a>
           </div>
           <div>
-            <span>© 2026 Todos os direitos reservados. Ecossistema desenvolvido em tempo real.</span>
+            <span>© 2026 Todos os direitos reservados. Ecossistema digital da Expo Industrial Sul.</span>
           </div>
         </div>
       </footer>
