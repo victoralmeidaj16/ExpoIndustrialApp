@@ -5,7 +5,7 @@
  * (nome/cargo/empresa) e as preferências que alimentam o matchmaking
  * (área, budget, gargalos). A leitura/escrita é restrita ao próprio dono.
  */
-import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
@@ -219,6 +219,43 @@ export function useVisitorProfile(): UseVisitorProfileResult {
   }, [uid]);
 
   return { profile, loading, error };
+}
+
+/**
+ * Dados mínimos de contato exigidos de TODO usuário no cadastro — captação de
+ * lead pedida pela organização (nome, WhatsApp, e-mail, empresa e cargo), mesmo
+ * de quem só baixa o app por curiosidade e não se inscreve no evento.
+ */
+export type LeadCapture = {
+  name: string;
+  company: string;
+  role: string;
+  phone: string;
+  email: string;
+};
+
+/**
+ * Grava os dados de lead captados no momento do cadastro em `visitors/{uid}`
+ * (visível ao organizador no painel match-web). Faz `merge`, então não sobrescreve
+ * o que o onboarding preencher depois. Best-effort: nunca deve bloquear o login.
+ */
+export async function captureLeadProfile(lead: LeadCapture): Promise<void> {
+  if (!db || !auth?.currentUser) return;
+  const uid = auth.currentUser.uid;
+  await setDoc(
+    doc(db, VISITORS_COLLECTION, uid),
+    {
+      name: lead.name.trim(),
+      company: lead.company.trim(),
+      role: lead.role.trim(),
+      phone: lead.phone.trim(),
+      email: lead.email.trim(),
+      ownerUid: uid,
+      leadCapturedAt: serverTimestamp(),
+      leadSource: 'signup',
+    },
+    { merge: true },
+  );
 }
 
 /** Cria/atualiza o perfil do visitante logado. */

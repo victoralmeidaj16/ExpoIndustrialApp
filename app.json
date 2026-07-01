@@ -44,6 +44,12 @@
         {
           "cameraPermission": "Permissão necessária para escanear QR Codes de crachás de participantes e expositores."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#E5B94E"
+        }
       ]
     ],
     "experiments": {

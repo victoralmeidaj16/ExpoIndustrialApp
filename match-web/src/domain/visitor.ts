@@ -27,6 +27,8 @@ export type VisitorProfile = {
   shareContact?: boolean;
   onboardingCompleted?: boolean;
   onboardingSkipped?: boolean;
+  /** Expo push tokens dos devices deste usuário (um por aparelho). Presença = optou por receber. */
+  pushTokens?: string[];
 };
 
 export const VISITORS_COLLECTION = 'visitors';
@@ -62,6 +64,7 @@ export const visitorConverter: FirestoreDataConverter<VisitorProfile> = {
       shareContact: data.shareContact ?? false,
       onboardingCompleted: data.onboardingCompleted ?? false,
       onboardingSkipped: data.onboardingSkipped ?? false,
+      pushTokens: Array.isArray(data.pushTokens) ? data.pushTokens : [],
     };
   },
 };

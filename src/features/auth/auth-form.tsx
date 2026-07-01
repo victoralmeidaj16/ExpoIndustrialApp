@@ -16,6 +16,7 @@ import {
 
 import { Brand, Radius, Spacing } from '@/constants/theme';
 import { authErrorMessage, useAuth } from '@/features/auth/use-auth';
+import { captureLeadProfile } from '@/features/visitor/visitor-profile';
 
 type Mode = 'login' | 'signup';
 
@@ -26,21 +27,64 @@ type Props = {
   onSuccess: () => void;
 };
 
+/** Conta só os dígitos do telefone (ignora máscara/DDI). */
+function phoneDigits(value: string) {
+  return value.replace(/\D/g, '');
+}
+
 export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess }: Props) {
   const { configured, signIn, signUp } = useAuth();
 
   const [mode, setMode] = useState<Mode>('login');
+  const [name, setName] = useState('');
+  const [company, setCompany] = useState('');
+  const [jobRole, setJobRole] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /** Valida os dados de lead exigidos no cadastro. Retorna a mensagem ou null. */
+  function validateSignup(): string | null {
+    if (!name.trim()) return 'Informe seu nome completo.';
+    if (phoneDigits(phone).length < 10) return 'Informe um WhatsApp válido com DDD.';
+    if (!company.trim()) return 'Informe o nome da sua empresa.';
+    if (!jobRole.trim()) return 'Informe seu cargo.';
+    return null;
+  }
+
   async function onSubmit() {
     setError(null);
+
+    if (mode === 'signup') {
+      const problem = validateSignup();
+      if (problem) {
+        setError(problem);
+        return;
+      }
+    }
+
     setBusy(true);
     try {
-      if (mode === 'login') await signIn(email, password);
-      else await signUp(email, password);
+      if (mode === 'login') {
+        await signIn(email, password);
+      } else {
+        await signUp(email, password);
+        // Captação de lead (obrigatória): grava nome, WhatsApp, e-mail, empresa e
+        // cargo assim que a conta é criada. Best-effort — não bloqueia o acesso.
+        try {
+          await captureLeadProfile({
+            name,
+            company,
+            role: jobRole,
+            phone,
+            email,
+          });
+        } catch {
+          // Se a gravação do lead falhar, o usuário ainda entra; o onboarding recaptura.
+        }
+      }
       onSuccess();
     } catch (err) {
       setError(authErrorMessage(err));
@@ -64,6 +108,70 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess }:
             Firebase ainda não configurado. Preencha o .env e reinicie o app.
           </Text>
         </View>
+      )}
+
+      {mode === 'signup' && (
+        <>
+          <View style={styles.field}>
+            <Text style={styles.label}>Nome completo</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Seu nome e sobrenome"
+              placeholderTextColor={Brand.textMuted}
+              autoCapitalize="words"
+              autoComplete="name"
+              textContentType="name"
+              editable={!busy}
+            />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>WhatsApp</Text>
+            <TextInput
+              style={styles.input}
+              value={phone}
+              onChangeText={setPhone}
+              placeholder="DDD + número (ex: 47 99999-9999)"
+              placeholderTextColor={Brand.textMuted}
+              keyboardType="phone-pad"
+              autoComplete="tel"
+              textContentType="telephoneNumber"
+              editable={!busy}
+            />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>Empresa</Text>
+            <TextInput
+              style={styles.input}
+              value={company}
+              onChangeText={setCompany}
+              placeholder="Nome da sua empresa"
+              placeholderTextColor={Brand.textMuted}
+              autoCapitalize="words"
+              autoComplete="organization"
+              textContentType="organizationName"
+              editable={!busy}
+            />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>Cargo</Text>
+            <TextInput
+              style={styles.input}
+              value={jobRole}
+              onChangeText={setJobRole}
+              placeholder="Ex.: Diretor de Operações, Comprador"
+              placeholderTextColor={Brand.textMuted}
+              autoCapitalize="words"
+              autoComplete="organization-title"
+              textContentType="jobTitle"
+              editable={!busy}
+            />
+          </View>
+        </>
       )}
 
       <View style={styles.field}>

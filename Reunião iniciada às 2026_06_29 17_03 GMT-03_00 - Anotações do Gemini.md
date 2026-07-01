@@ -21,9 +21,9 @@ Adotou-se o Member Kit para a gestão de cursos e certificados. A plataforma per
 
 ### **Próximas etapas**
 
-- [ ] \[Victor Almeida Jeremias\] Integrar API de inscritos: Investigar se o sistema Rai Gestor possui API ou integração via Webhook para validar CPFs de inscritos no aplicativo da feira.
+- [ ] \[Victor Almeida Jeremias\] Integrar API de inscritos: Investigar se o sistema HiGestor possui API ou integração via Webhook para validar CPFs de inscritos no aplicativo da feira.
 
-- [ ] \[André L.A. Bastos\] Contatar suporte Rai Gestor: Enviar mensagem para o suporte do sistema Rai Gestor solicitando informações sobre API ou métodos de integração com sistemas externos.
+- [ ] \[André L.A. Bastos\] Contatar suporte HiGestor: Enviar mensagem para o suporte do sistema HiGestor solicitando informações sobre API ou métodos de integração com sistemas externos.
 
 - [ ] \[Victor Almeida Jeremias\] Concluir desenvolvimento: Concluir o desenvolvimento das funcionalidades do aplicativo da feira demonstradas durante a reunião.
 

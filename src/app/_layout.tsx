@@ -7,8 +7,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Brand, Radius } from '@/constants/theme';
 import { AuthProvider } from '@/features/auth/use-auth';
+import { usePushRegistration } from '@/features/notifications/use-push-registration';
 
 type IconName = keyof typeof Ionicons.glyphMap;
+
+/** Registra o device para push (dentro do AuthProvider). Não renderiza nada. */
+function PushGate() {
+  usePushRegistration();
+  return null;
+}
 
 const TAB_ICONS: Record<string, { active: IconName; inactive: IconName }> = {
   index: { active: 'home', inactive: 'home-outline' },
@@ -69,6 +76,7 @@ export default function TabLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <AuthProvider>
+        <PushGate />
         <StatusBar style="light" />
         <Tabs
           tabBar={(props) => <CustomTabBar {...props} />}
