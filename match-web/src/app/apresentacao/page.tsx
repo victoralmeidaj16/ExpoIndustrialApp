@@ -333,16 +333,16 @@ export default function PresentationPage() {
                     <div className="flex gap-3">
                       <div className="h-6 w-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
                       <div>
-                        <h5 className="font-bold text-slate-800 text-sm">Cadastro Básico Obrigatório</h5>
-                        <p className="text-xs text-slate-500 mt-0.5">Ao abrir o app pela primeira vez, o visitante deve preencher Nome Completo, E-mail e WhatsApp para acessar as áreas internas da feira.</p>
+                        <h5 className="font-bold text-slate-800 text-sm">Cadastro de Lead Obrigatório</h5>
+                        <p className="text-xs text-slate-500 mt-0.5">Ao abrir o app pela primeira vez, o visitante deve preencher Nome Completo, E-mail, WhatsApp, Empresa e Cargo para acessar as áreas internas da feira.</p>
                       </div>
                     </div>
 
                     <div className="flex gap-3">
                       <div className="h-6 w-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</div>
                       <div>
-                        <h5 className="font-bold text-slate-800 text-sm">Incentivo ao Matchmaking B2B</h5>
-                        <p className="text-xs text-slate-500 mt-0.5">O app convida o visitante a preencher seu cargo, empresa e produtos de interesse. A inteligência artificial analisa e gera uma lista recomendada de estandes ideais.</p>
+                        <h5 className="font-bold text-slate-800 text-sm">Onboarding de Matchmaking B2B</h5>
+                        <p className="text-xs text-slate-500 mt-0.5">O app convida o visitante a preencher suas preferências (áreas de interesse, budget e gargalos). A inteligência artificial analisa e gera uma lista recomendada de estandes e pessoas ideais.</p>
                       </div>
                     </div>
 
