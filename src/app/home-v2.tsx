@@ -159,7 +159,7 @@ export default function Home2Screen() {
                   <Pressable
                     key={e.id}
                     style={styles.exhibitorBox}
-                    onPress={() => router.push(`/exhibitor/${e.id}` as never)}>
+                    onPress={() => router.push({ pathname: '/company-profile-v2', params: { id: e.id } })}>
                     <ExhibitorLogo logoUrl={e.logoUrl} logo={e.logo} style={styles.exhibitorLogo} textSize={13} />
                   </Pressable>
                 ))
@@ -207,9 +207,33 @@ export default function Home2Screen() {
             </View>
           )}
 
-          <View style={{ height: insets.bottom + 24 }} />
+          <View style={{ height: insets.bottom + 80 }} />
         </View>
       </ScrollView>
+
+      {/* Floating Bottom Tab Bar */}
+      <View style={[styles.floatingTabBar, { bottom: Math.max(insets.bottom, 16) }]}>
+        <Pressable style={styles.tabItem} onPress={() => router.push('/home-v2')}>
+          <Ionicons name="home" size={22} color="#0C2345" />
+          <Text style={[styles.tabLabel, styles.tabLabelActive]}>Home</Text>
+        </Pressable>
+        <Pressable style={styles.tabItem} onPress={() => router.push('/map')}>
+          <Ionicons name="map-outline" size={22} color="#94a3b8" />
+          <Text style={styles.tabLabel}>Map</Text>
+        </Pressable>
+        <Pressable style={styles.tabItem} onPress={() => router.push('/agenda')}>
+          <Ionicons name="calendar-outline" size={22} color="#94a3b8" />
+          <Text style={styles.tabLabel}>Agenda</Text>
+        </Pressable>
+        <Pressable style={styles.tabItem} onPress={() => router.push('/connections')}>
+          <Ionicons name="people-outline" size={22} color="#94a3b8" />
+          <Text style={styles.tabLabel}>Connect</Text>
+        </Pressable>
+        <Pressable style={styles.tabItem} onPress={() => router.push('/profile')}>
+          <Ionicons name="person-outline" size={22} color="#94a3b8" />
+          <Text style={styles.tabLabel}>Profile</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -399,4 +423,36 @@ const styles = StyleSheet.create({
     borderRadius: 11,
   },
   meetingBtnText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  floatingTabBar: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    height: 64,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: '#eef1f6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    shadowColor: '#071A33',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+  },
+  tabLabel: {
+    fontSize: 10,
+    color: '#94a3b8',
+    fontWeight: '600',
+  },
+  tabLabelActive: {
+    color: '#0C2345',
+  },
 });
