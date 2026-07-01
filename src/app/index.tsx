@@ -106,6 +106,12 @@ export default function HomeScreen() {
             />
           </View>
           <View style={styles.headerActions}>
+            <Pressable
+              style={styles.designBadge}
+              onPress={() => router.push('/home-v2')}>
+              <Ionicons name="color-palette-outline" size={14} color="#C9A24C" />
+              <Text style={styles.designBadgeText}>Design V2</Text>
+            </Pressable>
             <HeaderIcon icon="search-outline" />
             <HeaderIcon icon="notifications-outline" badge />
           </View>
@@ -671,5 +677,20 @@ const styles = StyleSheet.create({
     color: Brand.textSecondary,
     fontSize: 11.5,
     marginTop: 2,
+  },
+  designBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(201, 162, 76, 0.15)',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: Radius.pill,
+    gap: 4,
+    marginRight: 6,
+  },
+  designBadgeText: {
+    color: '#C9A24C',
+    fontSize: 11,
+    fontWeight: '700',
   },
 });

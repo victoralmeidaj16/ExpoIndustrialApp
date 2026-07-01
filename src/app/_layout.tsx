@@ -89,6 +89,7 @@ export default function TabLayout() {
           <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
           {/* Rotas acessíveis por navegação, mas fora da barra de abas */}
         <Tabs.Screen name="matchmaking" options={{ href: null }} />
+        <Tabs.Screen name="home-v2" options={{ href: null }} />
         <Tabs.Screen name="map-skia" options={{ href: null }} />
         <Tabs.Screen name="map-3d" options={{ href: null }} />
         <Tabs.Screen name="privacy" options={{ href: null }} />
