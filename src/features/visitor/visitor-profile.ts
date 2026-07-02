@@ -253,6 +253,7 @@ export async function captureLeadProfile(lead: LeadCapture): Promise<void> {
       ownerUid: uid,
       leadCapturedAt: serverTimestamp(),
       leadSource: 'signup',
+      onboardingSkipped: true,
     },
     { merge: true },
   );

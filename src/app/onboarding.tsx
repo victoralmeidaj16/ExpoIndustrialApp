@@ -167,7 +167,7 @@ export default function OnboardingScreen() {
               login: 'Entre para continuar seu onboarding e acessar seu crachá.',
               signup: 'Crie sua conta para gerar seu crachá, matches e recomendações.',
             }}
-            onSuccess={() => setInitialized(false)}
+            onSuccess={() => router.replace('/')}
           />
         </ScrollView>
       </KeyboardAvoidingView>
