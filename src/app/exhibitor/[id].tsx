@@ -7,7 +7,8 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import { ExhibitorLogo } from '@/components/exhibitor-logo';
 import { ScoreRing } from '@/components/score-ring';
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Card, HeaderIconButton, ScreenBody, ScreenHeader, TAB_BAR_CLEARANCE } from '@/components/ui-kit';
+import { Light, Radius, Spacing } from '@/constants/theme';
 import { useExhibitor } from '@/features/exhibitors/use-exhibitors';
 import { CATEGORY_COLOR } from '@/features/venue/venue';
 import { addSavedLead } from '@/features/visitor/leads';
@@ -108,14 +109,13 @@ export default function ExhibitorScreen() {
     }
   };
 
-
   if (!booth) {
     if (loading) {
       return <View style={[styles.screen, { paddingTop: insets.top + 40 }]} />;
     }
     return (
       <View style={[styles.screen, styles.empty, { paddingTop: insets.top + 40 }]}>
-        <Ionicons name="alert-circle-outline" size={40} color={Brand.textMuted} />
+        <Ionicons name="alert-circle-outline" size={40} color={Light.textMuted} />
         <Text style={styles.emptyText}>Estande não encontrado.</Text>
         <Pressable style={styles.backLink} onPress={() => router.back()}>
           <Text style={styles.backLinkText}>Voltar</Text>
@@ -126,198 +126,198 @@ export default function ExhibitorScreen() {
 
   return (
     <View style={styles.screen}>
+      <ScreenHeader
+        title="Perfil do Expositor"
+        subtitle={`Estande ${booth.stand}`}
+        onBack={() => router.back()}
+        right={
+          <HeaderIconButton
+            icon={saved ? 'bookmark' : 'bookmark-outline'}
+            onPress={toggleSaved}
+          />
+        }
+      />
+
       <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingTop: insets.top + Spacing.two, paddingBottom: 140 },
-        ]}
+        contentContainerStyle={{ paddingBottom: TAB_BAR_CLEARANCE }}
         showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Pressable style={styles.iconBtn} onPress={() => router.back()}>
-            <Ionicons name="chevron-back" size={22} color={Brand.textPrimary} />
-          </Pressable>
-          <Text style={styles.headerTitle}>Perfil do Expositor</Text>
-          <Pressable style={styles.iconBtn} onPress={toggleSaved}>
-            <Ionicons
-              name={saved ? 'bookmark' : 'bookmark-outline'}
-              size={20}
-              color={saved ? Brand.gold : Brand.textPrimary}
-            />
-          </Pressable>
-        </View>
-
-        {/* Capa + identidade */}
-        <View style={styles.cover}>
-          <ExhibitorLogo logoUrl={booth.logoUrl} logo={booth.logo} style={styles.logo} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.company}>{booth.company}</Text>
-            <Text style={styles.industry}>{booth.industry}</Text>
-            <View style={styles.badgeRow}>
-              <View style={[styles.catBadge, { borderColor: CATEGORY_COLOR[booth.category] }]}>
-                <View
-                  style={[styles.catDot, { backgroundColor: CATEGORY_COLOR[booth.category] }]}
-                />
-                <Text style={styles.catText}>{booth.category}</Text>
-              </View>
-            </View>
-          </View>
-          <ScoreRing score={booth.fit} />
-        </View>
-
-        {/* Localização do estande */}
-        <View style={styles.locRow}>
-          <Ionicons name="location" size={16} color={Brand.gold} />
-          <Text style={styles.locText}>
-            {booth.stand} · {booth.area}
-          </Text>
-        </View>
-
-        {/* Sobre */}
-        <Text style={styles.sectionTitle}>Apresentação</Text>
-        <Text style={styles.about}>{booth.about}</Text>
-
-        {Boolean(
-          booth.segments?.length ||
-            booth.targetAudience?.length ||
-            booth.lookingFor?.length ||
-            booth.keywords?.length,
-        ) && (
-          <>
-            <Text style={styles.sectionTitle}>Afinidade</Text>
-            <TagGroup title="Segmentos" items={booth.segments ?? []} />
-            <TagGroup title="Público-alvo" items={booth.targetAudience ?? []} />
-            <TagGroup title="Busca na feira" items={booth.lookingFor ?? []} />
-            <TagGroup title="Palavras-chave" items={booth.keywords ?? []} />
-          </>
-        )}
-
-        {/* Abas */}
-        <View style={styles.tabs}>
-          {TABS.map((t) => (
-            <Pressable key={t} style={styles.tabItem} onPress={() => setTab(t)}>
-              <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>{t}</Text>
-              {tab === t && <View style={styles.tabUnderline} />}
-            </Pressable>
-          ))}
-        </View>
-
-        {/* Conteúdo da aba */}
-        {tab === 'Produtos' ? (
-          <View style={styles.productGrid}>
-            {booth.products.map((p) => (
-              <View key={p} style={styles.productCard}>
-                <View style={styles.productIcon}>
-                  <Ionicons name="cube-outline" size={20} color={Brand.cyan} />
+        <ScreenBody style={{ marginTop: -32 }}>
+          {/* Capa + identidade */}
+          <Card>
+            <View style={styles.coverRow}>
+              <ExhibitorLogo logoUrl={booth.logoUrl} logo={booth.logo} style={styles.logo} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.company}>{booth.company}</Text>
+                <Text style={styles.industry}>{booth.industry}</Text>
+                <View style={styles.badgeRow}>
+                  <View style={[styles.catBadge, { borderColor: CATEGORY_COLOR[booth.category] }]}>
+                    <View
+                      style={[styles.catDot, { backgroundColor: CATEGORY_COLOR[booth.category] }]}
+                    />
+                    <Text style={styles.catText}>{booth.category}</Text>
+                  </View>
                 </View>
-                <Text style={styles.productName}>{p}</Text>
               </View>
-            ))}
-          </View>
-        ) : (
-          <View style={styles.placeholderBox}>
-            <Ionicons name="folder-open-outline" size={22} color={Brand.textMuted} />
-            <Text style={styles.placeholderText}>
-              {tab} disponíveis no estande durante o evento.
+              <ScoreRing score={booth.fit} />
+            </View>
+          </Card>
+
+          {/* Localização do estande */}
+          <View style={styles.locRow}>
+            <Ionicons name="location" size={16} color={Light.gold} />
+            <Text style={styles.locText}>
+              Estande {booth.stand} · {booth.area}
             </Text>
           </View>
-        )}
 
-        {/* Contatos de negócio */}
-        {Boolean(
-          booth.contactName ||
-            booth.contactEmail ||
-            booth.contactPhone ||
-            booth.website ||
-            booth.instagram ||
-            booth.linkedin,
-        ) && (
-          <>
-            <Text style={styles.sectionTitle}>Contatos de negócio</Text>
-            <View style={styles.contactCard}>
-              {booth.contactName ? (
-                <Text style={styles.contactName}>
-                  {booth.contactName}
-                  {booth.contactRole ? ` · ${booth.contactRole}` : ''}
-                </Text>
-              ) : null}
-              {booth.contactEmail ? (
-                <ContactLine
-                  icon="mail-outline"
-                  text={booth.contactEmail}
-                  onPress={() => openLink(`mailto:${booth.contactEmail}`)}
-                />
-              ) : null}
-              {booth.contactPhone ? (
-                <ContactLine
-                  icon="logo-whatsapp"
-                  text={booth.contactPhone}
-                  onPress={() => openLink(whatsappLink(booth.contactPhone!))}
-                />
-              ) : null}
-              {booth.website ? (
-                <ContactLine
-                  icon="globe-outline"
-                  text={booth.website}
-                  onPress={() => openLink(withHttps(booth.website!))}
-                />
-              ) : null}
-              {booth.instagram ? (
-                <ContactLine
-                  icon="logo-instagram"
-                  text={booth.instagram}
-                  onPress={() => openLink(instagramLink(booth.instagram!))}
-                />
-              ) : null}
-              {booth.linkedin ? (
-                <ContactLine
-                  icon="logo-linkedin"
-                  text={booth.linkedin}
-                  onPress={() => openLink(withHttps(booth.linkedin!))}
-                />
-              ) : null}
-            </View>
-          </>
-        )}
-        <View style={styles.contactRow}>
-          <ActionButton icon="qr-code-outline" label="Captar lead" primary onPress={startScanning} />
-        </View>
-        <Pressable style={styles.saveBtn} onPress={toggleSaved}>
-          <Ionicons
-            name={saved ? 'checkmark-circle' : 'bookmark-outline'}
-            size={18}
-            color={Brand.gold}
-          />
-          <Text style={styles.saveBtnText}>
-            {saved ? 'Empresa salva' : 'Salvar empresa'}
-          </Text>
-        </Pressable>
+          {/* Apresentação */}
+          <Text style={styles.sectionTitle}>Apresentação</Text>
+          <Text style={styles.about}>{booth.about}</Text>
 
-        {/* Modal de Scanner */}
-        <Modal
-          visible={scannerVisible}
-          animationType="slide"
-          onRequestClose={() => setScannerVisible(false)}>
-          <View style={styles.scannerContainer}>
-            <CameraView
-              style={StyleSheet.absoluteFill}
-              facing="back"
-              barcodeScannerSettings={{
-                barcodeTypes: ['qr'],
-              }}
-              onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
-            />
-            <View style={styles.scannerOverlay}>
-              <Text style={styles.scannerInstruction}>Aponte a câmera para o QR Code do Crachá</Text>
-              <View style={styles.scannerTarget} />
-              <Pressable style={styles.cancelScannerBtn} onPress={() => setScannerVisible(false)}>
-                <Text style={styles.cancelScannerText}>Cancelar</Text>
+          {/* Afinidades */}
+          {Boolean(
+            booth.segments?.length ||
+              booth.targetAudience?.length ||
+              booth.lookingFor?.length ||
+              booth.keywords?.length,
+          ) && (
+            <>
+              <Text style={styles.sectionTitle}>Afinidade</Text>
+              <TagGroup title="Segmentos" items={booth.segments ?? []} />
+              <TagGroup title="Público-alvo" items={booth.targetAudience ?? []} />
+              <TagGroup title="Busca na feira" items={booth.lookingFor ?? []} />
+              <TagGroup title="Palavras-chave" items={booth.keywords ?? []} />
+            </>
+          )}
+
+          {/* Abas */}
+          <View style={styles.tabs}>
+            {TABS.map((t) => (
+              <Pressable key={t} style={styles.tabItem} onPress={() => setTab(t)}>
+                <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>{t}</Text>
+                {tab === t && <View style={styles.tabUnderline} />}
               </Pressable>
-            </View>
+            ))}
           </View>
-        </Modal>
 
+          {/* Conteúdo da aba */}
+          {tab === 'Produtos' ? (
+            <View style={styles.productGrid}>
+              {booth.products.map((p) => (
+                <View key={p} style={styles.productCard}>
+                  <View style={styles.productIcon}>
+                    <Ionicons name="cube-outline" size={20} color={Light.navy} />
+                  </View>
+                  <Text style={styles.productName}>{p}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.placeholderBox}>
+              <Ionicons name="folder-open-outline" size={22} color={Light.textMuted} />
+              <Text style={styles.placeholderText}>
+                {tab} disponíveis no estande durante o evento.
+              </Text>
+            </View>
+          )}
+
+          {/* Contatos de negócio */}
+          {Boolean(
+            booth.contactName ||
+              booth.contactEmail ||
+              booth.contactPhone ||
+              booth.website ||
+              booth.instagram ||
+              booth.linkedin,
+          ) && (
+            <>
+              <Text style={styles.sectionTitle}>Contatos de negócio</Text>
+              <View style={styles.contactCard}>
+                {booth.contactName ? (
+                  <Text style={styles.contactNameTitle}>
+                    {booth.contactName}
+                    {booth.contactRole ? ` · ${booth.contactRole}` : ''}
+                  </Text>
+                ) : null}
+                {booth.contactEmail ? (
+                  <ContactLine
+                    icon="mail-outline"
+                    text={booth.contactEmail}
+                    onPress={() => openLink(`mailto:${booth.contactEmail}`)}
+                  />
+                ) : null}
+                {booth.contactPhone ? (
+                  <ContactLine
+                    icon="logo-whatsapp"
+                    text={booth.contactPhone}
+                    onPress={() => openLink(whatsappLink(booth.contactPhone!))}
+                  />
+                ) : null}
+                {booth.website ? (
+                  <ContactLine
+                    icon="globe-outline"
+                    text={booth.website}
+                    onPress={() => openLink(withHttps(booth.website!))}
+                  />
+                ) : null}
+                {booth.instagram ? (
+                  <ContactLine
+                    icon="logo-instagram"
+                    text={booth.instagram}
+                    onPress={() => openLink(instagramLink(booth.instagram!))}
+                  />
+                ) : null}
+                {booth.linkedin ? (
+                  <ContactLine
+                    icon="logo-linkedin"
+                    text={booth.linkedin}
+                    onPress={() => openLink(withHttps(booth.linkedin!))}
+                  />
+                ) : null}
+              </View>
+            </>
+          )}
+
+          {/* Ações */}
+          <View style={styles.actionRow}>
+            <ActionButton icon="qr-code-outline" label="Captar lead" primary onPress={startScanning} />
+          </View>
+          <Pressable style={styles.saveBtn} onPress={toggleSaved}>
+            <Ionicons
+              name={saved ? 'checkmark-circle' : 'bookmark-outline'}
+              size={18}
+              color={Light.gold}
+            />
+            <Text style={styles.saveBtnText}>
+              {saved ? 'Empresa salva nos favoritos' : 'Salvar nos favoritos'}
+            </Text>
+          </Pressable>
+        </ScreenBody>
       </ScrollView>
+
+      {/* Modal de Scanner */}
+      <Modal
+        visible={scannerVisible}
+        animationType="slide"
+        onRequestClose={() => setScannerVisible(false)}>
+        <View style={styles.scannerContainer}>
+          <CameraView
+            style={StyleSheet.absoluteFill}
+            facing="back"
+            barcodeScannerSettings={{
+              barcodeTypes: ['qr'],
+            }}
+            onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
+          />
+          <View style={styles.scannerOverlay}>
+            <Text style={styles.scannerInstruction}>Aponte a câmera para o QR Code do Crachá</Text>
+            <View style={styles.scannerTarget} />
+            <Pressable style={styles.cancelScannerBtn} onPress={() => setScannerVisible(false)}>
+              <Text style={styles.cancelScannerText}>Cancelar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -349,14 +349,13 @@ function ContactLine({
 }) {
   return (
     <Pressable style={styles.contactLine} onPress={onPress} disabled={!onPress}>
-      <Ionicons name={icon} size={15} color={Brand.gold} />
+      <Ionicons name={icon} size={15} color={Light.gold} />
       <Text style={[styles.contactLineText, onPress && styles.contactLineLink]}>{text}</Text>
-      {onPress ? <Ionicons name="open-outline" size={14} color={Brand.textMuted} /> : null}
+      {onPress ? <Ionicons name="open-outline" size={14} color={Light.textMuted} /> : null}
     </Pressable>
   );
 }
 
-/** Abre um link externo, avisando se o dispositivo não conseguir tratá-lo. */
 async function openLink(url: string) {
   try {
     await Linking.openURL(url);
@@ -365,19 +364,16 @@ async function openLink(url: string) {
   }
 }
 
-/** Garante o esquema https:// em URLs digitadas sem protocolo. */
 function withHttps(url: string): string {
   return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
 
-/** Monta o link do WhatsApp a partir de um telefone (só dígitos; assume BR). */
 function whatsappLink(phone: string): string {
   const digits = phone.replace(/\D/g, '');
   const intl = digits.startsWith('55') ? digits : `55${digits}`;
   return `https://wa.me/${intl}`;
 }
 
-/** Aceita "@usuario", "usuario" ou uma URL completa do Instagram. */
 function instagramLink(handle: string): string {
   if (/^https?:\/\//i.test(handle)) return handle;
   return `https://instagram.com/${handle.replace(/^@/, '')}`;
@@ -398,7 +394,7 @@ function ActionButton({
     <Pressable
       style={[styles.actionBtn, primary ? styles.actionPrimary : styles.actionGhost]}
       onPress={onPress}>
-      <Ionicons name={icon} size={16} color={primary ? Brand.bgPrimary : Brand.gold} />
+      <Ionicons name={icon} size={16} color={primary ? '#fff' : Light.gold} />
       <Text style={[styles.actionText, primary ? styles.actionTextPrimary : styles.actionTextGhost]}>
         {label}
       </Text>
@@ -406,42 +402,22 @@ function ActionButton({
   );
 }
 
-
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Brand.bgPrimary },
-  content: { paddingHorizontal: Spacing.four, gap: Spacing.three },
+  screen: { flex: 1, backgroundColor: Light.bg },
 
   empty: { alignItems: 'center', justifyContent: 'center', gap: Spacing.three },
-  emptyText: { color: Brand.textSecondary, fontSize: 15 },
+  emptyText: { color: Light.textMuted, fontSize: 15 },
   backLink: { paddingHorizontal: 20, paddingVertical: 10 },
-  backLinkText: { color: Brand.gold, fontWeight: '700' },
+  backLinkText: { color: Light.gold, fontWeight: '700' },
 
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  iconBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: Radius.pill,
-    backgroundColor: Brand.bgCard,
-    borderWidth: 1,
-    borderColor: Brand.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: { color: Brand.textPrimary, fontSize: 17, fontWeight: '800' },
-
-  cover: {
+  coverRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.three,
-    backgroundColor: Brand.bgCard,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Brand.border,
-    padding: Spacing.three,
   },
   logo: { width: 72, height: 56 },
-  company: { color: Brand.textPrimary, fontSize: 16, fontWeight: '800' },
-  industry: { color: Brand.textSecondary, fontSize: 12.5, marginTop: 2 },
+  company: { color: Light.textNavy, fontSize: 16, fontWeight: '800' },
+  industry: { color: Light.textMuted, fontSize: 12.5, marginTop: 2 },
   badgeRow: { flexDirection: 'row', marginTop: 8 },
   catBadge: {
     flexDirection: 'row',
@@ -453,100 +429,102 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   catDot: { width: 8, height: 8, borderRadius: 4 },
-  catText: { color: Brand.textSecondary, fontSize: 11.5, fontWeight: '600' },
+  catText: { color: Light.textNavy, fontSize: 11.5, fontWeight: '600' },
 
   locRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     padding: Spacing.three,
   },
-  locText: { color: Brand.textPrimary, fontSize: 14, fontWeight: '600', flex: 1 },
+  locText: { color: Light.textNavy, fontSize: 14, fontWeight: '600', flex: 1 },
 
-  sectionTitle: { color: Brand.textPrimary, fontSize: 16, fontWeight: '700', marginTop: Spacing.one },
-  about: { color: Brand.textSecondary, fontSize: 13.5, lineHeight: 20 },
+  sectionTitle: { color: Light.navyDeep, fontSize: 16, fontWeight: '700', marginTop: Spacing.one },
+  about: { color: Light.text, fontSize: 13.5, lineHeight: 20 },
   tagGroup: { gap: 7 },
-  tagGroupTitle: { color: Brand.textMuted, fontSize: 12, fontWeight: '800' },
+  tagGroupTitle: { color: Light.textMuted, fontSize: 12, fontWeight: '800' },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   tagChip: {
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.pill,
     paddingHorizontal: Spacing.three,
     paddingVertical: 7,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surfaceAlt,
   },
-  tagText: { color: Brand.textSecondary, fontSize: 12.5, fontWeight: '600' },
+  tagText: { color: Light.textNavy, fontSize: 12.5, fontWeight: '600' },
 
   tabs: {
     flexDirection: 'row',
     gap: Spacing.three,
     borderBottomWidth: 1,
-    borderBottomColor: Brand.border,
+    borderBottomColor: Light.border,
+    marginTop: 8,
   },
   tabItem: { paddingBottom: 10 },
-  tabText: { color: Brand.textMuted, fontSize: 13.5, fontWeight: '600' },
-  tabTextActive: { color: Brand.gold },
+  tabText: { color: Light.textMuted, fontSize: 13.5, fontWeight: '600' },
+  tabTextActive: { color: Light.gold },
   tabUnderline: {
     position: 'absolute',
     bottom: -1,
     left: 0,
     right: 0,
     height: 2,
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
     borderRadius: 2,
   },
 
-  productGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
+  productGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two, marginTop: 8 },
   productCard: {
     width: '48%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.two,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     padding: Spacing.three,
   },
   productIcon: {
     width: 36,
     height: 36,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.blueSoft,
+    backgroundColor: Light.iconSoftBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  productName: { color: Brand.textPrimary, fontSize: 12.5, fontWeight: '600', flex: 1 },
+  productName: { color: Light.textNavy, fontSize: 12.5, fontWeight: '600', flex: 1 },
 
   placeholderBox: {
     alignItems: 'center',
     gap: 8,
     paddingVertical: Spacing.five,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
+    marginTop: 8,
   },
-  placeholderText: { color: Brand.textMuted, fontSize: 13, textAlign: 'center', maxWidth: 240 },
+  placeholderText: { color: Light.textMuted, fontSize: 13, textAlign: 'center', maxWidth: 240 },
 
-  contactRow: { flexDirection: 'row', gap: Spacing.two },
+  actionRow: { flexDirection: 'row', gap: Spacing.two, marginTop: 12 },
   contactCard: {
     gap: 8,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     padding: Spacing.three,
   },
-  contactName: { color: Brand.textPrimary, fontSize: 14, fontWeight: '800' },
+  contactNameTitle: { color: Light.textNavy, fontSize: 14, fontWeight: '800' },
   contactLine: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  contactLineText: { color: Brand.textSecondary, fontSize: 13, flex: 1 },
-  contactLineLink: { color: Brand.gold, textDecorationLine: 'underline' },
+  contactLineText: { color: Light.text, fontSize: 13, flex: 1 },
+  contactLineLink: { color: Light.gold, textDecorationLine: 'underline' },
   actionBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -556,11 +534,11 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     borderRadius: Radius.sm,
   },
-  actionPrimary: { backgroundColor: Brand.gold },
-  actionGhost: { backgroundColor: Brand.goldSoft, borderWidth: 1, borderColor: Brand.borderGold },
+  actionPrimary: { backgroundColor: Light.gold },
+  actionGhost: { backgroundColor: Light.surfaceAlt, borderWidth: 1, borderColor: Light.border },
   actionText: { fontSize: 13.5, fontWeight: '800' },
-  actionTextPrimary: { color: Brand.bgPrimary },
-  actionTextGhost: { color: Brand.gold },
+  actionTextPrimary: { color: '#fff' },
+  actionTextGhost: { color: Light.gold },
   saveBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -569,10 +547,11 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Brand.border,
-    backgroundColor: Brand.bgCard,
+    borderColor: Light.border,
+    backgroundColor: Light.surface,
+    marginTop: 10,
   },
-  saveBtnText: { color: Brand.gold, fontSize: 13.5, fontWeight: '700' },
+  saveBtnText: { color: Light.gold, fontSize: 13.5, fontWeight: '700' },
 
   // Scanner Styles
   scannerContainer: {
@@ -603,7 +582,7 @@ const styles = StyleSheet.create({
     width: 220,
     height: 220,
     borderWidth: 3,
-    borderColor: Brand.gold,
+    borderColor: Light.gold,
     borderRadius: Radius.md,
     backgroundColor: 'transparent',
   },

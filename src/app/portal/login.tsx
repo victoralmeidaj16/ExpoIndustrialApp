@@ -3,7 +3,7 @@ import { Redirect, router } from 'expo-router';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Brand, Spacing } from '@/constants/theme';
+import { Light, Spacing } from '@/constants/theme';
 import { AuthForm } from '@/features/auth/auth-form';
 import { useAuth } from '@/features/auth/use-auth';
 
@@ -22,7 +22,7 @@ export default function PortalLogin() {
         contentContainerStyle={[styles.content, { paddingTop: insets.top + Spacing.five }]}
         keyboardShouldPersistTaps="handled">
         <Pressable style={styles.back} onPress={() => router.replace('/')}>
-          <Ionicons name="chevron-back" size={20} color={Brand.textSecondary} />
+          <Ionicons name="chevron-back" size={20} color={Light.textMuted} />
           <Text style={styles.backText}>Voltar ao app</Text>
         </Pressable>
 
@@ -41,8 +41,8 @@ export default function PortalLogin() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Brand.bgPrimary },
+  screen: { flex: 1, backgroundColor: Light.bg },
   content: { paddingHorizontal: Spacing.four, paddingBottom: Spacing.six, gap: Spacing.three },
   back: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: Spacing.two },
-  backText: { color: Brand.textSecondary, fontSize: 14 },
+  backText: { color: Light.textMuted, fontSize: 14 },
 });

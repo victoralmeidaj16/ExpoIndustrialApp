@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Light, Radius, Spacing } from '@/constants/theme';
 import { useAdminRole } from '@/features/admin/use-admin';
 import { authErrorMessage, useAuth } from '@/features/auth/use-auth';
 import {
@@ -213,7 +213,7 @@ export default function PortalEmpresa() {
   if (initializing || (loading && !hydrated)) {
     return (
       <View style={styles.centerScreen}>
-        <ActivityIndicator color={Brand.gold} />
+        <ActivityIndicator color={Light.gold} />
       </View>
     );
   }
@@ -237,13 +237,13 @@ export default function PortalEmpresa() {
         keyboardShouldPersistTaps="handled">
         <View style={styles.topRow}>
           <Pressable style={styles.back} onPress={() => router.replace('/')}>
-            <Ionicons name="chevron-back" size={20} color={Brand.textSecondary} />
+            <Ionicons name="chevron-back" size={20} color={Light.textMuted} />
             <Text style={styles.backText}>App</Text>
           </Pressable>
           <View style={styles.topActions}>
             {isAdmin && (
               <Pressable style={styles.adminLink} onPress={() => router.replace('/portal/admin')}>
-                <Ionicons name="shield-checkmark-outline" size={16} color={Brand.gold} />
+                <Ionicons name="shield-checkmark-outline" size={16} color={Light.gold} />
                 <Text style={styles.adminLinkText}>Controle</Text>
               </Pressable>
             )}
@@ -254,7 +254,7 @@ export default function PortalEmpresa() {
                 router.replace('/portal/login');
               }}>
               <Text style={styles.signOutText}>Sair</Text>
-              <Ionicons name="log-out-outline" size={18} color={Brand.textSecondary} />
+              <Ionicons name="log-out-outline" size={18} color={Light.textMuted} />
             </Pressable>
           </View>
         </View>
@@ -268,7 +268,7 @@ export default function PortalEmpresa() {
 
         <View style={styles.portalCard}>
           <View style={styles.portalIcon}>
-            <Ionicons name="link-outline" size={20} color={Brand.gold} />
+            <Ionicons name="link-outline" size={20} color={Light.gold} />
           </View>
           <View style={styles.portalCopy}>
             <Text style={styles.portalTitle}>Link para expositores</Text>
@@ -283,7 +283,7 @@ export default function PortalEmpresa() {
 
         <View style={[styles.statusPill, published ? styles.statusPub : styles.statusDraft]}>
           <View
-            style={[styles.statusDot, { backgroundColor: published ? Brand.success : Brand.warning }]}
+            style={[styles.statusDot, { backgroundColor: published ? Light.success : Light.warning }]}
           />
           <Text style={styles.statusText}>
             {published
@@ -315,7 +315,7 @@ export default function PortalEmpresa() {
                   <Ionicons
                     name={done ? 'checkmark-circle' : 'ellipse-outline'}
                     size={16}
-                    color={done ? Brand.success : Brand.textMuted}
+                    color={done ? Light.success : Light.textMuted}
                   />
                   <Text style={[styles.checkText, done && styles.checkTextDone]}>{check.label}</Text>
                 </View>
@@ -358,7 +358,7 @@ export default function PortalEmpresa() {
             value={form.company}
             onChangeText={(v) => set('company', v)}
             placeholder="Ex.: Siemens Digital Industries"
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
           />
         </Field>
 
@@ -368,7 +368,7 @@ export default function PortalEmpresa() {
             value={form.logo}
             onChangeText={(v) => set('logo', v)}
             placeholder="Ex.: SIEMENS"
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
             autoCapitalize="characters"
           />
         </Field>
@@ -379,7 +379,7 @@ export default function PortalEmpresa() {
               <Image source={{ uri: form.logoUrl }} style={styles.logoPreview} />
             ) : (
               <View style={styles.logoPlaceholder}>
-                <Ionicons name="image-outline" size={32} color={Brand.textMuted} />
+                <Ionicons name="image-outline" size={32} color={Light.textMuted} />
               </View>
             )}
             <View style={styles.imageUploadButtons}>
@@ -408,7 +408,7 @@ export default function PortalEmpresa() {
             value={form.industry}
             onChangeText={(v) => set('industry', v)}
             placeholder="Ex.: Automação & Robótica"
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
           />
         </Field>
 
@@ -418,7 +418,7 @@ export default function PortalEmpresa() {
             value={form.about}
             onChangeText={(v) => set('about', v)}
             placeholder="Descreva soluções, diferenciais e o que será apresentado no evento."
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
             multiline
           />
         </Field>
@@ -481,7 +481,7 @@ export default function PortalEmpresa() {
             value={form.contactName}
             onChangeText={(v) => set('contactName', v)}
             placeholder="Nome e sobrenome"
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
           />
         </Field>
 
@@ -491,7 +491,7 @@ export default function PortalEmpresa() {
             value={form.contactRole}
             onChangeText={(v) => set('contactRole', v)}
             placeholder="Ex.: Gerente Comercial"
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
           />
         </Field>
 
@@ -502,7 +502,7 @@ export default function PortalEmpresa() {
               value={form.contactEmail}
               onChangeText={(v) => set('contactEmail', v)}
               placeholder="comercial@empresa.com"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               autoCapitalize="none"
               keyboardType="email-address"
             />
@@ -513,7 +513,7 @@ export default function PortalEmpresa() {
               value={form.contactPhone}
               onChangeText={(v) => set('contactPhone', v)}
               placeholder="(47) 99999-9999"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               keyboardType="phone-pad"
             />
           </Field>
@@ -525,7 +525,7 @@ export default function PortalEmpresa() {
             value={form.website}
             onChangeText={(v) => set('website', v)}
             placeholder="https://www.empresa.com.br"
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
             autoCapitalize="none"
             keyboardType="url"
           />
@@ -538,7 +538,7 @@ export default function PortalEmpresa() {
               value={form.instagram}
               onChangeText={(v) => set('instagram', v)}
               placeholder="@empresa"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               autoCapitalize="none"
             />
           </Field>
@@ -548,7 +548,7 @@ export default function PortalEmpresa() {
               value={form.linkedin}
               onChangeText={(v) => set('linkedin', v)}
               placeholder="linkedin.com/company/empresa"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               autoCapitalize="none"
             />
           </Field>
@@ -557,14 +557,14 @@ export default function PortalEmpresa() {
         {error && <Text style={styles.error}>{error}</Text>}
         {saved && (
           <View style={styles.savedBox}>
-            <Ionicons name="checkmark-circle" size={18} color={Brand.success} />
+            <Ionicons name="checkmark-circle" size={18} color={Light.success} />
             <Text style={styles.savedText}>Cadastro salvo com sucesso.</Text>
           </View>
         )}
 
         <Pressable style={[styles.save, busy && styles.saveDisabled]} onPress={onSave} disabled={busy}>
           {busy ? (
-            <ActivityIndicator color="#0A1021" />
+            <ActivityIndicator color="#ffffff" />
           ) : (
             <Text style={styles.saveText}>Salvar cadastro</Text>
           )}
@@ -628,11 +628,11 @@ function ArrayField({
                 else onChange(i, v);
               }}
               placeholder={i === items.length ? placeholder : label}
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
             />
             {i < items.length && (
               <Pressable style={styles.removeBtn} onPress={() => onRemove(i)}>
-                <Ionicons name="close" size={18} color={Brand.textMuted} />
+                <Ionicons name="close" size={18} color={Light.textMuted} />
               </Pressable>
             )}
           </View>
@@ -643,44 +643,44 @@ function ArrayField({
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Brand.bgPrimary },
+  screen: { flex: 1, backgroundColor: Light.bg },
   centerScreen: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
   },
   content: { paddingHorizontal: Spacing.four, gap: Spacing.three },
 
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   back: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  backText: { color: Brand.textSecondary, fontSize: 14 },
+  backText: { color: Light.textMuted, fontSize: 14 },
   topActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
   adminLink: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
     borderWidth: 1,
-    borderColor: Brand.borderGold,
+    borderColor: Light.goldPillBorder,
     borderRadius: Radius.pill,
     paddingHorizontal: 10,
     paddingVertical: 7,
-    backgroundColor: Brand.goldSoft,
+    backgroundColor: '#FBF6E9',
   },
-  adminLinkText: { color: Brand.gold, fontSize: 12.5, fontWeight: '800' },
+  adminLinkText: { color: Light.gold, fontSize: 12.5, fontWeight: '800' },
   signOut: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  signOutText: { color: Brand.textSecondary, fontSize: 14 },
+  signOutText: { color: Light.textMuted, fontSize: 14 },
 
-  title: { color: Brand.textPrimary, fontSize: 24, fontWeight: '800' },
-  userEmail: { color: Brand.textMuted, fontSize: 13, marginTop: -8 },
-  intro: { color: Brand.textSecondary, fontSize: 13.5, lineHeight: 20 },
+  title: { color: Light.textNavy, fontSize: 24, fontWeight: '800' },
+  userEmail: { color: Light.textMuted, fontSize: 13, marginTop: -8 },
+  intro: { color: Light.text, fontSize: 13.5, lineHeight: 20 },
 
   portalCard: {
     flexDirection: 'row',
     gap: Spacing.three,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.borderGold,
+    borderColor: Light.goldPillBorder,
     borderRadius: Radius.sm,
     padding: Spacing.three,
   },
@@ -690,12 +690,12 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.goldSoft,
+    backgroundColor: '#FBF6E9',
   },
   portalCopy: { flex: 1, gap: 4 },
-  portalTitle: { color: Brand.textPrimary, fontSize: 14, fontWeight: '800' },
-  portalText: { color: Brand.textSecondary, fontSize: 12.5, lineHeight: 18 },
-  portalUrl: { color: Brand.gold, fontSize: 12.5, fontWeight: '700' },
+  portalTitle: { color: Light.textNavy, fontSize: 14, fontWeight: '800' },
+  portalText: { color: Light.text, fontSize: 12.5, lineHeight: 18 },
+  portalUrl: { color: Light.gold, fontSize: 12.5, fontWeight: '700' },
 
   statusPill: {
     flexDirection: 'row',
@@ -708,42 +708,42 @@ const styles = StyleSheet.create({
   statusDraft: { backgroundColor: 'rgba(245, 158, 11, 0.12)' },
   statusPub: { backgroundColor: 'rgba(34, 197, 94, 0.12)' },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
-  statusText: { color: Brand.textSecondary, fontSize: 12.5, flex: 1 },
+  statusText: { color: Light.textNavy, fontSize: 12.5, flex: 1 },
 
   completionCard: {
     gap: Spacing.three,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     padding: Spacing.three,
   },
   completionTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: Spacing.three },
-  completionLabel: { color: Brand.textPrimary, fontSize: 15, fontWeight: '800' },
-  completionHint: { color: Brand.textSecondary, fontSize: 12.5, lineHeight: 18, marginTop: 3 },
-  completionScore: { color: Brand.gold, fontSize: 22, fontWeight: '900' },
+  completionLabel: { color: Light.textNavy, fontSize: 15, fontWeight: '800' },
+  completionHint: { color: Light.textMuted, fontSize: 12.5, lineHeight: 18, marginTop: 3 },
+  completionScore: { color: Light.gold, fontSize: 22, fontWeight: '900' },
   progressTrack: {
     height: 8,
     borderRadius: Radius.pill,
     overflow: 'hidden',
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.surfaceAlt,
   },
-  progressFill: { height: '100%', borderRadius: Radius.pill, backgroundColor: Brand.gold },
+  progressFill: { height: '100%', borderRadius: Radius.pill, backgroundColor: Light.gold },
   checkGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   checkItem: { flexDirection: 'row', alignItems: 'center', gap: 6, minWidth: 150, flex: 1 },
-  checkText: { color: Brand.textMuted, fontSize: 12.5 },
-  checkTextDone: { color: Brand.textSecondary },
+  checkText: { color: Light.textMuted, fontSize: 12.5 },
+  checkTextDone: { color: Light.text },
 
   previewCard: {
     gap: Spacing.two,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     padding: Spacing.three,
   },
   previewKicker: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
     fontSize: 10.5,
     fontWeight: '800',
     textTransform: 'uppercase',
@@ -762,35 +762,35 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.goldSoft,
+    backgroundColor: '#FBF6E9',
     borderWidth: 1,
-    borderColor: Brand.borderGold,
+    borderColor: Light.goldPillBorder,
   },
-  previewLogoText: { color: Brand.gold, fontSize: 18, fontWeight: '900' },
+  previewLogoText: { color: Light.gold, fontSize: 18, fontWeight: '900' },
   previewCopy: { flex: 1, gap: 3 },
-  previewCompany: { color: Brand.textPrimary, fontSize: 16, fontWeight: '800' },
-  previewMeta: { color: Brand.gold, fontSize: 12.5, fontWeight: '700' },
-  previewAbout: { color: Brand.textSecondary, fontSize: 12.5, lineHeight: 18 },
+  previewCompany: { color: Light.textNavy, fontSize: 16, fontWeight: '800' },
+  previewMeta: { color: Light.gold, fontSize: 12.5, fontWeight: '700' },
+  previewAbout: { color: Light.textMuted, fontSize: 12.5, lineHeight: 18 },
 
   sectionTitle: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 16,
     fontWeight: '800',
     marginTop: Spacing.two,
   },
   field: { gap: 6 },
-  label: { color: Brand.textSecondary, fontSize: 13, fontWeight: '600' },
-  hint: { color: Brand.textMuted, fontSize: 11.5 },
+  label: { color: Light.textNavy, fontSize: 13, fontWeight: '600' },
+  hint: { color: Light.textMuted, fontSize: 11.5 },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.three },
   rowField: { flex: 1, minWidth: 220 },
   input: {
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     paddingHorizontal: Spacing.three,
     paddingVertical: 13,
-    color: Brand.textPrimary,
+    color: Light.text,
     fontSize: 15,
   },
   textarea: { minHeight: 96, textAlignVertical: 'top' },
@@ -803,32 +803,32 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
 
-  error: { color: Brand.danger, fontSize: 13.5 },
+  error: { color: Light.danger, fontSize: 13.5 },
   savedBox: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  savedText: { color: Brand.success, fontSize: 14, fontWeight: '600' },
+  savedText: { color: Light.success, fontSize: 14, fontWeight: '600' },
 
   save: {
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
     borderRadius: Radius.pill,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: Spacing.two,
   },
   saveDisabled: { opacity: 0.5 },
-  saveText: { color: '#0A1021', fontSize: 16, fontWeight: '800' },
+  saveText: { color: '#ffffff', fontSize: 16, fontWeight: '800' },
 
   imageUploadContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.three,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     padding: Spacing.three,
   },
@@ -843,27 +843,27 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
   imageUploadButtons: {
     flex: 1,
     gap: Spacing.one,
   },
   uploadBtn: {
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.surfaceAlt,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.pill,
     paddingVertical: 10,
     paddingHorizontal: Spacing.three,
     alignItems: 'center',
   },
   uploadBtnText: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -872,7 +872,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   removeImageBtnText: {
-    color: Brand.danger,
+    color: Light.danger,
     fontSize: 12,
     fontWeight: '600',
   },

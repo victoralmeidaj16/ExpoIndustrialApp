@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -14,7 +13,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Light, Radius, Spacing } from '@/constants/theme';
 import { addSavedLead, removeSavedLead, useSavedLeads } from '@/features/visitor/leads';
 import {
   DEMO_VISITOR_PROFILE,
@@ -110,7 +109,7 @@ export default function VisitorProfileDetailScreen() {
   if (loading) {
     return (
       <View style={styles.centerScreen}>
-        <ActivityIndicator size="large" color={Brand.gold} />
+        <ActivityIndicator size="large" color={Light.gold} />
       </View>
     );
   }
@@ -118,7 +117,7 @@ export default function VisitorProfileDetailScreen() {
   if (!profile) {
     return (
       <View style={[styles.screen, styles.centerScreen, { paddingTop: insets.top }]}>
-        <Ionicons name="alert-circle-outline" size={48} color={Brand.textMuted} />
+        <Ionicons name="alert-circle-outline" size={48} color={Light.textMuted} />
         <Text style={styles.errorText}>Perfil do visitante não encontrado.</Text>
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
           <Text style={styles.backBtnText}>Voltar</Text>
@@ -141,7 +140,7 @@ export default function VisitorProfileDetailScreen() {
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + Spacing.one }]}>
         <Pressable style={styles.iconBtn} onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={24} color={Brand.textPrimary} />
+          <Ionicons name="chevron-back" size={24} color={Light.textNavy} />
         </Pressable>
         <Text style={styles.headerTitle}>Credencial Digital</Text>
         <View style={{ width: 40 }} />
@@ -150,14 +149,10 @@ export default function VisitorProfileDetailScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        {/* Cartão de Visita Principal */}
-        <LinearGradient
-          colors={[Brand.bgSecondary, Brand.bgCard]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.profileCard}>
-          <View style={styles.badgeGlow} />
-
+        {/* Cartão de Visita Principal (Estilo Credencial Física) */}
+        <View style={styles.profileCard}>
+          <View style={styles.badgeLanyardStrip} />
+          
           <View style={styles.cardHeader}>
             <View style={styles.avatarContainer}>
               <Text style={styles.avatarText}>{initials}</Text>
@@ -172,7 +167,7 @@ export default function VisitorProfileDetailScreen() {
             <Text style={styles.roleText}>{profile.role}</Text>
             <Text style={styles.companyText}>{profile.company}</Text>
           </View>
-        </LinearGradient>
+        </View>
 
         {/* Botão de Salvar Lead */}
         <Pressable
@@ -180,13 +175,13 @@ export default function VisitorProfileDetailScreen() {
           onPress={handleToggleLead}
           disabled={savingLead}>
           {savingLead ? (
-            <ActivityIndicator color={Brand.bgPrimary} />
+            <ActivityIndicator color="#fff" />
           ) : (
             <>
               <Ionicons
                 name={isLeadSaved ? 'checkmark-circle' : 'person-add-outline'}
                 size={18}
-                color={isLeadSaved ? Brand.textPrimary : Brand.bgPrimary}
+                color={isLeadSaved ? Light.navy : '#ffffff'}
               />
               <Text style={[styles.actionBtnText, isLeadSaved && styles.actionBtnTextSaved]}>
                 {isLeadSaved ? 'Contato Salvo nos Leads' : 'Salvar nos Meus Leads'}
@@ -203,11 +198,11 @@ export default function VisitorProfileDetailScreen() {
             style={[styles.linkCard, !profile.phone && styles.linkCardDisabled]}
             onPress={handleOpenWhatsApp}
             disabled={!profile.phone}>
-            <View style={[styles.linkIconContainer, { backgroundColor: '#25D36622' }]}>
+            <View style={[styles.linkIconContainer, { backgroundColor: '#25D36618' }]}>
               <Ionicons
                 name="logo-whatsapp"
                 size={22}
-                color={profile.phone ? '#25D366' : Brand.textMuted}
+                color={profile.phone ? '#25D366' : Light.textMuted}
               />
             </View>
             <Text style={[styles.linkName, !profile.phone && styles.linkTextDisabled]}>
@@ -223,11 +218,11 @@ export default function VisitorProfileDetailScreen() {
             style={[styles.linkCard, !profile.linkedin && styles.linkCardDisabled]}
             onPress={() => profile.linkedin && handleOpenLink(profile.linkedin)}
             disabled={!profile.linkedin}>
-            <View style={[styles.linkIconContainer, { backgroundColor: '#0A66C222' }]}>
+            <View style={[styles.linkIconContainer, { backgroundColor: '#0A66C218' }]}>
               <Ionicons
                 name="logo-linkedin"
                 size={22}
-                color={profile.linkedin ? '#0A66C2' : Brand.textMuted}
+                color={profile.linkedin ? '#0A66C2' : Light.textMuted}
               />
             </View>
             <Text style={[styles.linkName, !profile.linkedin && styles.linkTextDisabled]}>
@@ -243,11 +238,11 @@ export default function VisitorProfileDetailScreen() {
             style={[styles.linkCard, !profile.email && styles.linkCardDisabled]}
             onPress={handleOpenMail}
             disabled={!profile.email}>
-            <View style={[styles.linkIconContainer, { backgroundColor: `${Brand.gold}22` }]}>
+            <View style={[styles.linkIconContainer, { backgroundColor: `${Light.gold}18` }]}>
               <Ionicons
                 name="mail-outline"
                 size={22}
-                color={profile.email ? Brand.gold : Brand.textMuted}
+                color={profile.email ? Light.gold : Light.textMuted}
               />
             </View>
             <Text style={[styles.linkName, !profile.email && styles.linkTextDisabled]}>
@@ -263,11 +258,11 @@ export default function VisitorProfileDetailScreen() {
             style={[styles.linkCard, !profile.website && styles.linkCardDisabled]}
             onPress={() => profile.website && handleOpenLink(profile.website)}
             disabled={!profile.website}>
-            <View style={[styles.linkIconContainer, { backgroundColor: '#00B4D822' }]}>
+            <View style={[styles.linkIconContainer, { backgroundColor: '#00B4D818' }]}>
               <Ionicons
                 name="globe-outline"
                 size={22}
-                color={profile.website ? '#00B4D8' : Brand.textMuted}
+                color={profile.website ? '#00B4D8' : Light.textMuted}
               />
             </View>
             <Text style={[styles.linkName, !profile.website && styles.linkTextDisabled]}>
@@ -318,27 +313,28 @@ export default function VisitorProfileDetailScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
   },
   centerScreen: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: Light.bg,
   },
   errorText: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 16,
     marginTop: Spacing.two,
     marginBottom: Spacing.three,
   },
   backBtn: {
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: Radius.md,
   },
   backBtnText: {
-    color: Brand.bgPrimary,
+    color: '#fff',
     fontWeight: 'bold',
   },
   header: {
@@ -348,11 +344,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingBottom: Spacing.two,
     borderBottomWidth: 1,
-    borderBottomColor: Brand.border,
-    backgroundColor: Brand.bgPrimary,
+    borderBottomColor: Light.border,
+    backgroundColor: Light.surface,
   },
   headerTitle: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -362,60 +358,67 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.iconSoftBg,
+    borderWidth: 1,
+    borderColor: Light.border,
   },
   scrollContent: {
     padding: Spacing.three,
     paddingBottom: 60,
   },
   profileCard: {
+    backgroundColor: Light.surface,
     borderRadius: Radius.lg,
     padding: Spacing.three,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     position: 'relative',
     overflow: 'hidden',
     marginBottom: Spacing.three,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  badgeGlow: {
+  badgeLanyardStrip: {
     position: 'absolute',
-    top: -50,
-    right: -50,
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: Brand.gold,
-    opacity: 0.08,
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 6,
+    backgroundColor: Light.navy,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 8,
     marginBottom: Spacing.three,
   },
   avatarContainer: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Brand.goldSoft,
+    backgroundColor: Light.iconSoftBg,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: Brand.gold,
+    borderColor: Light.gold,
   },
   avatarText: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 20,
     fontWeight: 'bold',
   },
   tagBadge: {
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.navy,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: Radius.pill,
   },
   tagBadgeText: {
-    color: Brand.bgPrimary,
+    color: '#ffffff',
     fontSize: 10,
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -424,17 +427,17 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   nameText: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 24,
     fontWeight: 'bold',
   },
   roleText: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 16,
     fontWeight: '500',
   },
   companyText: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 15,
     fontWeight: '600',
   },
@@ -442,27 +445,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
     paddingVertical: 14,
     borderRadius: Radius.md,
     gap: 8,
     marginBottom: Spacing.four,
   },
   actionBtnSaved: {
-    backgroundColor: Brand.goldSoft,
+    backgroundColor: Light.surfaceAlt,
     borderWidth: 1,
-    borderColor: Brand.gold,
+    borderColor: Light.border,
   },
   actionBtnText: {
-    color: Brand.bgPrimary,
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
   },
   actionBtnTextSaved: {
-    color: Brand.textPrimary,
+    color: Light.navy,
   },
   sectionTitle: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: Spacing.two,
@@ -475,11 +478,11 @@ const styles = StyleSheet.create({
   linkCard: {
     flex: 1,
     minWidth: '45%',
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderRadius: Radius.md,
     padding: Spacing.two,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     alignItems: 'center',
     gap: 4,
   },
@@ -495,39 +498,40 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   linkName: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 14,
     fontWeight: '600',
   },
   linkTextDisabled: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
   },
   linkVal: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 12,
     maxWidth: '90%',
   },
   detailsContainer: {
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     padding: Spacing.three,
     gap: Spacing.two,
+    marginBottom: Spacing.three,
   },
   detailRow: {
     paddingBottom: Spacing.two,
     borderBottomWidth: 1,
-    borderBottomColor: Brand.border,
+    borderBottomColor: Light.border,
     gap: 4,
   },
   detailLabel: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
     fontSize: 12,
     fontWeight: '500',
   },
   detailValue: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 15,
     fontWeight: '500',
   },
@@ -538,15 +542,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   chip: {
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.surfaceAlt,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: Radius.pill,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
   chipText: {
-    color: Brand.textSecondary,
+    color: Light.textNavy,
     fontSize: 12,
   },
 });

@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Light, Radius, Spacing } from '@/constants/theme';
 import { useAdminExhibitors, useAdminRole, setExhibitorStatus, useAdminVisitors } from '@/features/admin/use-admin';
 import { useAuth } from '@/features/auth/use-auth';
 import { type Exhibitor } from '@/features/exhibitors/exhibitor';
@@ -130,7 +130,7 @@ export default function PortalAdmin() {
   if (initializing || roleLoading) {
     return (
       <View style={styles.centerScreen}>
-        <ActivityIndicator color={Brand.gold} />
+        <ActivityIndicator color={Light.gold} />
       </View>
     );
   }
@@ -143,11 +143,11 @@ export default function PortalAdmin() {
         style={styles.screen}
         contentContainerStyle={[styles.content, { paddingTop: insets.top + Spacing.five }]}>
         <Pressable style={styles.back} onPress={() => router.replace('/portal')}>
-          <Ionicons name="chevron-back" size={20} color={Brand.textSecondary} />
+          <Ionicons name="chevron-back" size={20} color={Light.textMuted} />
           <Text style={styles.backText}>Voltar</Text>
         </Pressable>
         <View style={styles.lockedCard}>
-          <Ionicons name="lock-closed-outline" size={28} color={Brand.warning} />
+          <Ionicons name="lock-closed-outline" size={28} color={Light.warning} />
           <Text style={styles.title}>Acesso da equipe</Text>
           <Text style={styles.bodyText}>
             Este painel é restrito ao dono e equipe autorizada da feira. Para liberar acesso,
@@ -293,7 +293,7 @@ export default function PortalAdmin() {
       showsVerticalScrollIndicator={false}>
       <View style={styles.topRow}>
         <Pressable style={styles.back} onPress={() => router.replace('/')}>
-          <Ionicons name="chevron-back" size={20} color={Brand.textSecondary} />
+          <Ionicons name="chevron-back" size={20} color={Light.textMuted} />
           <Text style={styles.backText}>App</Text>
         </Pressable>
         <Pressable
@@ -303,7 +303,7 @@ export default function PortalAdmin() {
             router.replace('/portal/login');
           }}>
           <Text style={styles.signOutText}>Sair</Text>
-          <Ionicons name="log-out-outline" size={18} color={Brand.textSecondary} />
+          <Ionicons name="log-out-outline" size={18} color={Light.textMuted} />
         </Pressable>
       </View>
 
@@ -340,7 +340,7 @@ export default function PortalAdmin() {
           <Ionicons
             name="business-outline"
             size={16}
-            color={adminTab === 'exhibitors' ? Brand.gold : Brand.textMuted}
+            color={adminTab === 'exhibitors' ? Light.navy : Light.textMuted}
           />
           <Text style={[styles.adminTabBtnText, adminTab === 'exhibitors' && styles.adminTabBtnTextActive]}>
             Expositores ({exhibitors.length})
@@ -355,7 +355,7 @@ export default function PortalAdmin() {
           <Ionicons
             name="people-outline"
             size={16}
-            color={adminTab === 'visitors' ? Brand.gold : Brand.textMuted}
+            color={adminTab === 'visitors' ? Light.navy : Light.textMuted}
           />
           <Text style={[styles.adminTabBtnText, adminTab === 'visitors' && styles.adminTabBtnTextActive]}>
             Visitantes ({visitors.length})
@@ -370,7 +370,7 @@ export default function PortalAdmin() {
           <Ionicons
             name="ribbon-outline"
             size={16}
-            color={adminTab === 'sponsors' ? Brand.gold : Brand.textMuted}
+            color={adminTab === 'sponsors' ? Light.navy : Light.textMuted}
           />
           <Text style={[styles.adminTabBtnText, adminTab === 'sponsors' && styles.adminTabBtnTextActive]}>
             Patrocinadores ({sponsors.length})
@@ -385,7 +385,7 @@ export default function PortalAdmin() {
           <Ionicons
             name="id-card-outline"
             size={16}
-            color={adminTab === 'leads' ? Brand.gold : Brand.textMuted}
+            color={adminTab === 'leads' ? Light.navy : Light.textMuted}
           />
           <Text style={[styles.adminTabBtnText, adminTab === 'leads' && styles.adminTabBtnTextActive]}>
             Leads ({leads.length})
@@ -395,7 +395,7 @@ export default function PortalAdmin() {
 
       {adminTab === 'exhibitors' && missingStandCount > 0 && (
         <View style={styles.warnBox}>
-          <Ionicons name="alert-circle-outline" size={18} color={Brand.warning} />
+          <Ionicons name="alert-circle-outline" size={18} color={Light.warning} />
           <Text style={styles.warnText}>
             {missingStandCount} expositor(es) ainda sem estande definido pelo organizador.
           </Text>
@@ -423,7 +423,7 @@ export default function PortalAdmin() {
                   : `${filteredSponsors.length} de ${sponsors.length} patrocinadores · imagens exibidas na home`}
           </Text>
         </View>
-        {(exhibitorsLoading || visitorsLoading || leadsLoading) && <ActivityIndicator color={Brand.gold} />}
+        {(exhibitorsLoading || visitorsLoading || leadsLoading) && <ActivityIndicator color={Light.gold} />}
       </View>
 
       {adminTab === 'leads' && leads.length > 0 ? (
@@ -434,13 +434,13 @@ export default function PortalAdmin() {
               Alert.alert('Exportar CSV', (err as Error).message),
             )
           }>
-          <Ionicons name="download-outline" size={16} color={Brand.bgPrimary} />
+          <Ionicons name="download-outline" size={16} color="#fff" />
           <Text style={styles.exportButtonText}>Exportar CSV filtrado</Text>
         </Pressable>
       ) : null}
 
       <View style={styles.searchBox}>
-        <Ionicons name="search-outline" size={18} color={Brand.textMuted} />
+        <Ionicons name="search-outline" size={18} color={Light.textMuted} />
         <TextInput
           style={styles.searchInput}
           value={search}
@@ -454,12 +454,12 @@ export default function PortalAdmin() {
                   ? 'Buscar por contato, empresa, expositor, estande ou e-mail'
                   : 'Buscar por patrocinador, tier ou texto da logo'
           }
-          placeholderTextColor={Brand.textMuted}
+          placeholderTextColor={Light.textMuted}
           autoCapitalize="none"
         />
         {search ? (
           <Pressable onPress={() => setSearch('')}>
-            <Ionicons name="close-circle" size={18} color={Brand.textMuted} />
+            <Ionicons name="close-circle" size={18} color={Light.textMuted} />
           </Pressable>
         ) : null}
       </View>
@@ -531,7 +531,7 @@ export default function PortalAdmin() {
                         <Ionicons
                           name={approvalItem.done ? 'checkmark-circle' : 'alert-circle-outline'}
                           size={15}
-                          color={approvalItem.done ? Brand.success : Brand.warning}
+                          color={approvalItem.done ? Light.success : Light.warning}
                         />
                         <Text style={[styles.checklistText, approvalItem.done && styles.checklistTextDone]}>
                           {approvalItem.label}
@@ -571,7 +571,7 @@ export default function PortalAdmin() {
                 <View style={styles.companyBlock}>
                   <Text style={styles.companyName}>{item.profile.name || 'Visitante sem nome'}</Text>
                   <Text style={styles.companyMeta}>
-                    {item.profile.role || 'Cargo não informado'} · <Text style={{ color: Brand.gold }}>{item.profile.company || 'Empresa não informada'}</Text>
+                    {item.profile.role || 'Cargo não informado'} · <Text style={{ color: Light.gold }}>{item.profile.company || 'Empresa não informada'}</Text>
                   </Text>
                 </View>
                 <View style={[styles.statusBadge, item.profile.onboardingCompleted ? styles.statusPub : styles.statusDraft]}>
@@ -614,8 +614,8 @@ export default function PortalAdmin() {
                     <Text style={styles.visitorDetailLabel}>Objetivos: </Text>
                     <View style={styles.tagsContainer}>
                       {item.profile.objectives.map((o) => (
-                        <View key={o} style={[styles.tagChip, { borderColor: Brand.goldSoft }]}>
-                          <Text style={[styles.tagChipText, { color: Brand.gold }]}>{o}</Text>
+                        <View key={o} style={[styles.tagChip, { borderColor: Light.goldPillBorder }]}>
+                          <Text style={[styles.tagChipText, { color: Light.gold }]}>{o}</Text>
                         </View>
                       ))}
                     </View>
@@ -627,8 +627,8 @@ export default function PortalAdmin() {
                     <Text style={styles.visitorDetailLabel}>Interesses: </Text>
                     <View style={styles.tagsContainer}>
                       {item.profile.interests.map((i) => (
-                        <View key={i} style={[styles.tagChip, { borderColor: Brand.borderGold }]}>
-                          <Text style={[styles.tagChipText, { color: Brand.gold }]}>{i}</Text>
+                        <View key={i} style={[styles.tagChip, { borderColor: Light.goldPillBorder }]}>
+                          <Text style={[styles.tagChipText, { color: Light.gold }]}>{i}</Text>
                         </View>
                       ))}
                     </View>
@@ -655,7 +655,7 @@ export default function PortalAdmin() {
                     <View style={styles.tagsContainer}>
                       {item.profile.bottlenecks.map((b) => (
                         <View key={b} style={[styles.tagChip, { backgroundColor: 'rgba(239, 68, 68, 0.05)', borderColor: 'rgba(239, 68, 68, 0.2)' }]}>
-                          <Text style={[styles.tagChipText, { color: '#FECACA' }]}>{b}</Text>
+                          <Text style={[styles.tagChipText, { color: Light.danger }]}>{b}</Text>
                         </View>
                       ))}
                     </View>
@@ -671,9 +671,9 @@ export default function PortalAdmin() {
                   <Ionicons
                     name={item.profile.discoverable ? 'eye-outline' : 'eye-off-outline'}
                     size={13}
-                    color={item.profile.discoverable ? Brand.gold : Brand.textMuted}
+                    color={item.profile.discoverable ? Light.gold : Light.textMuted}
                   />
-                  <Text style={[styles.discoverableText, { color: item.profile.discoverable ? Brand.gold : Brand.textMuted }]}>
+                  <Text style={[styles.discoverableText, { color: item.profile.discoverable ? Light.gold : Light.textMuted }]}>
                     {item.profile.discoverable ? 'Público (Match)' : 'Privado'}
                   </Text>
                 </View>
@@ -688,7 +688,7 @@ export default function PortalAdmin() {
                   <Text style={styles.companyName}>{lead.name || 'Contato sem nome'}</Text>
                   <Text style={styles.companyMeta}>
                     {lead.role || 'Cargo não informado'} ·{' '}
-                    <Text style={{ color: Brand.gold }}>{lead.company || 'Empresa não informada'}</Text>
+                    <Text style={{ color: Light.gold }}>{lead.company || 'Empresa não informada'}</Text>
                   </Text>
                 </View>
                 <View style={styles.statusBadge}>
@@ -770,28 +770,28 @@ export default function PortalAdmin() {
 
         {adminTab === 'exhibitors' && !exhibitorsLoading && filtered.length === 0 && (
           <View style={styles.emptyBox}>
-            <Ionicons name="checkmark-circle-outline" size={24} color={Brand.success} />
+            <Ionicons name="checkmark-circle-outline" size={24} color={Light.success} />
             <Text style={styles.emptyText}>Nenhum expositor cadastrado ou correspondente ao filtro.</Text>
           </View>
         )}
 
         {adminTab === 'visitors' && !visitorsLoading && filteredVisitors.length === 0 && (
           <View style={styles.emptyBox}>
-            <Ionicons name="checkmark-circle-outline" size={24} color={Brand.success} />
+            <Ionicons name="checkmark-circle-outline" size={24} color={Light.success} />
             <Text style={styles.emptyText}>Nenhum visitante cadastrado ou correspondente à busca.</Text>
           </View>
         )}
 
         {adminTab === 'leads' && !leadsLoading && filteredLeads.length === 0 && (
           <View style={styles.emptyBox}>
-            <Ionicons name="id-card-outline" size={24} color={Brand.textMuted} />
+            <Ionicons name="id-card-outline" size={24} color={Light.textMuted} />
             <Text style={styles.emptyText}>Nenhum lead captado ou correspondente à busca.</Text>
           </View>
         )}
 
         {adminTab === 'sponsors' && filteredSponsors.length === 0 && (
           <View style={styles.emptyBox}>
-            <Ionicons name="image-outline" size={24} color={Brand.textMuted} />
+            <Ionicons name="image-outline" size={24} color={Light.textMuted} />
             <Text style={styles.emptyText}>Nenhum patrocinador correspondente à busca.</Text>
           </View>
         )}
@@ -809,7 +809,7 @@ function ChipFilter({ label, active, onPress }: { label: string; active: boolean
 }
 
 function Metric({ label, value, tone }: { label: string; value: number; tone?: 'success' | 'warning' }) {
-  const color = tone === 'success' ? Brand.success : tone === 'warning' ? Brand.warning : Brand.gold;
+  const color = tone === 'success' ? Light.success : tone === 'warning' ? Light.warning : Light.gold;
   return (
     <View style={styles.metricCard}>
       <Text style={[styles.metricValue, { color }]}>{value}</Text>
@@ -821,7 +821,7 @@ function Metric({ label, value, tone }: { label: string; value: number; tone?: '
 function LinkCard({ icon, title, value }: { icon: keyof typeof Ionicons.glyphMap; title: string; value: string }) {
   return (
     <View style={styles.linkCard}>
-      <Ionicons name={icon} size={19} color={Brand.gold} />
+      <Ionicons name={icon} size={19} color={Light.gold} />
       <View style={styles.linkCopy}>
         <Text style={styles.linkTitle}>{title}</Text>
         <Text selectable style={styles.linkValue} numberOfLines={2}>
@@ -841,49 +841,49 @@ function FilterButton({ label, active, onPress }: { label: string; active: boole
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Brand.bgPrimary },
+  screen: { flex: 1, backgroundColor: Light.bg },
   centerScreen: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
   },
   content: { paddingHorizontal: Spacing.four, gap: Spacing.three },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   back: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  backText: { color: Brand.textSecondary, fontSize: 14 },
+  backText: { color: Light.textMuted, fontSize: 14 },
   signOut: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  signOutText: { color: Brand.textSecondary, fontSize: 14 },
+  signOutText: { color: Light.textMuted, fontSize: 14 },
   heading: { gap: Spacing.one },
-  kicker: { color: Brand.gold, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' },
-  title: { color: Brand.textPrimary, fontSize: 25, fontWeight: '900' },
-  bodyText: { color: Brand.textSecondary, fontSize: 13.5, lineHeight: 20 },
+  kicker: { color: Light.gold, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' },
+  title: { color: Light.textNavy, fontSize: 25, fontWeight: '900' },
+  bodyText: { color: Light.text, fontSize: 13.5, lineHeight: 20 },
   linkGrid: { gap: Spacing.two },
   linkCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.two,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.borderGold,
+    borderColor: Light.goldPillBorder,
     borderRadius: Radius.sm,
     padding: Spacing.three,
   },
   linkCopy: { flex: 1, gap: 3 },
-  linkTitle: { color: Brand.textPrimary, fontSize: 13.5, fontWeight: '800' },
-  linkValue: { color: Brand.gold, fontSize: 12.5, fontWeight: '700' },
+  linkTitle: { color: Light.textNavy, fontSize: 13.5, fontWeight: '800' },
+  linkValue: { color: Light.gold, fontSize: 12.5, fontWeight: '700' },
   metricsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   metricCard: {
     minWidth: 135,
     flex: 1,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     padding: Spacing.three,
   },
   metricValue: { fontSize: 28, fontWeight: '900' },
-  metricLabel: { color: Brand.textSecondary, fontSize: 12.5, fontWeight: '700' },
+  metricLabel: { color: Light.textNavy, fontSize: 12.5, fontWeight: '700' },
   warnBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -892,35 +892,35 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     padding: Spacing.three,
   },
-  warnText: { color: Brand.warning, fontSize: 12.5, flex: 1 },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  sectionTitle: { color: Brand.textPrimary, fontSize: 17, fontWeight: '900' },
-  sectionMeta: { color: Brand.textMuted, fontSize: 12, marginTop: 3 },
+  warnText: { color: Light.warning, fontSize: 12.5, flex: 1 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 },
+  sectionTitle: { color: Light.textNavy, fontSize: 17, fontWeight: '900' },
+  sectionMeta: { color: Light.textMuted, fontSize: 12, marginTop: 3 },
   exportButton: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
     borderRadius: Radius.sm,
     paddingHorizontal: Spacing.three,
     paddingVertical: 10,
   },
-  exportButtonText: { color: Brand.bgPrimary, fontSize: 12.5, fontWeight: '900' },
+  exportButtonText: { color: '#ffffff', fontSize: 12.5, fontWeight: '900' },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.two,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     paddingHorizontal: Spacing.three,
     minHeight: 48,
   },
   searchInput: {
     flex: 1,
-    color: Brand.textPrimary,
+    color: Light.text,
     fontSize: 14,
     paddingVertical: 12,
   },
@@ -930,105 +930,106 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: Radius.pill,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     paddingVertical: 10,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
   },
-  filterButtonActive: { backgroundColor: Brand.goldSoft, borderColor: Brand.borderGold },
-  filterText: { color: Brand.textMuted, fontSize: 12.5, fontWeight: '800' },
-  filterTextActive: { color: Brand.gold },
+  filterButtonActive: { backgroundColor: '#FBF6E9', borderColor: Light.goldPillBorder },
+  filterText: { color: Light.textMuted, fontSize: 12.5, fontWeight: '800' },
+  filterTextActive: { color: Light.gold },
   qualityFilters: { gap: Spacing.two, paddingRight: Spacing.four },
   chipFilter: {
     borderRadius: Radius.pill,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     paddingHorizontal: Spacing.three,
     paddingVertical: 9,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
   },
-  chipFilterActive: { backgroundColor: Brand.blueSoft, borderColor: Brand.techBlue },
-  chipFilterText: { color: Brand.textSecondary, fontSize: 12.5, fontWeight: '800' },
-  chipFilterTextActive: { color: Brand.textPrimary },
+  chipFilterActive: { backgroundColor: 'rgba(47, 107, 255, 0.12)', borderColor: Light.gold },
+  chipFilterText: { color: Light.textMuted, fontSize: 12.5, fontWeight: '800' },
+  chipFilterTextActive: { color: Light.textNavy },
   list: { gap: Spacing.two },
   exhibitorCard: {
     gap: Spacing.two,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     padding: Spacing.three,
   },
   cardTop: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two },
   companyBlock: { flex: 1, gap: 3 },
-  companyName: { color: Brand.textPrimary, fontSize: 16, fontWeight: '900' },
-  companyMeta: { color: Brand.textSecondary, fontSize: 12.5 },
+  companyName: { color: Light.textNavy, fontSize: 16, fontWeight: '900' },
+  companyMeta: { color: Light.textMuted, fontSize: 12.5 },
   statusBadge: { borderRadius: Radius.pill, paddingHorizontal: 10, paddingVertical: 5 },
   statusDraft: { backgroundColor: 'rgba(245, 158, 11, 0.14)' },
   statusPub: { backgroundColor: 'rgba(34, 197, 94, 0.14)' },
-  statusText: { color: Brand.textPrimary, fontSize: 11, fontWeight: '800' },
-  aboutText: { color: Brand.textSecondary, fontSize: 12.5, lineHeight: 18 },
+  statusText: { color: Light.textNavy, fontSize: 11, fontWeight: '800' },
+  aboutText: { color: Light.text, fontSize: 12.5, lineHeight: 18 },
   approvalBox: {
     gap: Spacing.two,
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.surfaceAlt,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     padding: Spacing.three,
   },
   approvalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  approvalTitle: { color: Brand.textPrimary, fontSize: 13, fontWeight: '900' },
+  approvalTitle: { color: Light.textNavy, fontSize: 13, fontWeight: '900' },
   approvalScore: { fontSize: 12.5, fontWeight: '900' },
-  approvalScoreReady: { color: Brand.success },
-  approvalScorePending: { color: Brand.warning },
+  approvalScoreReady: { color: Light.success },
+  approvalScorePending: { color: Light.warning },
   checklistGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   checklistItem: { flexDirection: 'row', alignItems: 'center', gap: 5, minWidth: 108 },
-  checklistText: { color: Brand.warning, fontSize: 12 },
-  checklistTextDone: { color: Brand.textSecondary },
+  checklistText: { color: Light.warning, fontSize: 12 },
+  checklistTextDone: { color: Light.text },
   cardFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Spacing.two },
-  ownerText: { color: Brand.textMuted, fontSize: 12, flex: 1 },
+  ownerText: { color: Light.textMuted, fontSize: 12, flex: 1 },
   primaryAction: {
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
     borderRadius: Radius.pill,
     paddingHorizontal: Spacing.three,
     paddingVertical: 10,
   },
-  primaryActionText: { color: '#0A1021', fontSize: 12.5, fontWeight: '900' },
+  primaryActionText: { color: '#ffffff', fontSize: 12.5, fontWeight: '900' },
   secondaryAction: {
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.pill,
     paddingHorizontal: Spacing.three,
     paddingVertical: 10,
+    backgroundColor: Light.surfaceAlt,
   },
-  secondaryActionText: { color: Brand.textSecondary, fontSize: 12.5, fontWeight: '800' },
+  secondaryActionText: { color: Light.textNavy, fontSize: 12.5, fontWeight: '800' },
   actionDisabled: { opacity: 0.5 },
   emptyBox: {
     alignItems: 'center',
     gap: Spacing.two,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     padding: Spacing.four,
   },
-  emptyText: { color: Brand.textSecondary, fontSize: 13.5, fontWeight: '700' },
+  emptyText: { color: Light.textNavy, fontSize: 13.5, fontWeight: '700' },
   lockedCard: {
     gap: Spacing.three,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     padding: Spacing.four,
   },
-  uidText: { color: Brand.gold, fontSize: 12.5, fontWeight: '700' },
+  uidText: { color: Light.gold, fontSize: 12.5, fontWeight: '700' },
   adminTabs: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 4,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderRadius: Radius.pill,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     padding: 4,
     marginTop: Spacing.two,
   },
@@ -1043,18 +1044,18 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
   },
   adminTabBtnActive: {
-    backgroundColor: '#0E172F',
+    backgroundColor: Light.surfaceAlt,
     borderWidth: 1,
-    borderColor: 'rgba(47, 107, 255, 0.4)',
+    borderColor: Light.border,
   },
-  adminTabBtnText: { color: Brand.textSecondary, fontSize: 13, fontWeight: '600' },
-  adminTabBtnTextActive: { color: Brand.textPrimary, fontWeight: '700' },
+  adminTabBtnText: { color: Light.textMuted, fontSize: 13, fontWeight: '600' },
+  adminTabBtnTextActive: { color: Light.textNavy, fontWeight: '700' },
   sponsorPreviewBox: {
     width: 86,
     height: 58,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1076,15 +1077,16 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   visitorDetails: {
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.surfaceAlt,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     padding: Spacing.three,
     gap: Spacing.two,
+    marginTop: 8,
   },
   visitorDetailsTitle: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.8,
@@ -1100,36 +1102,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   visitorDetailLabel: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 12,
     fontWeight: '700',
   },
   visitorDetailValue: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 12,
   },
   visitorDetailChips: {
     gap: 6,
   },
   visitorText: {
-    color: Brand.textSecondary,
+    color: Light.text,
     fontSize: 12,
     lineHeight: 17,
   },
   visitorTextLabel: {
-    color: Brand.gold,
+    color: Light.gold,
     fontWeight: '700',
   },
   discoverableBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.surfaceAlt,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: Radius.pill,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
   discoverableText: {
     fontSize: 11,
@@ -1144,12 +1146,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
   tagChipText: {
-    color: Brand.textSecondary,
+    color: Light.textNavy,
     fontSize: 11,
     fontWeight: '500',
   },

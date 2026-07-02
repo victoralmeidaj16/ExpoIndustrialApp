@@ -28,11 +28,11 @@ function Metric({
     slate: 'text-slate-900',
     amber: 'text-amber-600',
     green: 'text-green-600',
-    indigo: 'text-indigo-600',
+    indigo: 'text-[#0C2345]',
   } as const;
   return (
     <Link href={href}>
-      <Card className="p-5 transition hover:border-indigo-300 hover:shadow-md">
+      <Card className="p-5 transition hover:border-[#C9A24C] hover:shadow-md">
         <p className={`text-3xl font-bold ${tones[tone]}`}>{value}</p>
         <p className="mt-1 text-sm font-medium text-slate-500">{label}</p>
       </Card>
@@ -49,7 +49,7 @@ function EventStatusBanner({ config }: { config: EventConfig }) {
   if (!status) return null;
 
   const styles = {
-    upcoming: 'border-indigo-200 bg-indigo-50 text-indigo-700',
+    upcoming: 'border-[#F0E4C4] bg-[#FBF6E9] text-[#7A6320]',
     live: 'border-green-200 bg-green-50 text-green-700',
     ended: 'border-slate-200 bg-slate-50 text-slate-500',
   } as const;
@@ -191,7 +191,7 @@ export default function DashboardPage() {
                         {alert.count}
                       </span>
                       <span className="font-medium text-slate-700">{alert.label}</span>
-                      <span className="ml-auto text-indigo-600">resolver →</span>
+                      <span className="ml-auto text-[#0C2345] hover:text-[#C9A24C] font-semibold">resolver →</span>
                     </Link>
                   </li>
                 ))}
@@ -202,16 +202,16 @@ export default function DashboardPage() {
           <Card className="mt-6 p-5">
             <h2 className="text-sm font-semibold text-slate-900">Atalhos</h2>
             <div className="mt-3 flex flex-wrap gap-3 text-sm">
-              <Link href="/croqui" className="text-indigo-600 hover:underline">
+              <Link href="/croqui" className="text-[#0C2345] hover:text-[#C9A24C] font-semibold hover:underline">
                 Posicionar estandes no croqui →
               </Link>
-              <Link href="/agenda" className="text-indigo-600 hover:underline">
+              <Link href="/agenda" className="text-[#0C2345] hover:text-[#C9A24C] font-semibold hover:underline">
                 Gerenciar agenda →
               </Link>
-              <Link href="/patrocinadores" className="text-indigo-600 hover:underline">
+              <Link href="/patrocinadores" className="text-[#0C2345] hover:text-[#C9A24C] font-semibold hover:underline">
                 Gerenciar patrocinadores →
               </Link>
-              <Link href="/evento" className="text-indigo-600 hover:underline">
+              <Link href="/evento" className="text-[#0C2345] hover:text-[#C9A24C] font-semibold hover:underline">
                 Editar dados do evento →
               </Link>
             </div>

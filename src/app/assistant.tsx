@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Light, Radius, Spacing } from '@/constants/theme';
 import { type Session } from '@/features/agenda/session';
 import { useSessions } from '@/features/agenda/use-sessions';
 import { type Exhibitor } from '@/features/exhibitors/exhibitor';
@@ -269,7 +269,7 @@ export default function AssistantScreen() {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
       <View style={[styles.header, { paddingTop: insets.top + Spacing.two }]}>
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={22} color={Brand.textPrimary} />
+          <Ionicons name="chevron-back" size={22} color={Light.textNavy} />
         </Pressable>
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>AI Assistant Industrial</Text>
@@ -278,12 +278,12 @@ export default function AssistantScreen() {
             <Text style={styles.statusText}>
               {loadingKnowledge
                 ? 'Carregando dados'
-                : `${exhibitors.length} expositores · ${sessions.length} sessões · ${exhibitorsSource}/${sessionsSource}`}
+                : `${exhibitors.length} expositores · ${sessions.length} sessões`}
             </Text>
           </View>
         </View>
         <View style={styles.headerIconBtn}>
-          <Ionicons name="sparkles" size={18} color={Brand.textPrimary} />
+          <Ionicons name="sparkles" size={18} color={Light.gold} />
         </View>
       </View>
 
@@ -296,7 +296,7 @@ export default function AssistantScreen() {
           <View style={[styles.messageRow, item.sender === 'user' ? styles.userRow : styles.aiRow]}>
             {item.sender === 'ai' && (
               <View style={styles.aiAvatar}>
-                <Ionicons name="sparkles" size={13} color={Brand.gold} />
+                <Ionicons name="sparkles" size={13} color={Light.gold} />
               </View>
             )}
             <View style={{ flex: 1, alignItems: item.sender === 'user' ? 'flex-end' : 'flex-start' }}>
@@ -306,7 +306,7 @@ export default function AssistantScreen() {
                 </Text>
                 {item.action && (
                   <Pressable style={styles.actionButton} onPress={() => handleAction(item.action!)}>
-                    <Ionicons name="compass-outline" size={16} color={Brand.gold} />
+                    <Ionicons name="compass-outline" size={16} color={Light.gold} />
                     <Text style={styles.actionButtonText}>{item.action.label}</Text>
                   </Pressable>
                 )}
@@ -319,10 +319,10 @@ export default function AssistantScreen() {
           isTyping ? (
             <View style={styles.typingIndicatorContainer}>
               <View style={styles.aiAvatar}>
-                <Ionicons name="sparkles" size={13} color={Brand.gold} />
+                <Ionicons name="sparkles" size={13} color={Light.gold} />
               </View>
               <View style={styles.typingBubble}>
-                <ActivityIndicator size="small" color={Brand.gold} />
+                <ActivityIndicator size="small" color={Light.gold} />
                 <Text style={styles.typingText}>Consultando agenda e mapa...</Text>
               </View>
             </View>
@@ -336,7 +336,7 @@ export default function AssistantScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScroll}>
             {SUGGESTIONS.map((suggestion) => (
               <Pressable key={suggestion} style={styles.suggestionChip} onPress={() => handleSend(suggestion)}>
-                <Ionicons name="chatbubble-ellipses-outline" size={13} color={Brand.textSecondary} />
+                <Ionicons name="chatbubble-ellipses-outline" size={13} color={Light.textMuted} />
                 <Text style={styles.suggestionText}>{suggestion}</Text>
               </Pressable>
             ))}
@@ -350,7 +350,7 @@ export default function AssistantScreen() {
             value={inputText}
             onChangeText={setInputText}
             placeholder="Pergunte sobre estandes, salas, horários..."
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
             style={styles.input}
             onSubmitEditing={() => handleSend(inputText)}
           />
@@ -367,41 +367,41 @@ export default function AssistantScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Brand.bgPrimary },
+  screen: { flex: 1, backgroundColor: Light.bg },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.four,
     paddingBottom: Spacing.three,
     borderBottomWidth: 1,
-    borderBottomColor: Brand.border,
-    backgroundColor: Brand.bgCard,
+    borderBottomColor: Light.border,
+    backgroundColor: Light.surface,
   },
   backBtn: {
     width: 40,
     height: 40,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.iconSoftBg,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerInfo: { flex: 1, marginLeft: 12 },
-  headerTitle: { color: Brand.textPrimary, fontSize: 16.5, fontWeight: '800' },
+  headerTitle: { color: Light.textNavy, fontSize: 16.5, fontWeight: '800' },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
-  statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Brand.success },
-  statusDotLoading: { backgroundColor: Brand.warning },
-  statusText: { color: Brand.textSecondary, fontSize: 11.5, fontWeight: '600' },
+  statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Light.success },
+  statusDotLoading: { backgroundColor: Light.warning },
+  statusText: { color: Light.textMuted, fontSize: 11.5, fontWeight: '600' },
   headerIconBtn: {
     width: 40,
     height: 40,
     borderRadius: Radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.iconSoftBg,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
   messageList: { padding: Spacing.four, gap: Spacing.three },
   messageRow: { flexDirection: 'row', gap: 10, maxWidth: '85%' },
@@ -411,61 +411,59 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
   },
   bubble: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: Radius.md },
   userBubble: {
-    backgroundColor: '#0E172F',
-    borderWidth: 1,
-    borderColor: 'rgba(47, 107, 255, 0.4)',
+    backgroundColor: Light.navy,
     borderBottomRightRadius: 2,
   },
   aiBubble: {
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderBottomLeftRadius: 2,
   },
   messageText: { fontSize: 14.5, lineHeight: 20 },
-  userText: { color: Brand.textPrimary, fontWeight: '500' },
-  aiText: { color: Brand.textPrimary },
-  timestamp: { color: Brand.textMuted, fontSize: 10, marginTop: 4, alignSelf: 'flex-end' },
+  userText: { color: '#FFFFFF', fontWeight: '500' },
+  aiText: { color: Light.text },
+  timestamp: { color: Light.textMuted, fontSize: 10, marginTop: 4, alignSelf: 'flex-end' },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.surfaceAlt,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: Radius.sm,
     marginTop: 10,
     alignSelf: 'flex-start',
   },
-  actionButtonText: { color: Brand.textPrimary, fontSize: 12.5, fontWeight: '700' },
+  actionButtonText: { color: Light.navyDeep, fontSize: 12.5, fontWeight: '700' },
   typingIndicatorContainer: { flexDirection: 'row', gap: 10, alignSelf: 'flex-start', alignItems: 'center' },
   typingBubble: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: Radius.md,
     borderBottomLeftRadius: 2,
   },
-  typingText: { color: Brand.textSecondary, fontSize: 13 },
-  suggestionsContainer: { paddingVertical: Spacing.two, borderTopWidth: 1, borderTopColor: Brand.border },
+  typingText: { color: Light.textMuted, fontSize: 13 },
+  suggestionsContainer: { paddingVertical: Spacing.two, borderTopWidth: 1, borderTopColor: Light.border, backgroundColor: Light.bg },
   suggestionsTitle: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 12.5,
     fontWeight: '700',
     paddingHorizontal: Spacing.four,
@@ -476,38 +474,38 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: Radius.pill,
   },
-  suggestionText: { color: Brand.textPrimary, fontSize: 12.5 },
+  suggestionText: { color: Light.textNavy, fontSize: 12.5 },
   inputContainer: {
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.two,
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
     borderTopWidth: 1,
-    borderTopColor: Brand.border,
+    borderTopColor: Light.border,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.pill,
     paddingLeft: 16,
     paddingRight: 6,
     height: 48,
   },
-  input: { flex: 1, color: Brand.textPrimary, fontSize: 14, paddingVertical: 8 },
+  input: { flex: 1, color: Light.text, fontSize: 14, paddingVertical: 8 },
   sendBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: Brand.techBlue,
+    backgroundColor: Light.navy,
     alignItems: 'center',
     justifyContent: 'center',
   },

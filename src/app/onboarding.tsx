@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Light, Radius, Spacing } from '@/constants/theme';
 import { AuthForm } from '@/features/auth/auth-form';
 import { useAuth } from '@/features/auth/use-auth';
 import {
@@ -72,7 +72,6 @@ export default function OnboardingScreen() {
 
   const handleNext = () => {
     if (step < 5) {
-      // Validações básicas por passo
       if (step === 1 && (!form.name.trim() || !form.phone?.trim() || !form.role.trim() || !form.company.trim() || !form.roleType)) {
         Alert.alert('Campos obrigatórios', 'Por favor, preencha nome completo, whatsapp, cargo, empresa e tipo de cargo.');
         return;
@@ -93,14 +92,12 @@ export default function OnboardingScreen() {
 
   const saveProfileWithStatus = async (completed: boolean, skipped: boolean) => {
     if (!configured) {
-      // Modo demo
       router.replace('/');
       return;
     }
 
     setSaving(true);
     try {
-      // Quando salva o setor, copia também para a área (texto) para compatibilidade com o match clássico
       const mainSector = form.sector && form.sector.length > 0 ? form.sector[0] : '';
       const updatedForm: VisitorProfile = {
         ...form,
@@ -147,7 +144,7 @@ export default function OnboardingScreen() {
   if (loading && !initialized) {
     return (
       <View style={styles.centerScreen}>
-        <ActivityIndicator color={Brand.gold} />
+        <ActivityIndicator color={Light.gold} />
       </View>
     );
   }
@@ -222,7 +219,7 @@ export default function OnboardingScreen() {
                 value={form.name}
                 onChangeText={(v) => set('name', v)}
                 placeholder="Nome Completo"
-                placeholderTextColor={Brand.textMuted}
+                placeholderTextColor={Light.textMuted}
                 style={styles.textInput}
               />
 
@@ -231,7 +228,7 @@ export default function OnboardingScreen() {
                 value={form.phone}
                 onChangeText={(v) => set('phone', v)}
                 placeholder="DDD + Número (ex: 47 99999-9999)"
-                placeholderTextColor={Brand.textMuted}
+                placeholderTextColor={Light.textMuted}
                 keyboardType="phone-pad"
                 style={styles.textInput}
               />
@@ -241,7 +238,7 @@ export default function OnboardingScreen() {
                 value={form.email}
                 editable={false}
                 placeholder="E-mail de cadastro"
-                placeholderTextColor={Brand.textMuted}
+                placeholderTextColor={Light.textMuted}
                 style={[styles.textInput, { opacity: 0.6 }]}
               />
 
@@ -250,7 +247,7 @@ export default function OnboardingScreen() {
                 value={form.role}
                 onChangeText={(v) => set('role', v)}
                 placeholder="Ex: Diretor de Operações, Comprador Pleno"
-                placeholderTextColor={Brand.textMuted}
+                placeholderTextColor={Light.textMuted}
                 style={styles.textInput}
               />
 
@@ -259,7 +256,7 @@ export default function OnboardingScreen() {
                 value={form.company}
                 onChangeText={(v) => set('company', v)}
                 placeholder="Nome da sua empresa"
-                placeholderTextColor={Brand.textMuted}
+                placeholderTextColor={Light.textMuted}
                 style={styles.textInput}
               />
 
@@ -410,7 +407,7 @@ export default function OnboardingScreen() {
                 value={form.lookingFor}
                 onChangeText={(v) => set('lookingFor', v)}
                 placeholder="Ex: Fornecedores de CLPs Siemens, painéis elétricos..."
-                placeholderTextColor={Brand.textMuted}
+                placeholderTextColor={Light.textMuted}
                 style={styles.textInput}
               />
 
@@ -419,7 +416,7 @@ export default function OnboardingScreen() {
                 value={form.offering}
                 onChangeText={(v) => set('offering', v)}
                 placeholder="Ex: Fabricação de estruturas metálicas, serviços de engenharia..."
-                placeholderTextColor={Brand.textMuted}
+                placeholderTextColor={Light.textMuted}
                 style={styles.textInput}
               />
             </View>
@@ -438,8 +435,7 @@ export default function OnboardingScreen() {
                   <Switch
                     value={form.discoverable}
                     onValueChange={(v) => set('discoverable', v)}
-                    trackColor={{ false: Brand.border, true: Brand.gold }}
-                    thumbColor={Platform.OS === 'android' ? Brand.bgPrimary : undefined}
+                    trackColor={{ false: Light.border, true: Light.gold }}
                   />
                 </View>
                 <Text style={styles.consentDescription}>
@@ -454,26 +450,24 @@ export default function OnboardingScreen() {
                   <Switch
                     value={form.shareContact}
                     onValueChange={(v) => set('shareContact', v)}
-                    trackColor={{ false: Brand.border, true: Brand.gold }}
-                    thumbColor={Platform.OS === 'android' ? Brand.bgPrimary : undefined}
+                    trackColor={{ false: Light.border, true: Light.gold }}
                   />
                 </View>
                 <Text style={styles.consentDescription}>
-                  Permite revelar seu e-mail e telefone para os contatos que você ACEITAR a conexão
-                  na feira.
+                  Permite revelar seu e-mail e telefone para os contatos que você ACEITAR a conexão na feira.
                 </Text>
               </View>
 
               <Text style={styles.termsText}>
                 Ao concluir, você concorda com a nossa{' '}
                 <Text
-                  style={{ color: Brand.gold, textDecorationLine: 'underline' }}
+                  style={{ color: Light.gold, textDecorationLine: 'underline' }}
                   onPress={() => Linking.openURL('https://expo-industrial-sul.vercel.app/privacy')}>
                   Política de Privacidade
                 </Text>{' '}
                 e os nossos{' '}
                 <Text
-                  style={{ color: Brand.gold, textDecorationLine: 'underline' }}
+                  style={{ color: Light.gold, textDecorationLine: 'underline' }}
                   onPress={() => Linking.openURL('https://expo-industrial-sul.vercel.app/terms')}>
                   Termos de Uso
                 </Text>.
@@ -486,7 +480,7 @@ export default function OnboardingScreen() {
         <View style={styles.footerRow}>
           {step > 1 ? (
             <Pressable onPress={handlePrev} style={styles.prevBtn}>
-              <Ionicons name="arrow-back" size={16} color={Brand.textPrimary} />
+              <Ionicons name="arrow-back" size={16} color={Light.navy} />
               <Text style={styles.prevBtnText}>Voltar</Text>
             </Pressable>
           ) : (
@@ -496,7 +490,7 @@ export default function OnboardingScreen() {
           {step < 5 ? (
             <Pressable onPress={handleNext} style={styles.nextBtn}>
               <Text style={styles.nextBtnText}>Próximo</Text>
-              <Ionicons name="arrow-forward" size={16} color={Brand.bgPrimary} />
+              <Ionicons name="arrow-forward" size={16} color="#fff" />
             </Pressable>
           ) : (
             <Pressable
@@ -504,11 +498,11 @@ export default function OnboardingScreen() {
               disabled={saving}
               style={[styles.nextBtn, saving && { opacity: 0.7 }]}>
               {saving ? (
-                <ActivityIndicator color={Brand.bgPrimary} size="small" />
+                <ActivityIndicator color="#fff" size="small" />
               ) : (
                 <>
                   <Text style={styles.nextBtnText}>Concluir</Text>
-                  <Ionicons name="checkmark" size={16} color={Brand.bgPrimary} />
+                  <Ionicons name="checkmark" size={16} color="#fff" />
                 </>
               )}
             </Pressable>
@@ -520,12 +514,12 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Brand.bgPrimary },
+  screen: { flex: 1, backgroundColor: Light.bg },
   centerScreen: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
   },
   content: { paddingHorizontal: Spacing.four, gap: Spacing.three },
   header: {
@@ -534,34 +528,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: Spacing.one,
   },
-  headerTitle: { color: Brand.textPrimary, fontSize: 20, fontWeight: '800' },
+  headerTitle: { color: Light.textNavy, fontSize: 20, fontWeight: '800' },
   skipButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
-  skipButtonText: { color: Brand.textMuted, fontSize: 13, fontWeight: '600' },
+  skipButtonText: { color: Light.textMuted, fontSize: 13, fontWeight: '600' },
 
   progressRow: { flexDirection: 'row', gap: 6, marginVertical: Spacing.one },
   progressDot: {
     flex: 1,
     height: 4,
     borderRadius: 2,
-    backgroundColor: Brand.border,
+    backgroundColor: Light.border,
   },
-  progressDotActive: { backgroundColor: Brand.gold },
-  progressDotCompleted: { backgroundColor: Brand.goldSoft },
+  progressDotActive: { backgroundColor: Light.gold },
+  progressDotCompleted: { backgroundColor: Light.navy },
 
   stepContainer: { minHeight: 400, marginTop: Spacing.two },
   stepContent: { gap: Spacing.three },
-  stepTitle: { color: Brand.textPrimary, fontSize: 22, fontWeight: '800' },
-  stepSubtitle: { color: Brand.textSecondary, fontSize: 13.5, lineHeight: 20 },
+  stepTitle: { color: Light.textNavy, fontSize: 22, fontWeight: '800' },
+  stepSubtitle: { color: Light.textMuted, fontSize: 13.5, lineHeight: 20 },
 
   label: {
-    color: Brand.gold,
+    color: Light.goldTextStrong,
     fontSize: 12,
     fontWeight: '800',
     marginTop: Spacing.two,
@@ -569,13 +563,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
   textInput: {
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     paddingHorizontal: 14,
     height: 46,
-    color: Brand.textPrimary,
+    color: Light.text,
     fontSize: 14.5,
   },
 
@@ -584,18 +578,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
-  optionChipActive: { backgroundColor: '#0E172F', borderColor: 'rgba(47, 107, 255, 0.6)' },
-  optionChipText: { color: Brand.textSecondary, fontSize: 12.5, fontWeight: '600' },
-  optionChipTextActive: { color: Brand.textPrimary, fontWeight: '700' },
+  optionChipActive: { backgroundColor: Light.navy, borderColor: Light.navy },
+  optionChipText: { color: Light.textMuted, fontSize: 12.5, fontWeight: '600' },
+  optionChipTextActive: { color: '#ffffff', fontWeight: '700' },
 
   consentCard: {
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     padding: Spacing.three,
     gap: 8,
@@ -605,10 +599,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  consentTitle: { color: Brand.textPrimary, fontSize: 15, fontWeight: '700' },
-  consentDescription: { color: Brand.textSecondary, fontSize: 12.5, lineHeight: 18 },
+  consentTitle: { color: Light.textNavy, fontSize: 15, fontWeight: '700' },
+  consentDescription: { color: Light.textMuted, fontSize: 12.5, lineHeight: 18 },
   termsText: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
     fontSize: 11,
     lineHeight: 16,
     textAlign: 'center',
@@ -629,11 +623,11 @@ const styles = StyleSheet.create({
     height: 46,
     paddingHorizontal: 20,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
-  prevBtnText: { color: Brand.textPrimary, fontSize: 14, fontWeight: '700' },
+  prevBtnText: { color: Light.navy, fontSize: 14, fontWeight: '700' },
   nextBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -642,7 +636,7 @@ const styles = StyleSheet.create({
     gap: 8,
     height: 46,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
   },
-  nextBtnText: { color: Brand.bgPrimary, fontSize: 14.5, fontWeight: '800' },
+  nextBtnText: { color: '#ffffff', fontSize: 14.5, fontWeight: '800' },
 });

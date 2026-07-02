@@ -4,7 +4,7 @@ import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Light, Radius, Spacing } from '@/constants/theme';
 
 export default function PrivacyScreen() {
   const insets = useSafeAreaInsets();
@@ -15,7 +15,7 @@ export default function PrivacyScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={20} color={Brand.textPrimary} />
+          <Ionicons name="chevron-back" size={20} color={Light.textNavy} />
         </Pressable>
         <Text style={styles.headerTitle}>Política de Privacidade</Text>
         <View style={{ width: 40 }} />
@@ -77,7 +77,7 @@ export default function PrivacyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
   },
   header: {
     flexDirection: 'row',
@@ -86,20 +86,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
+    backgroundColor: Light.surface,
   },
   backBtn: {
     width: 40,
     height: 40,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.iconSoftBg,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
   headerTitle: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 18,
     fontWeight: '800',
   },
@@ -107,19 +108,19 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
   },
   lastUpdated: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
     fontSize: 12,
     marginBottom: Spacing.three,
   },
   sectionTitle: {
-    color: Brand.gold,
+    color: Light.goldTextStrong,
     fontSize: 16,
     fontWeight: '800',
     marginTop: Spacing.four,
     marginBottom: Spacing.two,
   },
   paragraph: {
-    color: Brand.textSecondary,
+    color: Light.text,
     fontSize: 14,
     lineHeight: 22,
   },

@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Light, Radius, Spacing } from '@/constants/theme';
 import { AuthForm } from '@/features/auth/auth-form';
 import { authErrorMessage, useAuth } from '@/features/auth/use-auth';
 import {
@@ -224,7 +224,7 @@ export default function ExhibitorWebForm() {
   if (initializing) {
     return (
       <View style={styles.centerScreen}>
-        <ActivityIndicator color={Brand.gold} />
+        <ActivityIndicator color={Light.gold} />
       </View>
     );
   }
@@ -271,7 +271,7 @@ export default function ExhibitorWebForm() {
   if (loading && !hydrated) {
     return (
       <View style={styles.centerScreen}>
-        <ActivityIndicator color={Brand.gold} />
+        <ActivityIndicator color={Light.gold} />
       </View>
     );
   }
@@ -315,7 +315,7 @@ export default function ExhibitorWebForm() {
                     router.replace('/preencher');
                   }}
                   disabled={busy}>
-                  <Ionicons name="log-out-outline" size={16} color={Brand.textSecondary} />
+                  <Ionicons name="log-out-outline" size={16} color={Light.textMuted} />
                   <Text style={styles.secondaryButtonText}>Sair</Text>
                 </Pressable>
                 <Pressable
@@ -323,10 +323,10 @@ export default function ExhibitorWebForm() {
                   onPress={onSave}
                   disabled={busy}>
                   {busy ? (
-                    <ActivityIndicator color="#0A1021" />
+                    <ActivityIndicator color="#fff" />
                   ) : (
                     <>
-                      <Ionicons name="save-outline" size={17} color="#0A1021" />
+                      <Ionicons name="save-outline" size={17} color="#fff" />
                       <Text style={styles.primaryButtonText}>Salvar</Text>
                     </>
                   )}
@@ -364,7 +364,7 @@ export default function ExhibitorWebForm() {
                 <View
                   style={[
                     styles.statusDot,
-                    { backgroundColor: published ? Brand.success : Brand.warning },
+                    { backgroundColor: published ? Light.success : Light.warning },
                   ]}
                 />
                 <Text style={styles.statusText}>
@@ -398,7 +398,7 @@ export default function ExhibitorWebForm() {
                       <Ionicons
                         name={done ? 'checkmark-circle' : 'ellipse-outline'}
                         size={16}
-                        color={done ? Brand.success : Brand.textMuted}
+                        color={done ? Light.success : Light.textMuted}
                       />
                       <Text style={[styles.checkText, done && styles.checkTextDone]}>
                         {check.label}
@@ -412,13 +412,13 @@ export default function ExhibitorWebForm() {
 
           {error && (
             <View style={styles.feedbackError}>
-              <Ionicons name="alert-circle-outline" size={18} color={Brand.danger} />
+              <Ionicons name="alert-circle-outline" size={18} color={Light.danger} />
               <Text style={styles.feedbackErrorText}>{error}</Text>
             </View>
           )}
           {saved && (
             <View style={styles.feedbackSuccess}>
-              <Ionicons name="checkmark-circle" size={18} color={Brand.success} />
+              <Ionicons name="checkmark-circle" size={18} color={Light.success} />
               <Text style={styles.feedbackSuccessText}>Cadastro salvo com sucesso.</Text>
             </View>
           )}
@@ -433,7 +433,7 @@ export default function ExhibitorWebForm() {
                   value={form.company}
                   onChangeText={(value) => set('company', value)}
                   placeholder="Ex.: Siemens Digital Industries"
-                  placeholderTextColor={Brand.textMuted}
+                  placeholderTextColor={Light.textMuted}
                 />
               </Field>
 
@@ -443,7 +443,7 @@ export default function ExhibitorWebForm() {
                   value={form.industry}
                   onChangeText={(value) => set('industry', value)}
                   placeholder="Ex.: Automação & Robótica"
-                  placeholderTextColor={Brand.textMuted}
+                  placeholderTextColor={Light.textMuted}
                 />
               </Field>
             </View>
@@ -455,12 +455,12 @@ export default function ExhibitorWebForm() {
                     <Image source={{ uri: form.logoUrl }} style={styles.logoPreview} />
                   ) : (
                     <View style={styles.logoPlaceholder}>
-                      <Ionicons name="image-outline" size={28} color={Brand.textMuted} />
+                      <Ionicons name="image-outline" size={28} color={Light.textMuted} />
                     </View>
                   )}
                   <View style={styles.logoActions}>
                     <Pressable style={styles.uploadButton} onPress={onPickImage} disabled={busy}>
-                      <Ionicons name="cloud-upload-outline" size={17} color={Brand.gold} />
+                      <Ionicons name="cloud-upload-outline" size={17} color={Light.gold} />
                       <Text style={styles.uploadButtonText}>
                         {form.logoUrl ? 'Alterar imagem' : 'Selecionar imagem'}
                       </Text>
@@ -486,7 +486,7 @@ export default function ExhibitorWebForm() {
                   value={form.logo}
                   onChangeText={(value) => set('logo', value)}
                   placeholder="Ex.: SIEMENS"
-                  placeholderTextColor={Brand.textMuted}
+                  placeholderTextColor={Light.textMuted}
                   autoCapitalize="characters"
                 />
               </Field>
@@ -498,7 +498,7 @@ export default function ExhibitorWebForm() {
                 value={form.about}
                 onChangeText={(value) => set('about', value)}
                 placeholder="Descreva soluções, diferenciais e o que será apresentado no evento."
-                placeholderTextColor={Brand.textMuted}
+                placeholderTextColor={Light.textMuted}
                 multiline
               />
             </Field>
@@ -523,7 +523,7 @@ export default function ExhibitorWebForm() {
                   value={form.contactName}
                   onChangeText={(value) => set('contactName', value)}
                   placeholder="Nome e sobrenome"
-                  placeholderTextColor={Brand.textMuted}
+                  placeholderTextColor={Light.textMuted}
                 />
               </Field>
               <Field label="Cargo">
@@ -532,7 +532,7 @@ export default function ExhibitorWebForm() {
                   value={form.contactRole}
                   onChangeText={(value) => set('contactRole', value)}
                   placeholder="Ex.: Gerente Comercial"
-                  placeholderTextColor={Brand.textMuted}
+                  placeholderTextColor={Light.textMuted}
                 />
               </Field>
             </View>
@@ -544,7 +544,7 @@ export default function ExhibitorWebForm() {
                   value={form.contactEmail}
                   onChangeText={(value) => set('contactEmail', value)}
                   placeholder="comercial@empresa.com"
-                  placeholderTextColor={Brand.textMuted}
+                  placeholderTextColor={Light.textMuted}
                   autoCapitalize="none"
                   keyboardType="email-address"
                 />
@@ -555,7 +555,7 @@ export default function ExhibitorWebForm() {
                   value={form.contactPhone}
                   onChangeText={(value) => set('contactPhone', value)}
                   placeholder="(47) 99999-9999"
-                  placeholderTextColor={Brand.textMuted}
+                  placeholderTextColor={Light.textMuted}
                   keyboardType="phone-pad"
                 />
               </Field>
@@ -567,7 +567,7 @@ export default function ExhibitorWebForm() {
                 value={form.website}
                 onChangeText={(value) => set('website', value)}
                 placeholder="https://www.empresa.com.br"
-                placeholderTextColor={Brand.textMuted}
+                placeholderTextColor={Light.textMuted}
                 autoCapitalize="none"
                 keyboardType="url"
               />
@@ -580,7 +580,7 @@ export default function ExhibitorWebForm() {
                   value={form.instagram}
                   onChangeText={(value) => set('instagram', value)}
                   placeholder="@empresa"
-                  placeholderTextColor={Brand.textMuted}
+                  placeholderTextColor={Light.textMuted}
                   autoCapitalize="none"
                 />
               </Field>
@@ -590,7 +590,7 @@ export default function ExhibitorWebForm() {
                   value={form.linkedin}
                   onChangeText={(value) => set('linkedin', value)}
                   placeholder="linkedin.com/company/empresa"
-                  placeholderTextColor={Brand.textMuted}
+                  placeholderTextColor={Light.textMuted}
                   autoCapitalize="none"
                 />
               </Field>
@@ -654,10 +654,10 @@ export default function ExhibitorWebForm() {
               onPress={onSave}
               disabled={busy}>
               {busy ? (
-                <ActivityIndicator color="#0A1021" />
+                <ActivityIndicator color="#fff" />
               ) : (
                 <>
-                  <Ionicons name="save-outline" size={17} color="#0A1021" />
+                  <Ionicons name="save-outline" size={17} color="#fff" />
                   <Text style={styles.primaryButtonText}>Salvar cadastro</Text>
                 </>
               )}
@@ -672,7 +672,7 @@ export default function ExhibitorWebForm() {
 function Highlight({ icon, text }: { icon: keyof typeof Ionicons.glyphMap; text: string }) {
   return (
     <View style={styles.highlight}>
-      <Ionicons name={icon} size={18} color={Brand.gold} />
+      <Ionicons name={icon} size={18} color={Light.gold} />
       <Text style={styles.highlightText}>{text}</Text>
     </View>
   );
@@ -752,10 +752,10 @@ function ArrayField({
               value={item}
               onChangeText={(value) => onChange(index, value)}
               placeholder={label}
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
             />
             <Pressable style={styles.iconButton} onPress={() => onRemove(index)}>
-              <Ionicons name="close" size={18} color={Brand.textMuted} />
+              <Ionicons name="close" size={18} color={Light.textMuted} />
             </Pressable>
           </View>
         ))}
@@ -767,10 +767,10 @@ function ArrayField({
             onChangeText={setDraft}
             onSubmitEditing={addDraft}
             placeholder={placeholder}
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
           />
           <Pressable style={styles.addButton} onPress={addDraft}>
-            <Ionicons name="add" size={18} color="#0A1021" />
+            <Ionicons name="add" size={18} color="#ffffff" />
           </Pressable>
         </View>
       </View>
@@ -781,13 +781,13 @@ function ArrayField({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
   },
   centerScreen: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
   },
   authContent: {
     flexGrow: 1,
@@ -811,20 +811,20 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
   },
   brandLabel: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0,
     textTransform: 'uppercase',
   },
   authTitle: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 42,
     lineHeight: 48,
     fontWeight: '900',
   },
   authLead: {
-    color: Brand.textSecondary,
+    color: Light.text,
     fontSize: 17,
     lineHeight: 26,
     maxWidth: 520,
@@ -839,7 +839,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   highlightText: {
-    color: Brand.textSecondary,
+    color: Light.text,
     fontSize: 14.5,
     lineHeight: 20,
     flex: 1,
@@ -849,9 +849,9 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     flexBasis: 360,
     maxWidth: 430,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     padding: Spacing.four,
   },
@@ -871,9 +871,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: Spacing.three,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     padding: Spacing.four,
   },
@@ -884,13 +884,13 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   formTitle: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 32,
     lineHeight: 38,
     fontWeight: '900',
   },
   formSubtitle: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 15,
     lineHeight: 22,
     maxWidth: 640,
@@ -900,7 +900,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   userEmail: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
     fontSize: 13,
   },
   actionRow: {
@@ -912,7 +912,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     minHeight: 44,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
     paddingHorizontal: Spacing.three,
     paddingVertical: 12,
     alignItems: 'center',
@@ -921,7 +921,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   primaryButtonText: {
-    color: '#0A1021',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '900',
   },
@@ -929,7 +929,8 @@ const styles = StyleSheet.create({
     minHeight: 44,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
+    backgroundColor: Light.surfaceAlt,
     paddingHorizontal: Spacing.three,
     paddingVertical: 12,
     alignItems: 'center',
@@ -938,7 +939,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   secondaryButtonText: {
-    color: Brand.textSecondary,
+    color: Light.textNavy,
     fontSize: 14,
     fontWeight: '700',
   },
@@ -954,9 +955,9 @@ const styles = StyleSheet.create({
     flexGrow: 2,
     flexShrink: 1,
     flexBasis: 520,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     padding: Spacing.four,
     gap: Spacing.three,
@@ -965,15 +966,15 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     flexShrink: 1,
     flexBasis: 330,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     padding: Spacing.four,
     gap: Spacing.three,
   },
   panelKicker: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
     fontSize: 12,
     fontWeight: '800',
     textTransform: 'uppercase',
@@ -993,14 +994,14 @@ const styles = StyleSheet.create({
     width: 104,
     height: 104,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.goldSoft,
+    backgroundColor: '#FBF6E9',
     borderWidth: 1,
-    borderColor: Brand.borderGold,
+    borderColor: Light.goldPillBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
   previewLogoText: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 28,
     fontWeight: '900',
   },
@@ -1010,17 +1011,17 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   previewCompany: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 22,
     fontWeight: '900',
   },
   previewMeta: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 13,
     fontWeight: '700',
   },
   previewAbout: {
-    color: Brand.textSecondary,
+    color: Light.text,
     fontSize: 14,
     lineHeight: 21,
   },
@@ -1045,7 +1046,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusText: {
-    color: Brand.textSecondary,
+    color: Light.textNavy,
     fontSize: 13,
   },
   completionTop: {
@@ -1055,26 +1056,26 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
   },
   completionHint: {
-    color: Brand.textSecondary,
+    color: Light.text,
     fontSize: 13.5,
     lineHeight: 20,
     marginTop: 4,
   },
   completionScore: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 30,
     fontWeight: '900',
   },
   progressTrack: {
     height: 8,
     borderRadius: Radius.pill,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: Light.surfaceAlt,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     borderRadius: Radius.pill,
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
   },
   checkGrid: {
     flexDirection: 'row',
@@ -1090,12 +1091,12 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   checkText: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
     fontSize: 12.5,
     flex: 1,
   },
   checkTextDone: {
-    color: Brand.textSecondary,
+    color: Light.text,
   },
   feedbackError: {
     flexDirection: 'row',
@@ -1108,7 +1109,7 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
   },
   feedbackErrorText: {
-    color: Brand.danger,
+    color: Light.danger,
     fontSize: 13.5,
     flex: 1,
   },
@@ -1123,14 +1124,14 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
   },
   feedbackSuccessText: {
-    color: Brand.success,
+    color: Light.success,
     fontSize: 13.5,
     flex: 1,
   },
   section: {
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     padding: Spacing.four,
     gap: Spacing.three,
@@ -1139,12 +1140,12 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   sectionTitle: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 22,
     fontWeight: '900',
   },
   sectionSubtitle: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -1163,24 +1164,24 @@ const styles = StyleSheet.create({
     gap: 7,
   },
   label: {
-    color: Brand.textSecondary,
+    color: Light.textNavy,
     fontSize: 13,
     fontWeight: '700',
   },
   hint: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
     fontSize: 12.5,
     lineHeight: 18,
   },
   input: {
     minHeight: 46,
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     paddingHorizontal: Spacing.three,
     paddingVertical: 12,
-    color: Brand.textPrimary,
+    color: Light.text,
     fontSize: 15,
   },
   textarea: {
@@ -1193,9 +1194,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.three,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.surface,
     padding: Spacing.three,
   },
   logoPreview: {
@@ -1208,9 +1209,9 @@ const styles = StyleSheet.create({
     width: 78,
     height: 78,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.surfaceAlt,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1222,8 +1223,8 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Brand.borderGold,
-    backgroundColor: Brand.goldSoft,
+    borderColor: Light.goldPillBorder,
+    backgroundColor: '#FBF6E9',
     paddingHorizontal: Spacing.three,
     paddingVertical: 11,
     flexDirection: 'row',
@@ -1231,7 +1232,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   uploadButtonText: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 13,
     fontWeight: '800',
   },
@@ -1240,7 +1241,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   removeLogoButtonText: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
     fontSize: 12.5,
     fontWeight: '700',
   },
@@ -1260,15 +1261,16 @@ const styles = StyleSheet.create({
     height: 42,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: Light.surface,
   },
   addButton: {
     width: 42,
     height: 42,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1278,19 +1280,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: Spacing.three,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.borderGold,
+    borderColor: Light.goldPillBorder,
     borderRadius: Radius.md,
     padding: Spacing.four,
   },
   bottomTitle: {
-    color: Brand.textPrimary,
+    color: Light.textNavy,
     fontSize: 16,
     fontWeight: '900',
   },
   bottomText: {
-    color: Brand.textSecondary,
+    color: Light.text,
     fontSize: 13,
     lineHeight: 19,
     marginTop: 4,
