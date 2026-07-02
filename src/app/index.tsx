@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import * as Linking from 'expo-linking';
 import {
   Image,
@@ -15,7 +16,8 @@ import { useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ExhibitorLogo } from '@/components/exhibitor-logo';
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { TAB_BAR_CLEARANCE } from '@/components/ui-kit';
+import { Light, Radius, Spacing } from '@/constants/theme';
 import { useAuth } from '@/features/auth/use-auth';
 import { useEventConfig } from '@/features/event/use-event-config';
 import { useExhibitors } from '@/features/exhibitors/use-exhibitors';
@@ -45,26 +47,26 @@ const RECOMMENDATIONS = [
     tag: 'Palestra',
     title: 'Indústria 4.0 & ESG na prática',
     meta: '14:00 · Auditório Central',
-    accent: Brand.techBlue,
+    accent: '#2F6BFF',
   },
   {
     tag: 'Match IA',
     title: 'Siemens tem 95% de fit com sua operação',
     meta: 'Automação & Robótica',
-    accent: Brand.gold,
+    accent: Light.gold,
   },
   {
     tag: 'Networking',
     title: 'Rodada de compradores — PPCP',
     meta: '16:30 · Sala Executiva',
-    accent: Brand.cyan,
+    accent: '#00A9C7',
   },
 ];
 
 const TIER_COLOR: Record<SponsorTier, string> = {
-  DIAMOND: Brand.gold,
-  GOLD: Brand.techBlue,
-  SILVER: Brand.textSecondary,
+  DIAMOND: Light.gold,
+  GOLD: '#2F6BFF',
+  SILVER: Light.textMuted,
 };
 
 export default function HomeScreen() {
@@ -90,30 +92,21 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.screen}>
+      <StatusBar style="dark" />
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          { paddingTop: insets.top + Spacing.three, paddingBottom: 120 },
+          { paddingTop: insets.top + Spacing.three, paddingBottom: TAB_BAR_CLEARANCE },
         ]}
         showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <View>
-            <Image
-              source={require('@/assets/images/logo-expoindustrial.png')}
-              style={styles.brandLogo}
-              resizeMode="contain"
-            />
-          </View>
+          <Text style={styles.brand}>
+            EXPO<Text style={{ color: Light.gold }}>INDUSTRIAL</Text> SUL
+          </Text>
           <View style={styles.headerActions}>
-            <Pressable
-              style={styles.designBadge}
-              onPress={() => router.push('/home-v2')}>
-              <Ionicons name="color-palette-outline" size={14} color="#C9A24C" />
-              <Text style={styles.designBadgeText}>Design V2</Text>
-            </Pressable>
-            <HeaderIcon icon="search-outline" />
-            <HeaderIcon icon="notifications-outline" badge />
+            <HeaderIcon icon="search-outline" onPress={() => router.push('/exhibitors')} />
+            <HeaderIcon icon="notifications-outline" badge onPress={() => router.push('/connections')} />
           </View>
         </View>
 
@@ -147,13 +140,13 @@ export default function HomeScreen() {
             style={styles.onboardingBanner}
             onPress={() => router.push('/onboarding')}>
             <LinearGradient
-              colors={['#0F172A', '#1E1B4B']}
+              colors={[Light.navy, Light.navyDeep]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.onboardingBannerGradient}>
               <View style={styles.onboardingBannerLeft}>
                 <View style={styles.onboardingBannerIcon}>
-                  <Ionicons name="sparkles" size={16} color={Brand.gold} />
+                  <Ionicons name="sparkles" size={16} color={Light.goldLight} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.onboardingBannerTitle}>Complete seu perfil</Text>
@@ -162,7 +155,7 @@ export default function HomeScreen() {
                   </Text>
                 </View>
               </View>
-              <Ionicons name="chevron-forward" size={18} color={Brand.gold} />
+              <Ionicons name="chevron-forward" size={18} color={Light.goldLight} />
             </LinearGradient>
           </Pressable>
         )}
@@ -172,7 +165,7 @@ export default function HomeScreen() {
           {KPIS.map((kpi) => (
             <View key={kpi.label} style={styles.kpiCard}>
               <View style={styles.kpiIcon}>
-                <Ionicons name={kpi.icon} size={16} color={Brand.gold} />
+                <Ionicons name={kpi.icon} size={16} color={Light.gold} />
               </View>
               <Text style={styles.kpiValue}>{kpi.value}</Text>
               <Text style={styles.kpiLabel}>{kpi.label}</Text>
@@ -183,11 +176,11 @@ export default function HomeScreen() {
         {/* Assistente IA */}
         <Pressable style={styles.aiBar} onPress={() => router.push('/assistant')}>
           <View style={styles.aiIcon}>
-            <Ionicons name="sparkles" size={16} color={Brand.gold} />
+            <Ionicons name="sparkles" size={16} color={Light.gold} />
           </View>
           <Text style={styles.aiText}>Qual estande devo visitar agora?</Text>
           <View style={styles.micButton}>
-            <Ionicons name="mic" size={18} color={Brand.textPrimary} />
+            <Ionicons name="mic" size={18} color="#fff" />
           </View>
         </Pressable>
 
@@ -200,7 +193,7 @@ export default function HomeScreen() {
               style={styles.quickItem}
               onPress={() => action.route && router.push(action.route as never)}>
               <View style={styles.quickIcon}>
-                <Ionicons name={action.icon} size={29} color={Brand.textPrimary} />
+                <Ionicons name={action.icon} size={26} color={Light.navy} />
               </View>
               <Text style={styles.quickLabel}>{action.label}</Text>
             </Pressable>
@@ -254,7 +247,7 @@ export default function HomeScreen() {
                 <Text style={styles.recoTitle}>{item.title}</Text>
                 <Text style={styles.recoMeta}>{item.meta}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={18} color={Brand.textMuted} />
+              <Ionicons name="chevron-forward" size={18} color={Light.textMuted} />
             </Pressable>
           ))}
         </View>
@@ -298,7 +291,7 @@ export default function HomeScreen() {
                   style={styles.materialCard}
                   onPress={() => Linking.openURL(material.fileUrl)}>
                   <View style={styles.materialIcon}>
-                    <Ionicons name="document-text-outline" size={20} color={Brand.gold} />
+                    <Ionicons name="document-text-outline" size={20} color={Light.gold} />
                   </View>
                   <View style={styles.materialBody}>
                     <Text style={styles.materialTitle} numberOfLines={1}>
@@ -310,7 +303,7 @@ export default function HomeScreen() {
                       </Text>
                     ) : null}
                   </View>
-                  <Ionicons name="download-outline" size={20} color={Brand.textMuted} />
+                  <Ionicons name="download-outline" size={20} color={Light.textMuted} />
                 </Pressable>
               ))}
             </View>
@@ -326,7 +319,7 @@ export default function HomeScreen() {
             resizeMode="contain"
           />
           <Pressable style={styles.portalLink} onPress={() => router.push('/portal')}>
-            <Ionicons name="briefcase-outline" size={15} color={Brand.gold} />
+            <Ionicons name="briefcase-outline" size={15} color={Light.gold} />
             <Text style={styles.portalLinkText}>Portal do expositor</Text>
           </Pressable>
         </View>
@@ -335,12 +328,12 @@ export default function HomeScreen() {
   );
 }
 
-function HeaderIcon({ icon, badge }: { icon: IconName; badge?: boolean }) {
+function HeaderIcon({ icon, badge, onPress }: { icon: IconName; badge?: boolean; onPress?: () => void }) {
   return (
-    <View style={styles.headerIcon}>
-      <Ionicons name={icon} size={20} color={Brand.textPrimary} />
+    <Pressable style={styles.headerIcon} onPress={onPress}>
+      <Ionicons name={icon} size={20} color={Light.navyDeep} />
       {badge && <View style={styles.headerBadge} />}
-    </View>
+    </Pressable>
   );
 }
 
@@ -366,12 +359,12 @@ function SectionHeader({
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Brand.bgPrimary },
+  screen: { flex: 1, backgroundColor: Light.bg },
   content: { paddingHorizontal: Spacing.four, gap: Spacing.four },
 
   // Header
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  brandLogo: { width: 212, height: 36 },
+  brand: { color: Light.navyDeep, fontSize: 18, fontWeight: '800', letterSpacing: 0.3 },
 
   // Realização (co-branding)
   realization: {
@@ -380,10 +373,10 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.four,
     marginTop: Spacing.two,
     borderTopWidth: 1,
-    borderTopColor: Brand.border,
+    borderTopColor: Light.border,
   },
   realizationLabel: {
-    color: Brand.textMuted,
+    color: Light.textMuted,
     fontSize: 10.5,
     fontWeight: '700',
     letterSpacing: 2,
@@ -396,20 +389,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: 8,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.goldSoft,
+    backgroundColor: '#FBF6E9',
     borderWidth: 1,
-    borderColor: Brand.borderGold,
+    borderColor: Light.goldPillBorder,
     marginTop: Spacing.one,
   },
-  portalLinkText: { color: Brand.gold, fontSize: 12.5, fontWeight: '800' },
+  portalLinkText: { color: Light.goldTextStrong, fontSize: 12.5, fontWeight: '800' },
   headerActions: { flexDirection: 'row', gap: Spacing.two },
   headerIcon: {
     width: 42,
     height: 42,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -420,9 +413,9 @@ const styles = StyleSheet.create({
     width: 9,
     height: 9,
     borderRadius: 5,
-    backgroundColor: Brand.danger,
+    backgroundColor: Light.danger,
     borderWidth: 1.5,
-    borderColor: Brand.bgCard,
+    borderColor: Light.surface,
   },
 
   // Hero
@@ -430,8 +423,6 @@ const styles = StyleSheet.create({
     height: 210,
     borderRadius: Radius.lg,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Brand.borderGold,
     justifyContent: 'space-between',
   },
   heroImage: { borderRadius: Radius.lg },
@@ -449,17 +440,17 @@ const styles = StyleSheet.create({
   },
   liveText: { color: '#FECACA', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   heroBottom: { padding: Spacing.three, gap: 4 },
-  heroEyebrow: { color: Brand.gold, fontSize: 11, fontWeight: '800', letterSpacing: 1.2 },
-  heroTitle: { color: Brand.textPrimary, fontSize: 23, fontWeight: '800' },
+  heroEyebrow: { color: Light.goldLight, fontSize: 11, fontWeight: '800', letterSpacing: 1.2 },
+  heroTitle: { color: '#fff', fontSize: 23, fontWeight: '800' },
   heroSubtitle: { color: '#D7DCE3', fontSize: 12.5, lineHeight: 18 },
 
   // KPIs
   kpiRow: { flexDirection: 'row', gap: Spacing.two },
   kpiCard: {
     flex: 1,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.two,
@@ -470,24 +461,22 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.bgElevated,
-    borderWidth: 1,
-    borderColor: Brand.border,
+    backgroundColor: Light.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 2,
   },
-  kpiValue: { color: Brand.gold, fontSize: 19, fontWeight: '800' },
-  kpiLabel: { color: Brand.textSecondary, fontSize: 11, textAlign: 'center' },
+  kpiValue: { color: Light.navyDeep, fontSize: 19, fontWeight: '800' },
+  kpiLabel: { color: Light.textMuted, fontSize: 11, textAlign: 'center' },
 
   // AI bar
   aiBar: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.two,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.pill,
     paddingVertical: 8,
     paddingLeft: 8,
@@ -497,20 +486,16 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.bgElevated,
-    borderWidth: 1,
-    borderColor: Brand.border,
+    backgroundColor: Light.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  aiText: { flex: 1, color: Brand.textSecondary, fontSize: 14 },
+  aiText: { flex: 1, color: Light.textMuted, fontSize: 14 },
   micButton: {
     width: 36,
     height: 36,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.bgElevated,
-    borderWidth: 1,
-    borderColor: Brand.border,
+    backgroundColor: Light.navy,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -522,30 +507,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing.one,
   },
-  sectionTitle: { color: Brand.textPrimary, fontSize: 17, fontWeight: '700' },
-  sectionAction: { color: Brand.gold, fontSize: 13, fontWeight: '600' },
+  sectionTitle: { color: Light.navyDeep, fontSize: 17, fontWeight: '700' },
+  sectionAction: { color: Light.gold, fontSize: 13, fontWeight: '700' },
 
   // Quick actions
   quickRow: { flexDirection: 'row', justifyContent: 'space-around', flexWrap: 'wrap', gap: 8 },
   quickItem: { alignItems: 'center', gap: 8, width: 72, marginVertical: 4 },
   quickIcon: {
-    width: 83,
-    height: 83,
+    width: 72,
+    height: 72,
     borderRadius: Radius.md,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  quickLabel: { color: Brand.textSecondary, fontSize: 11.5, textAlign: 'center' },
+  quickLabel: { color: Light.textMuted, fontSize: 11.5, textAlign: 'center' },
 
   // Featured (cards brancos com logo)
   featuredRow: { gap: Spacing.two, paddingRight: Spacing.four },
   featuredCard: {
     width: 120,
     height: 72,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Light.surface,
+    borderWidth: 1,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -558,9 +545,9 @@ const styles = StyleSheet.create({
   recoCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     paddingRight: Spacing.three,
     overflow: 'hidden',
@@ -568,8 +555,8 @@ const styles = StyleSheet.create({
   recoAccent: { width: 4, alignSelf: 'stretch' },
   recoBody: { flex: 1, padding: Spacing.three, gap: 3 },
   recoTag: { fontSize: 10.5, fontWeight: '800', letterSpacing: 0.8 },
-  recoTitle: { color: Brand.textPrimary, fontSize: 14.5, fontWeight: '600' },
-  recoMeta: { color: Brand.textSecondary, fontSize: 12 },
+  recoTitle: { color: Light.navyDeep, fontSize: 14.5, fontWeight: '600' },
+  recoMeta: { color: Light.textMuted, fontSize: 12 },
 
   // Materiais para download
   materialsList: { gap: Spacing.two },
@@ -577,9 +564,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.two,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     padding: Spacing.three,
   },
@@ -587,36 +574,34 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: Radius.sm,
-    backgroundColor: Brand.bgElevated,
-    borderWidth: 1,
-    borderColor: Brand.border,
+    backgroundColor: Light.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
   materialBody: { flex: 1, gap: 2 },
-  materialTitle: { color: Brand.textPrimary, fontSize: 14, fontWeight: '700' },
-  materialMeta: { color: Brand.textSecondary, fontSize: 12 },
+  materialTitle: { color: Light.navyDeep, fontSize: 14, fontWeight: '700' },
+  materialMeta: { color: Light.textMuted, fontSize: 12 },
 
   // Sponsors
   sponsorsRow: { gap: Spacing.two, paddingRight: Spacing.four },
   sponsorCard: {
     width: 130,
     height: 76,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     alignItems: 'center',
     justifyContent: 'center',
     padding: Spacing.two,
     position: 'relative',
   },
   sponsorCardDiamond: {
-    borderColor: Brand.gold,
-    backgroundColor: 'rgba(201, 162, 76, 0.05)',
+    borderColor: Light.gold,
+    backgroundColor: '#FBF6E9',
   },
   sponsorCardGold: {
-    borderColor: Brand.techBlue,
+    borderColor: '#2F6BFF',
     backgroundColor: 'rgba(47, 107, 255, 0.05)',
   },
   sponsorTierBadge: {
@@ -630,7 +615,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
   sponsorName: {
-    color: Brand.textPrimary,
+    color: Light.navyDeep,
     fontSize: 16,
     fontWeight: '800',
     letterSpacing: 0.5,
@@ -644,8 +629,6 @@ const styles = StyleSheet.create({
   onboardingBanner: {
     borderRadius: Radius.md,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Brand.borderGold,
   },
   onboardingBannerGradient: {
     flexDirection: 'row',
@@ -664,33 +647,18 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: Radius.pill,
-    backgroundColor: 'rgba(201, 162, 76, 0.15)',
+    backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   onboardingBannerTitle: {
-    color: Brand.textPrimary,
+    color: '#fff',
     fontSize: 14,
     fontWeight: '700',
   },
   onboardingBannerSub: {
-    color: Brand.textSecondary,
+    color: 'rgba(255,255,255,0.7)',
     fontSize: 11.5,
     marginTop: 2,
-  },
-  designBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(201, 162, 76, 0.15)',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: Radius.pill,
-    gap: 4,
-    marginRight: 6,
-  },
-  designBadgeText: {
-    color: '#C9A24C',
-    fontSize: 11,
-    fontWeight: '700',
   },
 });

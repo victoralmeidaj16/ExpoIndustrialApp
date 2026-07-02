@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -21,7 +22,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ExhibitorLogo } from '@/components/exhibitor-logo';
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { TAB_BAR_CLEARANCE } from '@/components/ui-kit';
+import { Light, LightGradient, Radius, Spacing } from '@/constants/theme';
 import { AuthForm } from '@/features/auth/auth-form';
 import { useAuth } from '@/features/auth/use-auth';
 import { useExhibitors } from '@/features/exhibitors/use-exhibitors';
@@ -200,17 +202,19 @@ export default function ProfileScreen() {
   if ((initializing || (loading && !demoMode)) && !hydrated) {
     return (
       <View style={styles.centerScreen}>
-        <ActivityIndicator color={Brand.gold} />
+        <ActivityIndicator color={Light.gold} />
       </View>
     );
   }
 
   return (
-    <ScrollView
+    <>
+      <StatusBar style="dark" />
+      <ScrollView
       style={styles.screen}
       contentContainerStyle={[
         styles.content,
-        { paddingTop: insets.top + Spacing.two, paddingBottom: 120 },
+        { paddingTop: insets.top + Spacing.two, paddingBottom: TAB_BAR_CLEARANCE },
       ]}
       showsVerticalScrollIndicator={false}>
       {/* Header */}
@@ -218,15 +222,15 @@ export default function ProfileScreen() {
         <Text style={styles.headerTitle}>Meu Perfil</Text>
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           <Pressable style={styles.settingsBtn} onPress={() => router.push('/connections')}>
-            <Ionicons name="people-outline" size={20} color={Brand.textPrimary} />
+            <Ionicons name="people-outline" size={20} color={Light.navyDeep} />
           </Pressable>
           {demoMode ? (
             <Pressable style={styles.settingsBtn}>
-              <Ionicons name="settings-outline" size={20} color={Brand.textPrimary} />
+              <Ionicons name="settings-outline" size={20} color={Light.navyDeep} />
             </Pressable>
           ) : (
             <Pressable style={styles.settingsBtn} onPress={() => signOut()}>
-              <Ionicons name="log-out-outline" size={20} color={Brand.textPrimary} />
+              <Ionicons name="log-out-outline" size={20} color={Light.navyDeep} />
             </Pressable>
           )}
         </View>
@@ -234,16 +238,16 @@ export default function ProfileScreen() {
 
       {demoMode && (
         <View style={styles.demoBanner}>
-          <Ionicons name="warning-outline" size={15} color={Brand.warning} />
+          <Ionicons name="warning-outline" size={15} color={Light.goldTextStrong} />
           <Text style={styles.demoBannerText}>
             Modo demonstração — configure o Firebase para salvar e sincronizar.
           </Text>
         </View>
       )}
 
-      {/* Crachá Digital (Badge Card) */}
+      {/* Crachá Digital (Badge Card — navy premium por design) */}
       <LinearGradient
-        colors={[Brand.bgSecondary, Brand.bgCard]}
+        colors={LightGradient.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.badgeCard}>
@@ -284,7 +288,7 @@ export default function ProfileScreen() {
               />
             ) : (
               <>
-                <Ionicons name="qr-code" size={50} color={Brand.bgPrimary} />
+                <Ionicons name="qr-code" size={50} color={Light.navyDeep} />
                 <Text style={styles.qrCodeText}>COMPLETAR PERFIL</Text>
               </>
             )}
@@ -293,7 +297,7 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.badgeFooter}>
-          <Ionicons name="sparkles" size={14} color={Brand.gold} />
+          <Ionicons name="sparkles" size={14} color={Light.gold} />
           <Text style={styles.badgeFooterText}>Clique para ampliar · Aproxime nos estandes</Text>
         </View>
       </LinearGradient>
@@ -308,7 +312,7 @@ export default function ProfileScreen() {
           <View style={styles.zoomContent} onStartShouldSetResponder={() => true}>
             <Text style={styles.zoomTitle}>Meu Crachá Digital</Text>
             <Text style={styles.zoomSubtitle}>Apresente este código para outros participantes ou expositores</Text>
-            
+
             <View style={styles.zoomQrWrapper}>
               <Image
                 source={{
@@ -338,7 +342,7 @@ export default function ProfileScreen() {
           <Ionicons
             name="sparkles-outline"
             size={16}
-            color={activeTab === 'preferences' ? Brand.gold : Brand.textMuted}
+            color={activeTab === 'preferences' ? '#fff' : Light.textMuted}
           />
           <Text style={[styles.tabButtonText, activeTab === 'preferences' && styles.tabButtonTextActive]}>
             Preferências
@@ -350,7 +354,7 @@ export default function ProfileScreen() {
           <Ionicons
             name="people-outline"
             size={16}
-            color={activeTab === 'leads' ? Brand.gold : Brand.textMuted}
+            color={activeTab === 'leads' ? '#fff' : Light.textMuted}
           />
           <Text style={[styles.tabButtonText, activeTab === 'leads' && styles.tabButtonTextActive]}>
             Leads ({savedLeads.length})
@@ -362,7 +366,7 @@ export default function ProfileScreen() {
           <Ionicons
             name="bookmark-outline"
             size={16}
-            color={activeTab === 'saved' ? Brand.gold : Brand.textMuted}
+            color={activeTab === 'saved' ? '#fff' : Light.textMuted}
           />
           <Text style={[styles.tabButtonText, activeTab === 'saved' && styles.tabButtonTextActive]}>
             Salvos ({savedExhibitors.length})
@@ -377,7 +381,7 @@ export default function ProfileScreen() {
             value={form.name}
             onChangeText={(v) => set('name', v)}
             placeholder="Nome completo"
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
             style={styles.textInput}
           />
           <View style={styles.inlineRow}>
@@ -385,14 +389,14 @@ export default function ProfileScreen() {
               value={form.role}
               onChangeText={(v) => set('role', v)}
               placeholder="Cargo"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               style={[styles.textInput, { flex: 1 }]}
             />
             <TextInput
               value={form.company}
               onChangeText={(v) => set('company', v)}
               placeholder="Empresa"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               style={[styles.textInput, { flex: 1 }]}
             />
           </View>
@@ -403,7 +407,7 @@ export default function ProfileScreen() {
               value={form.phone}
               onChangeText={(v) => set('phone', v)}
               placeholder="Telefone / WhatsApp"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               style={[styles.textInput, { flex: 1 }]}
               keyboardType="phone-pad"
             />
@@ -411,7 +415,7 @@ export default function ProfileScreen() {
               value={form.email}
               onChangeText={(v) => set('email', v)}
               placeholder="E-mail de Contato"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               style={[styles.textInput, { flex: 1 }]}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -422,7 +426,7 @@ export default function ProfileScreen() {
               value={form.linkedin}
               onChangeText={(v) => set('linkedin', v)}
               placeholder="LinkedIn (URL)"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               style={[styles.textInput, { flex: 1 }]}
               autoCapitalize="none"
               autoCorrect={false}
@@ -431,7 +435,7 @@ export default function ProfileScreen() {
               value={form.website}
               onChangeText={(v) => set('website', v)}
               placeholder="Site / Portfólio (URL)"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               style={[styles.textInput, { flex: 1 }]}
               autoCapitalize="none"
               autoCorrect={false}
@@ -569,7 +573,7 @@ export default function ProfileScreen() {
             value={form.lookingFor}
             onChangeText={(v) => set('lookingFor', v)}
             placeholder="Ex: Fornecedores de sensores IoT"
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
             style={styles.textInput}
           />
 
@@ -578,7 +582,7 @@ export default function ProfileScreen() {
             value={form.offering}
             onChangeText={(v) => set('offering', v)}
             placeholder="Ex: Painéis elétricos customizados"
-            placeholderTextColor={Brand.textMuted}
+            placeholderTextColor={Light.textMuted}
             style={styles.textInput}
           />
 
@@ -592,8 +596,8 @@ export default function ProfileScreen() {
               <Switch
                 value={form.discoverable}
                 onValueChange={(v) => set('discoverable', v)}
-                trackColor={{ false: Brand.border, true: Brand.gold }}
-                thumbColor={Platform.OS === 'android' ? Brand.bgPrimary : undefined}
+                trackColor={{ false: Light.border, true: Light.gold }}
+                thumbColor={Platform.OS === 'android' ? '#fff' : undefined}
               />
             </View>
             <Text style={styles.consentDescription}>
@@ -607,8 +611,8 @@ export default function ProfileScreen() {
               <Switch
                 value={form.shareContact}
                 onValueChange={(v) => set('shareContact', v)}
-                trackColor={{ false: Brand.border, true: Brand.gold }}
-                thumbColor={Platform.OS === 'android' ? Brand.bgPrimary : undefined}
+                trackColor={{ false: Light.border, true: Light.gold }}
+                thumbColor={Platform.OS === 'android' ? '#fff' : undefined}
               />
             </View>
             <Text style={styles.consentDescription}>
@@ -618,10 +622,10 @@ export default function ProfileScreen() {
 
           <Pressable style={[styles.saveBtn, saving && { opacity: 0.5 }]} onPress={handleSave} disabled={saving}>
             {saving ? (
-              <ActivityIndicator color={Brand.bgPrimary} />
+              <ActivityIndicator color="#fff" />
             ) : (
               <>
-                <Ionicons name="checkmark-circle-outline" size={18} color={Brand.bgPrimary} />
+                <Ionicons name="checkmark-circle-outline" size={18} color="#fff" />
                 <Text style={styles.saveBtnText}>Salvar e Atualizar Matchmaking</Text>
               </>
             )}
@@ -633,15 +637,15 @@ export default function ProfileScreen() {
           <Pressable
             style={styles.legalBtn}
             onPress={() => Linking.openURL('https://expo-industrial-sul.vercel.app/privacy')}>
-            <Ionicons name="document-text-outline" size={16} color={Brand.textSecondary} />
+            <Ionicons name="document-text-outline" size={16} color={Light.textMuted} />
             <Text style={styles.legalBtnText}>Política de Privacidade & Termos de Uso</Text>
           </Pressable>
 
-          <Text style={[styles.sectionTitle, { marginTop: Spacing.four, color: Brand.danger }]}>
+          <Text style={[styles.sectionTitle, { marginTop: Spacing.four, color: Light.danger }]}>
             Zona de Risco
           </Text>
           <Pressable style={styles.deleteBtn} onPress={handleDeleteAccount} disabled={saving}>
-            <Ionicons name="trash-outline" size={16} color={Brand.danger} />
+            <Ionicons name="trash-outline" size={16} color={Light.danger} />
             <Text style={styles.deleteBtnText}>Excluir Minha Conta</Text>
           </Pressable>
         </View>
@@ -660,14 +664,14 @@ export default function ProfileScreen() {
                   Alert.alert('Exportar CSV', (err as Error).message),
                 )
               }>
-              <Ionicons name="download-outline" size={16} color={Brand.bgPrimary} />
+              <Ionicons name="download-outline" size={16} color="#fff" />
               <Text style={styles.exportCsvText}>Exportar lista CSV</Text>
             </Pressable>
           ) : null}
 
           {savedLeads.length === 0 ? (
             <View style={styles.leadsEmpty}>
-              <Ionicons name="qr-code-outline" size={32} color={Brand.textMuted} />
+              <Ionicons name="qr-code-outline" size={32} color={Light.textFaint} />
               <Text style={styles.leadsEmptyText}>
                 Nenhum contato captado ainda. Use “Captar lead” no perfil de um expositor para
                 escanear o QR Code do crachá.
@@ -681,7 +685,7 @@ export default function ProfileScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.leadName}>{lead.name}</Text>
                   <Text style={styles.leadRole}>
-                    {lead.role} · <Text style={{ color: Brand.gold }}>{lead.company}</Text>
+                    {lead.role} · <Text style={styles.leadCompany}>{lead.company}</Text>
                   </Text>
                 </View>
                 <View style={styles.sourceBadge}>
@@ -700,17 +704,17 @@ export default function ProfileScreen() {
                       },
                     ])
                   }>
-                  <Ionicons name="trash-outline" size={16} color={Brand.textMuted} />
+                  <Ionicons name="trash-outline" size={16} color={Light.textMuted} />
                 </Pressable>
               </View>
 
               <View style={styles.leadContactRow}>
                 <View style={styles.contactItem}>
-                  <Ionicons name="mail-outline" size={13} color={Brand.textSecondary} />
+                  <Ionicons name="mail-outline" size={13} color={Light.textMuted} />
                   <Text style={styles.contactItemText}>{lead.email}</Text>
                 </View>
                 <View style={styles.contactItem}>
-                  <Ionicons name="call-outline" size={13} color={Brand.textSecondary} />
+                  <Ionicons name="call-outline" size={13} color={Light.textMuted} />
                   <Text style={styles.contactItemText}>{lead.phone}</Text>
                 </View>
               </View>
@@ -723,7 +727,7 @@ export default function ProfileScreen() {
                       Alert.alert('Não foi possível abrir', 'Verifique o app de mensagens/e-mail.'),
                     )
                   }>
-                  <Ionicons name="chatbubble-ellipses-outline" size={14} color={Brand.gold} />
+                  <Ionicons name="chatbubble-ellipses-outline" size={14} color={Light.gold} />
                   <Text style={styles.leadActionText}>Mensagem</Text>
                 </Pressable>
                 <Pressable
@@ -733,7 +737,7 @@ export default function ProfileScreen() {
                       Alert.alert('Exportar contato', (err as Error).message),
                     )
                   }>
-                  <Ionicons name="cloud-upload-outline" size={14} color={Brand.gold} />
+                  <Ionicons name="cloud-upload-outline" size={14} color={Light.gold} />
                   <Text style={styles.leadActionText}>Exportar .vcf</Text>
                 </Pressable>
               </View>
@@ -749,7 +753,7 @@ export default function ProfileScreen() {
 
           {savedExhibitors.length === 0 ? (
             <View style={styles.leadsEmpty}>
-              <Ionicons name="bookmark-outline" size={32} color={Brand.textMuted} />
+              <Ionicons name="bookmark-outline" size={32} color={Light.textFaint} />
               <Text style={styles.leadsEmptyText}>
                 Nenhuma empresa salva ainda. Abra um expositor e toque em “Salvar empresa”.
               </Text>
@@ -765,30 +769,31 @@ export default function ProfileScreen() {
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={styles.leadName}>{ex.company}</Text>
                 <Text style={styles.leadRole}>
-                  {ex.industry} · <Text style={{ color: Brand.gold }}>{ex.stand}</Text>
+                  {ex.industry} · <Text style={styles.leadCompany}>{ex.stand}</Text>
                 </Text>
               </View>
               <Pressable
                 hitSlop={8}
                 style={styles.leadDelete}
                 onPress={() => toggleSaved(ex.id)}>
-                <Ionicons name="bookmark" size={16} color={Brand.gold} />
+                <Ionicons name="bookmark" size={16} color={Light.gold} />
               </Pressable>
             </Pressable>
           ))}
         </View>
       )}
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Brand.bgPrimary },
+  screen: { flex: 1, backgroundColor: Light.bg },
   centerScreen: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
   },
   content: { paddingHorizontal: Spacing.four, gap: Spacing.four },
   gateContent: { paddingHorizontal: Spacing.four, paddingBottom: Spacing.six },
@@ -799,14 +804,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: Spacing.two,
   },
-  headerTitle: { color: Brand.textPrimary, fontSize: 22, fontWeight: '800' },
+  headerTitle: { color: Light.navyDeep, fontSize: 22, fontWeight: '800' },
   settingsBtn: {
     width: 42,
     height: 42,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -815,22 +820,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    backgroundColor: '#FBF6E9',
+    borderWidth: 1,
+    borderColor: Light.goldPillBorder,
     borderRadius: Radius.sm,
     paddingHorizontal: Spacing.three,
     paddingVertical: 10,
   },
-  demoBannerText: { color: Brand.warning, fontSize: 12.5, flex: 1 },
+  demoBannerText: { color: Light.goldTextStrong, fontSize: 12.5, flex: 1 },
 
-  // Crachá Digital
+  // Crachá Digital (navy)
   badgeCard: {
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Brand.borderGold,
+    borderRadius: 20,
     padding: Spacing.four,
     gap: Spacing.three,
     overflow: 'hidden',
     position: 'relative',
+    shadowColor: Light.navyDeep,
+    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.22,
+    shadowRadius: 28,
+    elevation: 6,
   },
   badgeGlow: {
     position: 'absolute',
@@ -839,30 +849,30 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 75,
-    backgroundColor: Brand.goldSoft,
-    opacity: 0.5,
+    backgroundColor: 'rgba(201,162,76,0.18)',
+    opacity: 0.7,
   },
   badgeTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   badgeLogo: { width: 150, height: 23 },
   badgeYear: {
-    color: Brand.textSecondary,
+    color: 'rgba(255,255,255,0.6)',
     fontSize: 10.5,
     fontWeight: '600',
     marginTop: 2,
     letterSpacing: 0.5,
   },
   badgeTypeContainer: {
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.gold,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: Radius.sm,
   },
-  badgeTypeText: { color: Brand.bgPrimary, fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
+  badgeTypeText: { color: Light.navyDeep, fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
 
   dashedDivider: {
     height: 1,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: 'rgba(255,255,255,0.18)',
     borderStyle: 'dashed',
     marginVertical: Spacing.two,
   },
@@ -874,9 +884,9 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
   },
   badgeInfo: { flex: 1, gap: 4 },
-  visitorName: { color: Brand.textPrimary, fontSize: 20, fontWeight: '800' },
-  visitorRole: { color: Brand.gold, fontSize: 13, fontWeight: '700' },
-  visitorCompany: { color: Brand.textSecondary, fontSize: 13, fontWeight: '600' },
+  visitorName: { color: '#fff', fontSize: 20, fontWeight: '800' },
+  visitorRole: { color: Light.goldLight, fontSize: 13, fontWeight: '700' },
+  visitorCompany: { color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '600' },
   qrCodeContainer: {
     width: 96,
     height: 96,
@@ -886,7 +896,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 6,
     borderWidth: 3,
-    borderColor: Brand.gold,
+    borderColor: Light.gold,
     overflow: 'hidden',
   },
   qrCodeImage: {
@@ -895,7 +905,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   qrCodeText: {
-    color: Brand.bgPrimary,
+    color: Light.navyDeep,
     fontSize: 7.5,
     fontWeight: '800',
     letterSpacing: 0.5,
@@ -908,21 +918,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: Radius.sm,
     marginTop: 6,
   },
-  badgeFooterText: { color: Brand.textSecondary, fontSize: 11, fontWeight: '500' },
+  badgeFooterText: { color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: '500' },
 
   // Tabs
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderRadius: Radius.pill,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     padding: 4,
     marginTop: Spacing.two,
   },
@@ -936,21 +946,19 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
   },
   tabButtonActive: {
-    backgroundColor: '#0E172F',
-    borderWidth: 1,
-    borderColor: 'rgba(47, 107, 255, 0.4)',
+    backgroundColor: Light.navy,
   },
-  tabButtonText: { color: Brand.textSecondary, fontSize: 13, fontWeight: '600' },
-  tabButtonTextActive: { color: Brand.textPrimary, fontWeight: '700' },
+  tabButtonText: { color: Light.textMuted, fontSize: 13, fontWeight: '600' },
+  tabButtonTextActive: { color: '#fff', fontWeight: '700' },
 
   // Tab Content
   tabContent: { gap: Spacing.three, marginTop: Spacing.one },
-  sectionTitle: { color: Brand.textPrimary, fontSize: 16.5, fontWeight: '700' },
-  sectionSubtitle: { color: Brand.textSecondary, fontSize: 12.5, lineHeight: 18 },
+  sectionTitle: { color: Light.navyDeep, fontSize: 16.5, fontWeight: '700' },
+  sectionSubtitle: { color: Light.textMuted, fontSize: 12.5, lineHeight: 18 },
 
   inlineRow: { flexDirection: 'row', gap: Spacing.two },
   label: {
-    color: Brand.gold,
+    color: Light.goldTextStrong,
     fontSize: 12.5,
     fontWeight: '700',
     marginTop: Spacing.two,
@@ -958,13 +966,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   textInput: {
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
-    borderRadius: Radius.sm,
+    borderColor: Light.border,
+    borderRadius: 12,
     paddingHorizontal: 14,
     height: 46,
-    color: Brand.textPrimary,
+    color: Light.navyDeep,
     fontSize: 14.5,
   },
 
@@ -973,25 +981,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
-  optionChipActive: { backgroundColor: '#0E172F', borderColor: 'rgba(47, 107, 255, 0.6)' },
-  optionChipText: { color: Brand.textSecondary, fontSize: 12.5, fontWeight: '600' },
-  optionChipTextActive: { color: Brand.textPrimary, fontWeight: '700' },
+  optionChipActive: { backgroundColor: Light.navy, borderColor: Light.navy },
+  optionChipText: { color: Light.textMuted, fontSize: 12.5, fontWeight: '600' },
+  optionChipTextActive: { color: '#fff', fontWeight: '700' },
 
   saveBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: Brand.gold,
+    backgroundColor: Light.navy,
     height: 48,
-    borderRadius: Radius.sm,
+    borderRadius: 12,
     marginTop: Spacing.three,
   },
-  saveBtnText: { color: Brand.bgPrimary, fontSize: 14.5, fontWeight: '800' },
+  saveBtnText: { color: '#fff', fontSize: 14.5, fontWeight: '800' },
 
   // Leads
   leadsEmpty: {
@@ -999,38 +1007,38 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     paddingVertical: Spacing.five,
     paddingHorizontal: Spacing.three,
-    backgroundColor: Brand.bgCard,
-    borderRadius: Radius.md,
+    backgroundColor: Light.surface,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
-  leadsEmptyText: { color: Brand.textMuted, fontSize: 13, textAlign: 'center', lineHeight: 19 },
+  leadsEmptyText: { color: Light.textMuted, fontSize: 13, textAlign: 'center', lineHeight: 19 },
   leadDelete: {
     width: 32,
     height: 32,
     borderRadius: Radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.surfaceAlt,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
   savedCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.three,
-    backgroundColor: Brand.bgCard,
-    borderRadius: Radius.md,
+    backgroundColor: Light.surface,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     padding: Spacing.three,
   },
-  savedLogo: { width: 56, height: 44 },
+  savedLogo: { width: 56, height: 44, backgroundColor: Light.surfaceAlt },
   leadCard: {
-    backgroundColor: Brand.bgCard,
-    borderRadius: Radius.md,
+    backgroundColor: Light.surface,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     padding: Spacing.three,
     gap: Spacing.three,
   },
@@ -1040,32 +1048,35 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: Spacing.two,
   },
-  leadName: { color: Brand.textPrimary, fontSize: 15.5, fontWeight: '700' },
-  leadRole: { color: Brand.textSecondary, fontSize: 12.5, marginTop: 2 },
+  leadName: { color: Light.navyDeep, fontSize: 15.5, fontWeight: '700' },
+  leadRole: { color: Light.textMuted, fontSize: 12.5, marginTop: 2 },
+  leadCompany: { color: Light.gold, fontWeight: '700' },
   sourceBadge: {
-    backgroundColor: 'rgba(47, 107, 255, 0.12)',
+    backgroundColor: '#FBF6E9',
+    borderWidth: 1,
+    borderColor: Light.goldPillBorder,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: Radius.pill,
   },
-  sourceBadgeText: { color: Brand.techBlue, fontSize: 9.5, fontWeight: '700' },
+  sourceBadgeText: { color: Light.goldTextStrong, fontSize: 9.5, fontWeight: '700' },
   leadContactRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.three,
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.surfaceAlt,
     padding: 8,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
   contactItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  contactItemText: { color: Brand.textSecondary, fontSize: 12 },
+  contactItemText: { color: Light.navyDeep, fontSize: 12 },
   leadActions: {
     flexDirection: 'row',
     gap: Spacing.two,
     borderTopWidth: 1,
-    borderTopColor: Brand.border,
+    borderTopColor: Light.border,
     paddingTop: Spacing.three,
   },
   leadActionBtn: {
@@ -1075,28 +1086,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     borderWidth: 1,
-    borderColor: Brand.border,
-    backgroundColor: Brand.bgPrimary,
+    borderColor: Light.goldPillBorder,
+    backgroundColor: '#FBF6E9',
     paddingVertical: 8,
-    borderRadius: Radius.sm,
+    borderRadius: 12,
   },
-  leadActionText: { color: Brand.textPrimary, fontSize: 12.5, fontWeight: '700' },
+  leadActionText: { color: Light.goldTextStrong, fontSize: 12.5, fontWeight: '700' },
   exportCsvBtn: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: Brand.gold,
-    borderRadius: Radius.sm,
+    backgroundColor: Light.navy,
+    borderRadius: 12,
     paddingHorizontal: Spacing.three,
     paddingVertical: 10,
   },
-  exportCsvText: { color: Brand.bgPrimary, fontSize: 12.5, fontWeight: '800' },
+  exportCsvText: { color: '#fff', fontSize: 12.5, fontWeight: '800' },
   consentCard: {
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
-    borderRadius: Radius.md,
+    borderColor: Light.border,
+    borderRadius: 16,
     padding: Spacing.three,
     gap: 8,
     marginTop: Spacing.two,
@@ -1106,13 +1117,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  consentTitle: { color: Brand.textPrimary, fontSize: 15, fontWeight: '700' },
-  consentDescription: { color: Brand.textSecondary, fontSize: 12.5, lineHeight: 18 },
+  consentTitle: { color: Light.navyDeep, fontSize: 15, fontWeight: '700' },
+  consentDescription: { color: Light.textMuted, fontSize: 12.5, lineHeight: 18 },
 
   // Zoom QR
   zoomOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(9, 9, 11, 0.85)',
+    backgroundColor: 'rgba(9, 9, 11, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: Spacing.four,
@@ -1120,22 +1131,22 @@ const styles = StyleSheet.create({
   zoomContent: {
     width: '100%',
     maxWidth: 340,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Brand.borderGold,
+    borderColor: Light.border,
     padding: Spacing.five,
     alignItems: 'center',
     gap: Spacing.three,
   },
   zoomTitle: {
-    color: Brand.textPrimary,
+    color: Light.navyDeep,
     fontSize: 20,
     fontWeight: '800',
     textAlign: 'center',
   },
   zoomSubtitle: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 13,
     textAlign: 'center',
     lineHeight: 18,
@@ -1150,7 +1161,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 12,
     borderWidth: 4,
-    borderColor: Brand.gold,
+    borderColor: Light.gold,
   },
   zoomQrImage: {
     width: '100%',
@@ -1158,14 +1169,14 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   zoomName: {
-    color: Brand.textPrimary,
+    color: Light.navyDeep,
     fontSize: 18,
     fontWeight: '800',
     marginTop: Spacing.one,
     textAlign: 'center',
   },
   zoomMeta: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 13,
     fontWeight: '700',
     textAlign: 'center',
@@ -1173,14 +1184,14 @@ const styles = StyleSheet.create({
   zoomCloseBtn: {
     width: '100%',
     height: 46,
-    backgroundColor: Brand.gold,
-    borderRadius: Radius.sm,
+    backgroundColor: Light.navy,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: Spacing.two,
   },
   zoomCloseText: {
-    color: Brand.bgPrimary,
+    color: '#fff',
     fontSize: 15,
     fontWeight: '800',
   },
@@ -1190,23 +1201,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     borderWidth: 1.5,
-    borderColor: Brand.danger,
-    borderRadius: Radius.sm,
+    borderColor: Light.danger,
+    borderRadius: 12,
     paddingVertical: 14,
     marginTop: Spacing.one,
   },
-  deleteBtnText: { color: Brand.danger, fontSize: 14.5, fontWeight: '700' },
+  deleteBtnText: { color: Light.danger, fontSize: 14.5, fontWeight: '700' },
   legalBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
-    borderRadius: Radius.sm,
+    borderColor: Light.border,
+    borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: Spacing.three,
     marginTop: Spacing.one,
   },
-  legalBtnText: { color: Brand.textSecondary, fontSize: 13.5, fontWeight: '600' },
+  legalBtnText: { color: Light.textMuted, fontSize: 13.5, fontWeight: '600' },
 });

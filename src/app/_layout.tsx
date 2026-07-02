@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Brand, Radius } from '@/constants/theme';
+import { Light } from '@/constants/theme';
 import { AuthProvider } from '@/features/auth/use-auth';
 import { usePushRegistration } from '@/features/notifications/use-push-registration';
 
@@ -26,48 +26,47 @@ const TAB_ICONS: Record<string, { active: IconName; inactive: IconName }> = {
   profile: { active: 'person', inactive: 'person-outline' },
 };
 
-function CustomTabBar({ state, descriptors, navigation }: any) {
+function CustomTabBar({ state, navigation }: any) {
   const insets = useSafeAreaInsets();
   const activeRoute = state.routes[state.index]?.name;
 
   if (activeRoute === 'preencher' || activeRoute === 'expositor') return null;
 
   return (
-    <View style={[styles.tabBar, { paddingBottom: Math.max(insets.bottom, 10) }]}>
-      {state.routes.map((route: any, index: number) => {
-        const icons = TAB_ICONS[route.name];
-        // Rotas sem ícone definido (ex.: matchmaking) ficam fora da barra,
-        // mas continuam acessíveis por navegação.
-        if (!icons) return null;
+    <View style={[styles.tabBarWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+      <View style={styles.tabBar}>
+        {state.routes.map((route: any, index: number) => {
+          const icons = TAB_ICONS[route.name];
+          // Rotas sem ícone definido (ex.: matchmaking) ficam fora da barra,
+          // mas continuam acessíveis por navegação.
+          if (!icons) return null;
 
-        const { options } = descriptors[route.key];
-        const label = options.title ?? route.name;
-        const isFocused = state.index === index;
+          const isFocused = state.index === index;
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
 
-        return (
-          <Pressable key={route.key} onPress={onPress} style={styles.tabItem}>
-            <View style={[styles.iconWrap, isFocused && styles.iconWrapActive]}>
-              <Ionicons
-                name={isFocused ? icons.active : icons.inactive}
-                size={22}
-                color={isFocused ? Brand.gold : Brand.textMuted}
-              />
-            </View>
-            <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>{label}</Text>
-          </Pressable>
-        );
-      })}
+          return (
+            <Pressable key={route.key} onPress={onPress} style={styles.tabItem}>
+              <View style={[styles.iconWrap, isFocused && styles.iconWrapActive]}>
+                <Ionicons
+                  name={isFocused ? icons.active : icons.inactive}
+                  size={22}
+                  color={isFocused ? Light.navy : Light.textMuted}
+                />
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -80,7 +79,7 @@ export default function TabLayout() {
         <StatusBar style="light" />
         <Tabs
           tabBar={(props) => <CustomTabBar {...props} />}
-          screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: Brand.bgPrimary } }}>
+          screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: Light.bg } }}>
           <Tabs.Screen name="index" options={{ title: 'Início' }} />
           <Tabs.Screen name="map" options={{ title: 'Mapa' }} />
           <Tabs.Screen name="agenda" options={{ title: 'Agenda' }} />
@@ -112,44 +111,48 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
+  tabBarWrap: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    backgroundColor: 'transparent',
+  },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: Brand.bgCard,
-    borderTopWidth: 1,
-    borderTopColor: Brand.border,
-    paddingTop: 10,
+    width: '100%',
+    height: 64,
+    backgroundColor: Light.surface,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: Light.border,
+    alignItems: 'center',
     paddingHorizontal: 8,
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
+        shadowColor: Light.navyDeep,
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.12,
+        shadowRadius: 20,
       },
-      android: { elevation: 12 },
+      android: { elevation: 8 },
     }),
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'center',
   },
   iconWrap: {
-    width: 44,
-    height: 30,
-    borderRadius: Radius.pill,
+    width: 46,
+    height: 38,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconWrapActive: {
-    backgroundColor: Brand.goldSoft,
-  },
-  tabLabel: {
-    fontSize: 10.5,
-    fontWeight: '600',
-    color: Brand.textMuted,
-  },
-  tabLabelActive: {
-    color: Brand.gold,
+    backgroundColor: '#FBF6E9',
   },
 });

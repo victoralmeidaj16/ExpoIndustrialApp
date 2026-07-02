@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+</style>
+</helmet>
+
+<div style="min-height:100vh;padding:60px 64px 76px;font-family:'Geist',system-ui,sans-serif;color:#071A33;background-color:#ffffff;background-image:linear-gradient(rgba(7,26,51,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(7,26,51,0.035) 1px,transparent 1px),linear-gradient(rgba(7,26,51,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(7,26,51,0.05) 1px,transparent 1px);background-size:28px 28px,28px 28px,168px 168px,168px 168px;background-position:center;">
+<div style="max-width:2000px;margin:0 auto;position:relative;">
+
+  <!-- ============ HEADER ============ -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:26px;margin-bottom:44px;border-bottom:1px solid rgba(7,26,51,0.09);">
+    <div>
+      <div style="font-size:23px;font-weight:700;letter-spacing:0.01em;line-height:1;">EXPO<span style="color:#C9A24C;">INDUSTRIAL</span> SUL</div>
+      <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:#94a3b8;margin-top:11px;">Enterprise Event Platform &nbsp;·&nbsp; Industry 4.0</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#64748b;border:1px solid rgba(7,26,51,0.12);border-radius:999px;padding:7px 13px;background:#fff;">iOS · iPhone 15 Pro</div>
+      <div style="font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#64748b;border:1px solid rgba(7,26,51,0.12);border-radius:999px;padding:7px 13px;background:#fff;display:flex;align-items:center;gap:7px;"><span style="width:6px;height:6px;border-radius:99px;background:#C9A24C;"></span>Design System v2.0</div>
+    </div>
+  </div>
+
+  <!-- ============ TOP BAND: component chips ============ -->
+  <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;margin-bottom:52px;">
+
+    <!-- KPI card -->
+    <div style="width:270px;background:#fff;border:1px solid #eef1f6;border-radius:24px;box-shadow:0 2px 4px rgba(7,26,51,.03),0 22px 44px -26px rgba(7,26,51,.20);padding:22px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div><div style="font-size:16px;font-weight:700;">KPI</div><div style="font-size:12.5px;color:#94a3b8;margin-top:2px;">Visitors</div></div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:#159a5b;background:#e9f7ef;padding:4px 9px;border-radius:99px;">▲ 15%</div>
+      </div>
+      <svg width="100%" height="82" viewBox="0 0 226 82" style="margin-top:16px;display:block;overflow:visible;">
+        <g>
+          <rect x="2" y="46" width="22" height="36" rx="4" fill="#0C2345"/>
+          <rect x="34" y="30" width="22" height="52" rx="4" fill="#0C2345"/>
+          <rect x="66" y="52" width="22" height="30" rx="4" fill="#0C2345"/>
+          <rect x="98" y="38" width="22" height="44" rx="4" fill="#0C2345"/>
+          <rect x="130" y="18" width="22" height="64" rx="4" fill="#C9A24C"/>
+          <rect x="162" y="44" width="22" height="38" rx="4" fill="#e3e8ef"/>
+          <rect x="194" y="34" width="22" height="48" rx="4" fill="#e3e8ef"/>
+        </g>
+      </svg>
+      <div style="display:flex;justify-content:space-between;font-family:'Geist Mono',monospace;font-size:10px;color:#b6c0cf;margin-top:9px;letter-spacing:.04em;"><span>MON</span><span>WED</span><span>FRI</span><span>SUN</span></div>
+    </div>
+
+    <!-- Metric: Visitor Traffic -->
+    <div style="width:210px;background:linear-gradient(158deg,#0C2345,#071A33);border-radius:24px;box-shadow:0 22px 44px -22px rgba(7,26,51,.5);padding:22px;color:#fff;position:relative;overflow:hidden;">
+      <div style="font-size:12.5px;color:rgba(255,255,255,.62);">Visitor Traffic</div>
+      <div style="font-size:30px;font-weight:700;margin-top:6px;letter-spacing:-.01em;">+15%<span style="font-size:15px;font-weight:500;color:rgba(255,255,255,.6);"> YoY</span></div>
+      <svg width="100%" height="56" viewBox="0 0 170 56" style="margin-top:10px;display:block;">
+        <defs><linearGradient id="ga1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D8B25A" stop-opacity=".4"/><stop offset="1" stop-color="#D8B25A" stop-opacity="0"/></linearGradient></defs>
+        <path d="M0,44 C22,40 30,22 48,26 C66,30 78,12 96,18 C118,25 132,8 150,14 L170,10 L170,56 L0,56 Z" fill="url(#ga1)"/>
+        <path d="M0,44 C22,40 30,22 48,26 C66,30 78,12 96,18 C118,25 132,8 150,14 L170,10" fill="none" stroke="#D8B25A" stroke-width="2.5"/>
+      </svg>
+    </div>
+
+    <!-- Metric: Deals Closed -->
+    <div style="width:200px;background:linear-gradient(158deg,#0C2345,#071A33);border-radius:24px;box-shadow:0 22px 44px -22px rgba(7,26,51,.5);padding:22px;color:#fff;">
+      <div style="font-size:12.5px;color:rgba(255,255,255,.62);">Deals Closed</div>
+      <div style="font-size:30px;font-weight:700;margin-top:6px;letter-spacing:-.01em;">$5.0M</div>
+      <svg width="100%" height="56" viewBox="0 0 160 56" style="margin-top:10px;display:block;">
+        <defs><linearGradient id="ga2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D8B25A" stop-opacity=".38"/><stop offset="1" stop-color="#D8B25A" stop-opacity="0"/></linearGradient></defs>
+        <path d="M0,40 C18,36 26,44 44,40 C64,35 74,16 94,22 C114,28 128,20 160,12 L160,56 L0,56 Z" fill="url(#ga2)"/>
+        <path d="M0,40 C18,36 26,44 44,40 C64,35 74,16 94,22 C114,28 128,20 160,12" fill="none" stroke="#D8B25A" stroke-width="2.5"/>
+      </svg>
+    </div>
+
+    <!-- Metric: Deals Traffic -->
+    <div style="width:200px;background:linear-gradient(158deg,#0C2345,#071A33);border-radius:24px;box-shadow:0 22px 44px -22px rgba(7,26,51,.5);padding:22px;color:#fff;">
+      <div style="font-size:12.5px;color:rgba(255,255,255,.62);">Deals Traffic</div>
+      <div style="font-size:30px;font-weight:700;margin-top:6px;letter-spacing:-.01em;">$20K</div>
+      <svg width="100%" height="56" viewBox="0 0 160 56" style="margin-top:10px;display:block;overflow:visible;">
+        <path d="M4,42 L36,34 L68,38 L100,20 L132,26 L156,14" fill="none" stroke="#D8B25A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="36" cy="34" r="3" fill="#071A33" stroke="#D8B25A" stroke-width="2"/>
+        <circle cx="100" cy="20" r="3" fill="#071A33" stroke="#D8B25A" stroke-width="2"/>
+        <circle cx="156" cy="14" r="4.5" fill="#D8B25A"/>
+      </svg>
+    </div>
+
+    <!-- Action buttons -->
+    <div style="display:flex;flex-direction:column;gap:12px;padding-top:2px;">
+      <button style="border:none;cursor:pointer;background:linear-gradient(158deg,#0C2345,#071A33);color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:14px 24px;border-radius:16px;box-shadow:0 12px 26px -12px rgba(7,26,51,.55);">Schedule Meeting</button>
+      <button style="cursor:pointer;background:#fff;color:#0C2345;font-family:inherit;font-size:14px;font-weight:600;padding:13px 24px;border-radius:16px;border:1.5px solid #dbe2ec;box-shadow:0 6px 16px -10px rgba(7,26,51,.25);">View Profile</button>
+      <button style="cursor:pointer;background:#0C2345;color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:14px 24px;border-radius:16px;border:none;box-shadow:0 12px 26px -12px rgba(7,26,51,.55);">View Profile</button>
+    </div>
+
+    <!-- Filters -->
+    <div style="display:flex;flex-direction:column;gap:12px;padding-top:2px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;width:190px;background:#fff;border:1.5px solid #dbe2ec;border-radius:14px;padding:12px 16px;font-size:13.5px;font-weight:500;color:#334155;box-shadow:0 6px 16px -12px rgba(7,26,51,.2);">Filter by Sector <span style="color:#94a3b8;">▾</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;width:190px;background:#0C2345;border:none;border-radius:14px;padding:12px 16px;font-size:13.5px;font-weight:500;color:#fff;box-shadow:0 10px 22px -12px rgba(7,26,51,.5);">Filter by Sector <span style="color:rgba(255,255,255,.6);">▾</span></div>
+      <div style="display:flex;gap:10px;">
+        <span style="font-size:13px;font-weight:600;color:#0C2345;background:#fff;border:1.5px solid #dbe2ec;border-radius:99px;padding:9px 18px;">IoT</span>
+        <span style="font-size:13px;font-weight:600;color:#fff;background:#2F6BFF;border-radius:99px;padding:9px 18px;box-shadow:0 8px 18px -10px rgba(47,107,255,.6);">Automation</span>
+      </div>
+    </div>
+
+    <!-- Search group -->
+    <div style="display:flex;flex-direction:column;gap:12px;flex:1;min-width:320px;">
+      <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e6ebf2;border-radius:16px;padding:6px 8px 6px 18px;box-shadow:0 8px 20px -14px rgba(7,26,51,.25);">
+        <span style="flex:1;font-size:14.5px;color:#94a3b8;">Search for "Robotics"…</span>
+        <button style="cursor:pointer;border:none;width:40px;height:40px;border-radius:12px;background:linear-gradient(158deg,#0C2345,#071A33);display:flex;align-items:center;justify-content:center;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div style="background:#fff;border:1px solid #eef1f6;border-radius:16px;box-shadow:0 14px 30px -18px rgba(7,26,51,.28);overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid #f1f5f9;font-size:13.5px;color:#475569;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg>
+          Search for "Robotics"…</div>
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 18px;font-size:13.5px;color:#475569;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg>
+          Search for "Automation"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MAIN ROW: sidebar + phones + right col ============ -->
+  <div style="display:flex;gap:32px;align-items:flex-start;justify-content:center;">
+
+    <!-- LEFT COLUMN -->
+    <div style="width:288px;display:flex;flex-direction:column;gap:22px;flex:none;">
+      <!-- Featured Traffic (navy) -->
+      <div style="background:linear-gradient(158deg,#0C2345,#071A33);border-radius:24px;box-shadow:0 24px 48px -24px rgba(7,26,51,.5);padding:22px;color:#fff;position:relative;overflow:hidden;">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 26px);opacity:.7;"></div>
+        <div style="position:relative;">
+          <div style="font-size:12.5px;color:rgba(255,255,255,.6);letter-spacing:.02em;">Featured Traffic</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px;">
+            <div><div style="font-size:30px;font-weight:700;line-height:1;">200+</div><div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px;">expositores</div></div>
+            <svg width="80" height="40" viewBox="0 0 80 40"><path d="M2,30 C14,28 20,18 32,20 C46,22 54,8 78,6" fill="none" stroke="#D8B25A" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+          <div style="height:1px;background:rgba(255,255,255,.1);margin:16px 0;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div><div style="font-size:30px;font-weight:700;line-height:1;">8</div><div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px;">eventos simultâneos</div></div>
+            <svg width="80" height="40" viewBox="0 0 80 40"><path d="M2,26 C16,30 24,14 38,18 C52,22 60,10 78,12" fill="none" stroke="#D8B25A" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav sidebar -->
+      <div style="background:#fff;border:1px solid #eef1f6;border-radius:24px;box-shadow:0 2px 4px rgba(7,26,51,.03),0 22px 44px -28px rgba(7,26,51,.2);padding:12px;">
+        <div style="display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:15px;">
+          <div style="width:38px;height:38px;border-radius:11px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0C2345" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/></svg></div>
+          <div><div style="font-size:14.5px;font-weight:600;">Event</div><div style="font-size:12px;color:#94a3b8;">Overview</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:15px;background:#f8fafc;position:relative;">
+          <div style="position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:99px;background:#C9A24C;"></div>
+          <div style="width:38px;height:38px;border-radius:11px;background:#071A33;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c.6-3.3 3-5 5.5-5s4.9 1.7 5.5 5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M16 20c.3-2 1.3-3.6 3-4.3"/></svg></div>
+          <div><div style="font-size:14.5px;font-weight:600;color:#071A33;">Exhibitors</div><div style="font-size:12px;color:#94a3b8;">200+ companies</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:15px;">
+          <div style="width:38px;height:38px;border-radius:11px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0C2345" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg></div>
+          <div><div style="font-size:14.5px;font-weight:600;">Indoor Halls</div><div style="font-size:12px;color:#94a3b8;">Expo centers</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:15px;">
+          <div style="width:38px;height:38px;border-radius:11px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0C2345" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+          <div><div style="font-size:14.5px;font-weight:600;">Sessions</div><div style="font-size:12px;color:#94a3b8;">Agenda</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:15px;">
+          <div style="width:38px;height:38px;border-radius:11px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0C2345" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18" stroke-linecap="round"/></svg></div>
+          <div><div style="font-size:14.5px;font-weight:600;">Upcoming</div><div style="font-size:12px;color:#94a3b8;">Meetings</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:15px;">
+          <div style="width:38px;height:38px;border-radius:11px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0C2345" stroke-width="1.8"><circle cx="12" cy="10" r="3"/><path d="M12 21c5-5 7-8.5 7-11a7 7 0 1 0-14 0c0 2.5 2 6 7 11z"/></svg></div>
+          <div><div style="font-size:14.5px;font-weight:600;">Navigate</div><div style="font-size:12px;color:#94a3b8;">Smart map</div></div>
+        </div>
+      </div>
+
+      <!-- Profile card -->
+      <div style="background:#fff;border:1px solid #eef1f6;border-radius:24px;box-shadow:0 2px 4px rgba(7,26,51,.03),0 22px 44px -28px rgba(7,26,51,.2);padding:24px;text-align:center;">
+        <div style="width:76px;height:76px;border-radius:99px;margin:0 auto;background:linear-gradient(150deg,#1e3a6b,#0C2345);display:flex;align-items:center;justify-content:center;color:#D8B25A;font-size:26px;font-weight:600;box-shadow:0 12px 28px -12px rgba(7,26,51,.5);border:3px solid #fff;outline:2px solid #eef1f6;">ES</div>
+        <div style="font-size:17px;font-weight:700;margin-top:14px;">Dr. Elena Santos</div>
+        <div style="font-size:13px;color:#94a3b8;margin-top:3px;">Industry Leader · Bosch</div>
+        <button style="width:100%;margin-top:18px;cursor:pointer;border:none;background:linear-gradient(158deg,#0C2345,#071A33);color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:14px;border-radius:15px;box-shadow:0 12px 26px -14px rgba(7,26,51,.55);">Join Meeting</button>
+      </div>
+    </div>
+
+    <!-- ===== PHONE 1: HOME ===== -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:20px;flex:none;">
+      <div style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#94a3b8;"><span style="color:#C9A24C;">01</span> · Home</div>
+      <div style="position:relative;width:322px;height:678px;background:linear-gradient(145deg,#23252b,#050506);border-radius:56px;padding:12px;box-shadow:0 60px 100px -46px rgba(7,26,51,.55),0 12px 26px -10px rgba(0,0,0,.4);flex:none;">
+        <div style="position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;background:#F8FAFC;display:flex;flex-direction:column;">
+          <div style="position:absolute;top:13px;left:50%;transform:translateX(-50%);width:106px;height:31px;background:#000;border-radius:18px;z-index:30;"></div>
+          <!-- header -->
+          <div style="background:linear-gradient(162deg,#0C2345,#071A33);padding:52px 22px 22px;color:#fff;position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 24px),repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 24px);"></div>
+            <svg style="position:absolute;right:-40px;bottom:-70px;opacity:.5;" width="200" height="200" viewBox="0 0 200 200" fill="none" stroke="#C9A24C" stroke-width="1"><circle cx="100" cy="100" r="90" opacity=".3"/><circle cx="100" cy="100" r="60" opacity=".25"/><circle cx="100" cy="100" r="30" opacity=".2"/><path d="M100 0v200M0 100h200" opacity=".15"/></svg>
+            <div style="position:relative;">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;margin-bottom:16px;">
+                <span>9:41</span>
+                <svg width="52" height="13" viewBox="0 0 52 13" fill="#fff"><rect x="0" y="7" width="3" height="6" rx="1"/><rect x="5" y="5" width="3" height="8" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="1" width="3" height="12" rx="1"/><path d="M22 4c3-2.5 8-2.5 11 0M24 6.7c1.8-1.4 5.2-1.4 7 0" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="27.5" cy="10.3" r="1.2"/><rect x="37" y="3" width="13" height="8" rx="2.5" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.3"/><rect x="38.6" y="4.6" width="8" height="4.8" rx="1.2"/><rect x="50.6" y="5.4" width="1.4" height="3.2" rx="1"/></svg>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="font-size:16px;font-weight:700;letter-spacing:.01em;">EXPO<span style="color:#D8B25A;">INDUSTRIAL</span> SUL</div>
+                <div style="position:relative;width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.5 21a2 2 0 0 0 3 0"/></svg>
+                  <span style="position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:99px;background:#ef4444;border:1.5px solid #0C2345;"></span>
+                </div>
+              </div>
+              <div style="font-size:25px;font-weight:700;margin-top:20px;letter-spacing:-.01em;">Welcome, Executive!</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.66);margin-top:4px;">Your day at a glance.</div>
+            </div>
+          </div>
+          <!-- body -->
+          <div style="flex:1;padding:16px 16px 0;display:flex;flex-direction:column;gap:14px;overflow:hidden;">
+            <!-- event overview -->
+            <div style="background:#fff;border:1px solid #eef1f6;border-radius:20px;box-shadow:0 12px 26px -18px rgba(7,26,51,.22);padding:16px;margin-top:-42px;position:relative;">
+              <div style="font-size:14.5px;font-weight:700;margin-bottom:14px;">Event Overview</div>
+              <div style="display:flex;align-items:center;">
+                <div style="flex:1;text-align:center;"><div style="font-size:19px;font-weight:700;color:#0C2345;">10.000+</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">visitantes</div></div>
+                <div style="width:1px;height:32px;background:#eef1f6;"></div>
+                <div style="flex:1;text-align:center;"><div style="font-size:19px;font-weight:700;color:#0C2345;">200+</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">expositores</div></div>
+                <div style="width:1px;height:32px;background:#eef1f6;"></div>
+                <div style="flex:1;text-align:center;"><div style="font-size:19px;font-weight:700;color:#C9A24C;">8</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">eventos</div></div>
+              </div>
+            </div>
+            <!-- AI insight -->
+            <div style="display:flex;align-items:center;gap:11px;background:linear-gradient(100deg,#fbf6e9,#f8f1df);border:1px solid #f0e4c4;border-radius:15px;padding:12px 14px;">
+              <div style="width:30px;height:30px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 3px 8px -3px rgba(201,162,76,.5);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A24C" stroke-width="1.9"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"/></svg></div>
+              <div style="font-size:12px;color:#7a6320;line-height:1.35;"><span style="font-weight:700;color:#8a6d15;">AI Insight:</span> Connect with Siemens on Industry 4.0 solutions.</div>
+            </div>
+            <!-- featured exhibitors -->
+            <div>
+              <div style="font-size:14.5px;font-weight:700;margin-bottom:10px;">Featured Exhibitors</div>
+              <div style="display:flex;gap:10px;">
+                <div style="flex:1;height:58px;background:#fff;border:1px solid #eef1f6;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -14px rgba(7,26,51,.25);"><span style="background:#0a4ba3;color:#fff;font-weight:800;font-size:15px;letter-spacing:.04em;padding:5px 9px;border-radius:5px;">SAP</span></div>
+                <div style="flex:1;height:58px;background:#fff;border:1px solid #eef1f6;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -14px rgba(7,26,51,.25);"><span style="color:#009999;font-weight:700;font-size:14px;letter-spacing:.02em;">SIEMENS</span></div>
+                <div style="width:34px;height:58px;background:#f8fafc;border:1px solid #eef1f6;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#c4cdda;font-size:18px;">›</div>
+              </div>
+            </div>
+            <!-- upcoming meetings -->
+            <div>
+              <div style="font-size:14.5px;font-weight:700;margin-bottom:10px;">Upcoming Meetings</div>
+              <div style="background:#fff;border:1px solid #eef1f6;border-radius:16px;padding:12px 13px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 22px -16px rgba(7,26,51,.22);">
+                <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(150deg,#1e3a6b,#0C2345);display:flex;align-items:center;justify-content:center;color:#D8B25A;font-size:14px;font-weight:600;flex:none;">ES</div>
+                <div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:600;">Dr. Elena Santos</div><div style="font-size:11.5px;color:#94a3b8;">Industry Leader · 10:30 AM</div></div>
+                <button style="cursor:pointer;border:none;background:#0C2345;color:#fff;font-family:inherit;font-size:12px;font-weight:600;padding:9px 14px;border-radius:11px;flex:none;">Join</button>
+              </div>
+            </div>
+          </div>
+          <!-- tab bar -->
+          <div style="background:#fff;border-top:1px solid #eef1f6;padding:12px 26px 22px;display:flex;justify-content:space-between;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:5px;color:#0C2345;"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span style="font-size:10px;font-weight:600;">Scan</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:5px;color:#c4cdda;"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2.5"/><path d="M8 2v4M16 2v4M3 10h18" stroke-linecap="round"/></svg><span style="font-size:10px;font-weight:600;">Schedule</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:5px;color:#c4cdda;"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l18-8-8 18-2-8z" stroke-linejoin="round"/></svg><span style="font-size:10px;font-weight:600;">Navigate</span></div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:99px;background:#0C2345;opacity:.85;z-index:30;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PHONE 2: SMART MAP ===== -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:20px;flex:none;">
+      <div style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#94a3b8;"><span style="color:#C9A24C;">02</span> · Smart Map</div>
+      <div style="position:relative;width:322px;height:678px;background:linear-gradient(145deg,#23252b,#050506);border-radius:56px;padding:12px;box-shadow:0 60px 100px -46px rgba(7,26,51,.55),0 12px 26px -10px rgba(0,0,0,.4);flex:none;">
+        <div style="position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;background:#eef2f8;display:flex;flex-direction:column;">
+          <div style="position:absolute;top:13px;left:50%;transform:translateX(-50%);width:106px;height:31px;background:#000;border-radius:18px;z-index:30;"></div>
+          <!-- map background -->
+          <div style="position:absolute;inset:0;background:#eef2f8;background-image:linear-gradient(rgba(7,26,51,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(7,26,51,0.04) 1px,transparent 1px);background-size:22px 22px;"></div>
+          <div style="position:absolute;top:120px;left:0;right:0;bottom:0;">{{ smartMap }}</div>
+          <!-- booth labels -->
+          <div style="position:absolute;top:196px;left:96px;background:#0C2345;color:#fff;font-size:11px;font-weight:600;padding:6px 11px;border-radius:9px;box-shadow:0 8px 18px -8px rgba(7,26,51,.5);z-index:12;">Siemens Xcelerator</div>
+          <div style="position:absolute;top:330px;left:56px;background:#fff;color:#0C2345;font-size:11px;font-weight:700;padding:5px 10px 5px 8px;border-radius:9px;box-shadow:0 8px 18px -8px rgba(7,26,51,.3);z-index:12;display:flex;align-items:center;gap:6px;"><span style="background:#0a4ba3;color:#fff;font-weight:800;font-size:9px;padding:2px 5px;border-radius:3px;">SAP</span></div>
+          <div style="position:absolute;top:300px;right:34px;background:#fff;color:#0C2345;font-size:11px;font-weight:700;padding:6px 11px;border-radius:9px;box-shadow:0 8px 18px -8px rgba(7,26,51,.3);z-index:12;">Ramp</div>
+          <!-- search + tabs -->
+          <div style="position:relative;padding:52px 16px 0;z-index:14;">
+            <div style="display:flex;align-items:center;gap:10px;background:#fff;border-radius:16px;padding:6px 8px 6px 16px;box-shadow:0 12px 28px -14px rgba(7,26,51,.35);">
+              <span style="flex:1;font-size:13.5px;color:#94a3b8;">Find exhibitors, stages, facilities…</span>
+              <div style="width:36px;height:36px;border-radius:12px;background:linear-gradient(158deg,#0C2345,#071A33);display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <span style="font-size:12.5px;font-weight:600;color:#fff;background:#0C2345;padding:8px 15px;border-radius:99px;box-shadow:0 8px 16px -10px rgba(7,26,51,.5);">Exhibitors</span>
+              <span style="font-size:12.5px;font-weight:600;color:#475569;background:#fff;padding:8px 15px;border-radius:99px;box-shadow:0 6px 14px -10px rgba(7,26,51,.2);">Stages</span>
+              <span style="font-size:12.5px;font-weight:600;color:#475569;background:#fff;padding:8px 15px;border-radius:99px;box-shadow:0 6px 14px -10px rgba(7,26,51,.2);">Food</span>
+            </div>
+          </div>
+          <!-- map controls -->
+          <div style="position:absolute;top:150px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:14;">
+            <div style="width:42px;height:42px;border-radius:13px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px -12px rgba(7,26,51,.4);"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0C2345" stroke-width="1.8"><path d="M12 3l9 5-9 5-9-5z" stroke-linejoin="round"/><path d="M3 13l9 5 9-5" stroke-linejoin="round"/></svg></div>
+            <div style="width:42px;height:42px;border-radius:13px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px -12px rgba(7,26,51,.4);"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0C2345" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5 11 11l-1.5 3.5L13 13z" fill="#C9A24C" stroke="none"/></svg></div>
+          </div>
+          <!-- location button -->
+          <div style="position:absolute;bottom:118px;right:16px;width:44px;height:44px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 26px -12px rgba(7,26,51,.45);z-index:14;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2F6BFF" stroke-width="1.9"><path d="M3 11l18-8-8 18-2-8z" stroke-linejoin="round"/></svg></div>
+          <!-- user position marker -->
+          <div style="position:absolute;bottom:150px;left:50%;transform:translateX(-50%);z-index:13;">
+            <div style="width:40px;height:40px;border-radius:99px;background:rgba(47,107,255,.16);display:flex;align-items:center;justify-content:center;"><div style="width:26px;height:26px;border-radius:99px;background:#2F6BFF;border:3px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px -4px rgba(47,107,255,.6);"><svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M12 3l7 16-7-4-7 4z"/></svg></div></div>
+          </div>
+          <!-- bottom directions card -->
+          <div style="position:absolute;left:16px;right:16px;bottom:30px;background:#fff;border-radius:18px;box-shadow:0 18px 40px -18px rgba(7,26,51,.4);padding:14px;display:flex;align-items:center;gap:12px;z-index:16;">
+            <div style="width:44px;height:44px;border-radius:13px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2F6BFF" stroke-width="2"><path d="M4 15v-2a4 4 0 0 1 4-4h9" stroke-linecap="round"/><path d="M14 6l4 3-4 3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div style="flex:1;"><div style="font-size:13.5px;font-weight:700;">Turn-by-turn directions</div><div style="font-size:11.5px;color:#94a3b8;margin-top:2px;">Siemens Xcelerator · Hall B</div></div>
+            <div style="text-align:right;"><div style="font-size:14px;font-weight:700;color:#0C2345;">27 min</div><div style="font-size:11px;color:#94a3b8;">arrival</div></div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:99px;background:#0C2345;opacity:.85;z-index:30;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PHONE 3: AI MATCHMAKING ===== -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:20px;flex:none;">
+      <div style="font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#94a3b8;"><span style="color:#C9A24C;">03</span> · AI Matchmaking</div>
+      <div style="position:relative;width:322px;height:678px;background:linear-gradient(145deg,#23252b,#050506);border-radius:56px;padding:12px;box-shadow:0 60px 100px -46px rgba(7,26,51,.55),0 12px 26px -10px rgba(0,0,0,.4);flex:none;">
+        <div style="position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;background:#F8FAFC;display:flex;flex-direction:column;">
+          <div style="position:absolute;top:13px;left:50%;transform:translateX(-50%);width:106px;height:31px;background:#000;border-radius:18px;z-index:30;"></div>
+          <!-- header -->
+          <div style="background:linear-gradient(162deg,#0C2345,#071A33);padding:52px 22px 20px;color:#fff;position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 24px),repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 24px);"></div>
+            <svg style="position:absolute;right:-30px;top:20px;opacity:.55;" width="150" height="150" viewBox="0 0 150 150" fill="none" stroke="#C9A24C" stroke-width="1"><circle cx="75" cy="75" r="66" opacity=".3"/><circle cx="75" cy="75" r="42" opacity=".25"/><path d="M9 75h132M75 9v132" opacity=".15"/></svg>
+            <div style="position:relative;">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;margin-bottom:16px;">
+                <span>9:41</span>
+                <svg width="52" height="13" viewBox="0 0 52 13" fill="#fff"><rect x="0" y="7" width="3" height="6" rx="1"/><rect x="5" y="5" width="3" height="8" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="1" width="3" height="12" rx="1"/><path d="M22 4c3-2.5 8-2.5 11 0M24 6.7c1.8-1.4 5.2-1.4 7 0" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="27.5" cy="10.3" r="1.2"/><rect x="37" y="3" width="13" height="8" rx="2.5" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.3"/><rect x="38.6" y="4.6" width="8" height="4.8" rx="1.2"/><rect x="50.6" y="5.4" width="1.4" height="3.2" rx="1"/></svg>
+              </div>
+              <div style="font-size:24px;font-weight:700;letter-spacing:-.01em;">AI Matchmaking</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.66);margin-top:4px;">Connecting Industry Leaders</div>
+            </div>
+          </div>
+          <!-- body -->
+          <div style="flex:1;padding:18px 16px 0;display:flex;flex-direction:column;gap:16px;overflow:hidden;">
+            <div>
+              <div style="font-size:14.5px;font-weight:700;margin-bottom:11px;">Recommended Companies</div>
+              <div style="display:flex;gap:11px;">
+                <!-- Stripe card selected -->
+                <div style="flex:1;background:linear-gradient(160deg,#fdfaf1,#faf3e1);border:1.5px solid #ecdcb4;border-radius:18px;padding:14px;box-shadow:0 14px 30px -18px rgba(201,162,76,.5);">
+                  <div style="height:34px;display:flex;align-items:center;"><span style="font-size:20px;font-weight:800;color:#635bff;letter-spacing:-.02em;">stripe</span></div>
+                  <div style="font-size:14px;font-weight:700;margin-top:8px;">Stripe</div>
+                  <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;"><span style="font-size:10px;font-weight:600;color:#475569;background:#fff;border:1px solid #eadfc4;border-radius:6px;padding:3px 7px;">Fintech</span><span style="font-size:10px;font-weight:600;color:#475569;background:#fff;border:1px solid #eadfc4;border-radius:6px;padding:3px 7px;">Payments</span></div>
+                  <div style="font-size:12.5px;font-weight:700;color:#C9A24C;margin-top:10px;">95% Compatibility</div>
+                  <button style="width:100%;margin-top:10px;cursor:pointer;border:none;background:#0C2345;color:#fff;font-family:inherit;font-size:11.5px;font-weight:600;padding:9px;border-radius:11px;">Schedule Meeting</button>
+                </div>
+                <!-- Linear card -->
+                <div style="flex:1;background:#fff;border:1px solid #eef1f6;border-radius:18px;padding:14px;box-shadow:0 12px 26px -18px rgba(7,26,51,.22);">
+                  <div style="height:34px;display:flex;align-items:center;"><span style="width:30px;height:30px;border-radius:8px;background:linear-gradient(150deg,#5b63d3,#3b40a0);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M3 13.5 10.5 21A9 9 0 0 1 3 13.5zM3.2 10.6 13.4 20.8a9 9 0 0 0 2.6-.9L4.1 8A9 9 0 0 0 3.2 10.6zM5.2 5.6 18.4 18.8a9 9 0 0 0 1.7-1.9L7.1 3.9A9 9 0 0 0 5.2 5.6zM9 3.2 20.8 15a9 9 0 0 0-9-11.8z"/></svg></span></div>
+                  <div style="font-size:14px;font-weight:700;margin-top:8px;">Linear</div>
+                  <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;"><span style="font-size:10px;font-weight:600;color:#475569;background:#f1f5f9;border-radius:6px;padding:3px 7px;">Project Mgmt</span></div>
+                  <div style="font-size:12.5px;font-weight:700;color:#159a5b;margin-top:10px;">92% Compatibility</div>
+                  <button style="width:100%;margin-top:10px;cursor:pointer;background:#fff;color:#0C2345;font-family:inherit;font-size:11.5px;font-weight:600;padding:9px;border-radius:11px;border:1.5px solid #dbe2ec;">Schedule Meeting</button>
+                </div>
+              </div>
+            </div>
+            <!-- meeting suggestions -->
+            <div>
+              <div style="font-size:14.5px;font-weight:700;margin-bottom:11px;">Meeting Suggestions</div>
+              <div style="background:#fff;border:1px solid #eef1f6;border-radius:18px;padding:14px;box-shadow:0 12px 26px -18px rgba(7,26,51,.2);">
+                <div style="display:flex;align-items:center;gap:11px;">
+                  <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(150deg,#1e3a6b,#0C2345);display:flex;align-items:center;justify-content:center;color:#D8B25A;font-size:14px;font-weight:600;flex:none;">ES</div>
+                  <div style="flex:1;"><div style="font-size:13.5px;font-weight:700;">Dr. Elena Santos</div><div style="font-size:11.5px;color:#94a3b8;">Industry Leader · Bosch</div></div>
+                  <span style="color:#c4cdda;font-size:18px;">›</span>
+                </div>
+                <div style="font-size:11.5px;color:#64748b;line-height:1.4;margin-top:10px;">Leads automation strategy across three plants — strong overlap with your sourcing focus.</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:11px;">
+                  <div style="display:flex;">
+                    <div style="width:22px;height:22px;border-radius:99px;background:linear-gradient(150deg,#c9a24c,#a9863b);border:2px solid #fff;"></div>
+                    <div style="width:22px;height:22px;border-radius:99px;background:linear-gradient(150deg,#2F6BFF,#1e4fd0);border:2px solid #fff;margin-left:-8px;"></div>
+                    <div style="width:22px;height:22px;border-radius:99px;background:linear-gradient(150deg,#1e3a6b,#0C2345);border:2px solid #fff;margin-left:-8px;"></div>
+                  </div>
+                  <span style="font-size:11.5px;color:#94a3b8;">12 mutual interests</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:9px;background:linear-gradient(100deg,#fbf6e9,#f8f1df);border:1px solid #f0e4c4;border-radius:14px;padding:11px 12px;margin-top:11px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A24C" stroke-width="1.9" style="flex:none;margin-top:1px;"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"/></svg>
+                <div style="font-size:11.5px;color:#7a6320;line-height:1.35;"><span style="font-weight:700;color:#8a6d15;">AI Insight:</span> Recommended based on your focus on automation.</div>
+              </div>
+            </div>
+          </div>
+          <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:99px;background:#0C2345;opacity:.85;z-index:30;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div style="width:340px;display:flex;flex-direction:column;gap:22px;flex:none;">
+      <!-- calendar -->
+      <div style="background:#fff;border:1px solid #eef1f6;border-radius:24px;box-shadow:0 2px 4px rgba(7,26,51,.03),0 22px 44px -28px rgba(7,26,51,.2);padding:20px 22px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:16px;font-weight:700;">Apr 2026</div>
+          <div style="display:flex;gap:6px;"><div style="width:28px;height:28px;border-radius:9px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:13px;">‹</div><div style="width:28px;height:28px;border-radius:9px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:13px;">›</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px 2px;font-family:'Geist Mono',monospace;font-size:10.5px;color:#b6c0cf;text-align:center;margin-bottom:6px;"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px 2px;font-size:12.5px;text-align:center;color:#334155;">
+          <span style="padding:6px 0;color:#c4cdda;"></span><span style="padding:6px 0;color:#c4cdda;"></span><span style="padding:6px 0;color:#c4cdda;"></span>
+          <span style="padding:6px 0;position:relative;"><span style="display:inline-flex;width:26px;height:26px;border-radius:99px;background:#0C2345;color:#fff;align-items:center;justify-content:center;font-weight:600;">1</span></span>
+          <span style="padding:6px 0;">2</span><span style="padding:6px 0;">3</span><span style="padding:6px 0;">4</span>
+          <span style="padding:6px 0;">5</span><span style="padding:6px 0;">6</span><span style="padding:6px 0;">7</span><span style="padding:6px 0;">8</span><span style="padding:6px 0;">9</span><span style="padding:6px 0;">10</span><span style="padding:6px 0;">11</span>
+          <span style="padding:6px 0;">12</span><span style="padding:6px 0;">13</span><span style="padding:6px 0;position:relative;">14<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:99px;background:#C9A24C;"></span></span><span style="padding:6px 0;">15</span><span style="padding:6px 0;">16</span><span style="padding:6px 0;">17</span><span style="padding:6px 0;">18</span>
+          <span style="padding:6px 0;">19</span><span style="padding:6px 0;">20</span><span style="padding:6px 0;">21</span><span style="padding:6px 0;">22</span><span style="padding:6px 0;">23</span><span style="padding:6px 0;">24</span><span style="padding:6px 0;">25</span>
+          <span style="padding:6px 0;">26</span><span style="padding:6px 0;">27</span><span style="padding:6px 0;">28</span><span style="padding:6px 0;">29</span><span style="padding:6px 0;">30</span>
+        </div>
+        <div style="height:1px;background:#eef1f6;margin:16px 0 14px;"></div>
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px;"><span style="width:3px;height:30px;border-radius:99px;background:#2F6BFF;"></span><div><div style="font-size:13px;font-weight:600;">Upcoming Events</div><div style="font-size:11.5px;color:#94a3b8;">Industry & Innovation</div></div></div>
+        <div style="display:flex;align-items:center;gap:11px;"><span style="width:3px;height:30px;border-radius:99px;background:#C9A24C;"></span><div><div style="font-size:13px;font-weight:600;">Siemens Xcelerator</div><div style="font-size:11.5px;color:#94a3b8;">Keynote · 14:00</div></div></div>
+      </div>
+
+      <!-- hall map -->
+      <div style="background:#fff;border:1px solid #eef1f6;border-radius:24px;box-shadow:0 2px 4px rgba(7,26,51,.03),0 22px 44px -28px rgba(7,26,51,.2);padding:18px 18px 8px;position:relative;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700;">Hall B <span style="color:#c4cdda;font-size:15px;">›</span></div>
+          <div style="width:30px;height:30px;border-radius:9px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div style="height:120px;background:#f8fafc;border-radius:16px;overflow:hidden;">{{ hallMap }}</div>
+      </div>
+
+      <!-- business matchmaking row -->
+      <div style="background:#fff;border:1px solid #eef1f6;border-radius:20px;box-shadow:0 2px 4px rgba(7,26,51,.03),0 16px 34px -24px rgba(7,26,51,.2);padding:16px 18px;display:flex;align-items:center;gap:13px;">
+        <div style="width:40px;height:40px;border-radius:12px;background:#111;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700;flex:none;">N</div>
+        <div style="flex:1;"><div style="font-size:14.5px;font-weight:700;">Business Matchmaking</div><div style="font-size:11.5px;color:#94a3b8;">Powered by AI · 24 new matches</div></div>
+        <span style="color:#c4cdda;font-size:18px;">›</span>
+      </div>
+
+      <!-- AI insight card -->
+      <div style="display:flex;align-items:center;gap:12px;background:linear-gradient(100deg,#fbf6e9,#f8f1df);border:1px solid #f0e4c4;border-radius:18px;padding:16px 18px;">
+        <div style="width:36px;height:36px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 4px 10px -3px rgba(201,162,76,.5);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A24C" stroke-width="1.9"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"/></svg></div>
+        <div style="font-size:13px;color:#7a6320;line-height:1.4;"><span style="font-weight:700;color:#8a6d15;">AI Insight:</span> 3 exhibitors match your focus on automation.</div>
+      </div>
+
+      <!-- notification card -->
+      <div style="background:#fff;border:1px solid #eef1f6;border-radius:20px;box-shadow:0 2px 4px rgba(7,26,51,.03),0 16px 34px -24px rgba(7,26,51,.2);padding:16px 18px;display:flex;align-items:flex-start;gap:13px;">
+        <div style="width:38px;height:38px;border-radius:11px;background:#eef4ff;display:flex;align-items:center;justify-content:center;flex:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2F6BFF" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.5 21a2 2 0 0 0 3 0"/></svg></div>
+        <div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:14px;font-weight:700;">Notification</span><span style="font-size:11px;color:#94a3b8;">now</span></div><div style="font-size:12px;color:#64748b;margin-top:3px;line-height:1.4;">Meeting reminder — Dr. Elena Santos in 15 minutes.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BOTTOM BAND ============ -->
+  <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;margin-top:52px;justify-content:center;">
+
+    <!-- Visitor Traffic chart -->
+    <div style="width:300px;background:#fff;border:1px solid #eef1f6;border-radius:24px;box-shadow:0 2px 4px rgba(7,26,51,.03),0 22px 44px -28px rgba(7,26,51,.2);padding:22px;">
+      <div style="font-size:15px;font-weight:700;">Visitor Traffic</div>
+      <svg width="100%" height="96" viewBox="0 0 256 96" style="margin-top:16px;display:block;">
+        <g>
+          <rect x="4" y="52" width="16" height="44" rx="3" fill="#0C2345"/><rect x="26" y="38" width="16" height="58" rx="3" fill="#0C2345"/><rect x="48" y="60" width="16" height="36" rx="3" fill="#cbd5e3"/><rect x="70" y="30" width="16" height="66" rx="3" fill="#0C2345"/><rect x="92" y="18" width="16" height="78" rx="3" fill="#C9A24C"/><rect x="114" y="44" width="16" height="52" rx="3" fill="#0C2345"/><rect x="136" y="56" width="16" height="40" rx="3" fill="#cbd5e3"/><rect x="158" y="34" width="16" height="62" rx="3" fill="#0C2345"/><rect x="180" y="48" width="16" height="48" rx="3" fill="#cbd5e3"/><rect x="202" y="40" width="16" height="56" rx="3" fill="#0C2345"/><rect x="224" y="58" width="16" height="38" rx="3" fill="#cbd5e3"/>
+        </g>
+      </svg>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;"><div style="font-size:26px;font-weight:700;">$5M</div><div style="font-size:13px;font-weight:600;color:#159a5b;">+15% YoY</div></div>
+    </div>
+
+    <!-- button variants -->
+    <div style="display:flex;flex-direction:column;gap:12px;justify-content:flex-start;padding-top:4px;">
+      <button style="border:none;cursor:pointer;background:linear-gradient(158deg,#0C2345,#071A33);color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:14px 30px;border-radius:16px;box-shadow:0 12px 26px -12px rgba(7,26,51,.55);">Schedule Meeting</button>
+      <button style="cursor:pointer;background:#0C2345;color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:14px 30px;border-radius:16px;border:none;">View Profile</button>
+      <button style="cursor:pointer;background:#fff;color:#0C2345;font-family:inherit;font-size:14px;font-weight:600;padding:13px 30px;border-radius:16px;border:1.5px solid #dbe2ec;">View Profile</button>
+    </div>
+
+    <!-- search + tabs -->
+    <div style="width:300px;display:flex;flex-direction:column;gap:14px;padding-top:4px;">
+      <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e6ebf2;border-radius:16px;padding:6px 8px 6px 18px;box-shadow:0 8px 20px -14px rgba(7,26,51,.25);">
+        <span style="flex:1;font-size:14px;color:#94a3b8;">Search for "Robotics"…</span>
+        <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(158deg,#0C2345,#071A33);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <span style="font-size:13px;font-weight:600;color:#fff;background:#0C2345;padding:9px 16px;border-radius:99px;">Exhibitors</span>
+        <span style="font-size:13px;font-weight:600;color:#475569;background:#fff;border:1px solid #e6ebf2;padding:9px 16px;border-radius:99px;">Stages</span>
+        <span style="font-size:13px;font-weight:600;color:#475569;background:#fff;border:1px solid #e6ebf2;padding:9px 16px;border-radius:99px;">Food</span>
+      </div>
+    </div>
+
+    <!-- progress steps -->
+    <div style="display:flex;align-items:center;gap:12px;padding:20px 4px;">
+      <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1px solid #e6ebf2;display:flex;align-items:center;justify-content:center;color:#64748b;box-shadow:0 8px 18px -12px rgba(7,26,51,.25);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="17" fill="none" stroke="#eef1f6" stroke-width="4"/><circle cx="22" cy="22" r="17" fill="none" stroke="#C9A24C" stroke-width="4" stroke-linecap="round" stroke-dasharray="107" stroke-dashoffset="53" transform="rotate(-90 22 22)"/></svg>
+      <svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="17" fill="none" stroke="#eef1f6" stroke-width="4"/><circle cx="22" cy="22" r="17" fill="none" stroke="#C9A24C" stroke-width="4" stroke-linecap="round" stroke-dasharray="107" stroke-dashoffset="0" transform="rotate(-90 22 22)"/></svg>
+      <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1px solid #e6ebf2;display:flex;align-items:center;justify-content:center;color:#64748b;box-shadow:0 8px 18px -12px rgba(7,26,51,.25);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(158deg,#0C2345,#071A33);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 12px 24px -12px rgba(7,26,51,.5);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+
+    <!-- profile + QR -->
+    <div style="display:flex;gap:16px;align-items:stretch;">
+      <div style="width:170px;background:#fff;border:1px solid #eef1f6;border-radius:22px;box-shadow:0 2px 4px rgba(7,26,51,.03),0 20px 40px -28px rgba(7,26,51,.2);padding:20px;text-align:center;">
+        <div style="width:60px;height:60px;border-radius:99px;margin:0 auto;background:linear-gradient(150deg,#2a5091,#0C2345);display:flex;align-items:center;justify-content:center;color:#D8B25A;font-size:20px;font-weight:600;border:3px solid #fff;outline:2px solid #eef1f6;">MC</div>
+        <div style="font-size:15px;font-weight:700;margin-top:12px;">Marco Costa</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Executive</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;"><span style="font-size:12px;font-weight:600;color:#0C2345;background:#f1f5f9;border-radius:9px;padding:8px;">Executive Pass</span><span style="font-size:12px;font-weight:600;color:#0C2345;background:#f1f5f9;border-radius:9px;padding:8px;">QR Ticket</span></div>
+      </div>
+      <!-- QR ticket -->
+      <div style="width:180px;background:#fff;border:2px dashed #d8c286;border-radius:22px;padding:20px 18px;text-align:center;position:relative;box-shadow:0 20px 40px -28px rgba(7,26,51,.2);">
+        <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#C9A24C;font-weight:500;">QR Ticket</div>
+        <div style="width:118px;height:118px;margin:14px auto 0;">{{ qr }}</div>
+        <div style="font-family:'Geist Mono',monospace;font-size:10px;color:#94a3b8;margin-top:12px;letter-spacing:.08em;">EXP-2026-00147</div>
+      </div>
+    </div>
+
+    <!-- enterprise data chart -->
+    <div style="width:320px;background:#fff;border:1px solid #eef1f6;border-radius:24px;box-shadow:0 2px 4px rgba(7,26,51,.03),0 22px 44px -28px rgba(7,26,51,.2);padding:22px;">
+      <div style="font-size:15px;font-weight:700;">Enterprise Data</div>
+      <svg width="100%" height="120" viewBox="0 0 276 120" style="margin-top:16px;display:block;overflow:visible;">
+        <defs><linearGradient id="entA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F6BFF" stop-opacity=".18"/><stop offset="1" stop-color="#2F6BFF" stop-opacity="0"/></linearGradient></defs>
+        <g font-family="Geist Mono, monospace" font-size="9" fill="#b6c0cf"><text x="0" y="14">15M</text><text x="0" y="52">10M</text><text x="0" y="90">5M</text><text x="6" y="118">0</text></g>
+        <line x1="30" y1="10" x2="276" y2="10" stroke="#f1f5f9"/><line x1="30" y1="48" x2="276" y2="48" stroke="#f1f5f9"/><line x1="30" y1="86" x2="276" y2="86" stroke="#f1f5f9"/>
+        <path d="M34,80 C58,72 72,44 96,50 C120,56 132,30 156,40 C182,50 196,22 222,30 C244,37 258,26 272,22 L272,104 L34,104 Z" fill="url(#entA)"/>
+        <path d="M34,80 C58,72 72,44 96,50 C120,56 132,30 156,40 C182,50 196,22 222,30 C244,37 258,26 272,22" fill="none" stroke="#2F6BFF" stroke-width="2.5"/>
+        <path d="M34,92 C58,88 72,74 96,78 C120,82 132,66 156,72 C182,78 196,60 222,66 C244,71 258,62 272,58" fill="none" stroke="#C9A24C" stroke-width="2.5"/>
+      </svg>
+      <div style="display:flex;gap:20px;margin-top:14px;font-size:12px;color:#64748b;">
+        <div style="display:flex;align-items:center;gap:7px;"><span style="width:9px;height:9px;border-radius:99px;background:#2F6BFF;"></span>Progress</div>
+        <div style="display:flex;align-items:center;gap:7px;"><span style="width:9px;height:9px;border-radius:99px;background:#C9A24C;"></span>Automation</div>
+        <div style="margin-left:auto;font-family:'Geist Mono',monospace;font-size:10px;color:#b6c0cf;">JAN — JUN</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  iso(x, y, e) {
+    const o = this._o;
+    return [o.ox + (x - y) * o.tw, o.oy + (x + y) * o.th - e];
+  }
+  boothFaces(k, gx, gy, w, d, h, top, east, south) {
+    const p = (x, y, e) => this.iso(x, y, e);
+    const pts = a => a.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join(' ');
+    const topPts = [p(gx, gy, h), p(gx + w, gy, h), p(gx + w, gy + d, h), p(gx, gy + d, h)];
+    const eastPts = [p(gx + w, gy, h), p(gx + w, gy + d, h), p(gx + w, gy + d, 0), p(gx + w, gy, 0)];
+    const southPts = [p(gx + w, gy + d, h), p(gx, gy + d, h), p(gx, gy + d, 0), p(gx + w, gy + d, 0)];
+    const e = React.createElement;
+    return e('g', { key: k },
+      e('polygon', { points: pts(southPts), fill: south }),
+      e('polygon', { points: pts(eastPts), fill: east }),
+      e('polygon', { points: pts(topPts), fill: top, stroke: 'rgba(255,255,255,.5)', strokeWidth: 0.6 })
+    );
+  }
+  smartMap() {
+    this._o = { ox: 150, oy: 58, tw: 23, th: 12.5 };
+    const e = React.createElement;
+    const grid = [];
+    for (let i = 0; i <= 7; i++) {
+      const a1 = this.iso(i, 0, 0), a2 = this.iso(i, 7, 0);
+      const b1 = this.iso(0, i, 0), b2 = this.iso(7, i, 0);
+      grid.push(e('line', { key: 'a' + i, x1: a1[0], y1: a1[1], x2: a2[0], y2: a2[1], stroke: '#dbe3ee', strokeWidth: 1 }));
+      grid.push(e('line', { key: 'b' + i, x1: b1[0], y1: b1[1], x2: b2[0], y2: b2[1], stroke: '#dbe3ee', strokeWidth: 1 }));
+    }
+    const G = ['#E6ECF4', '#CDD7E5', '#B7C3D6'];
+    const Y = ['#E2C876', '#C9A24C', '#A9863B'];
+    const booths = [
+      this.boothFaces('b1', 0.4, 0.6, 2, 1.5, 30, G[0], G[1], G[2]),
+      this.boothFaces('b3', 0.9, 3.1, 1.6, 1.6, 28, G[0], G[1], G[2]),
+      this.boothFaces('b2', 3.2, 0.9, 1.9, 1.7, 54, Y[0], Y[1], Y[2]),
+      this.boothFaces('b5', 5.2, 1.9, 1.3, 1.2, 26, G[0], G[1], G[2]),
+      this.boothFaces('b6', 1.6, 5.0, 2.4, 1.2, 24, G[0], G[1], G[2]),
+      this.boothFaces('b4', 3.7, 3.5, 1.5, 1.4, 40, Y[0], Y[1], Y[2])
+    ];
+    const routePts = [[2.6, 6.4], [2.6, 4.4], [3.4, 3.2], [3.9, 1.9]].map(q => this.iso(q[0], q[1], 0));
+    const routeStr = routePts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    return e('svg', { viewBox: '0 0 300 300', width: '100%', height: '100%', style: { display: 'block' }, preserveAspectRatio: 'xMidYMid meet' },
+      e('g', {}, grid),
+      ...booths,
+      e('polyline', { points: routeStr, fill: 'none', stroke: '#fff', strokeWidth: 8, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      e('polyline', { points: routeStr, fill: 'none', stroke: '#2F6BFF', strokeWidth: 5, strokeLinecap: 'round', strokeLinejoin: 'round' })
+    );
+  }
+  hallMap() {
+    this._o = { ox: 150, oy: 24, tw: 30, th: 16 };
+    const e = React.createElement;
+    return e('svg', { viewBox: '0 0 320 132', width: '100%', height: '100%', style: { display: 'block' }, preserveAspectRatio: 'xMidYMid meet' },
+      this.boothFaces('base', 0.3, 0.3, 3.6, 2.6, 8, '#EEF2F8', '#DDE4EE', '#CBD5E3'),
+      this.boothFaces('gold', 1.5, 1.2, 1.1, 0.9, 26, '#E2C876', '#C9A24C', '#A9863B'),
+      (() => { const p = this.iso(2.05, 1.65, 30); return e('g', { key: 'pin' }, e('circle', { cx: p[0], cy: p[1], r: 8, fill: '#071A33' }), e('circle', { cx: p[0], cy: p[1], r: 3, fill: '#fff' })); })()
+    );
+  }
+  qr() {
+    const e = React.createElement;
+    const n = 21, cell = 100 / n, rects = [];
+    const on = (x, y) => {
+      const inFinder = (fx, fy) => x >= fx && x < fx + 7 && y >= fy && y < fy + 7;
+      if (inFinder(0, 0) || inFinder(n - 7, 0) || inFinder(0, n - 7)) return null;
+      return ((x * 3 + y * 7 + x * y * 5 + ((x + y) % 3) * 4) % 7) < 3;
+    };
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+      if (on(x, y)) rects.push(e('rect', { key: x + '_' + y, x: (x * cell).toFixed(2), y: (y * cell).toFixed(2), width: (cell * 0.92).toFixed(2), height: (cell * 0.92).toFixed(2), rx: 0.6, fill: '#071A33' }));
+    }
+    const finder = (fx, fy) => {
+      const px = fx * cell, py = fy * cell, s = 7 * cell;
+      return e('g', { key: 'f' + fx + '_' + fy },
+        e('rect', { x: px, y: py, width: s, height: s, rx: 3, fill: 'none', stroke: '#071A33', strokeWidth: cell * 0.95 }),
+        e('rect', { x: px + cell * 2, y: py + cell * 2, width: 3 * cell, height: 3 * cell, rx: 1.5, fill: '#C9A24C' })
+      );
+    };
+    return e('svg', { viewBox: '0 0 100 100', width: '100%', height: '100%', style: { display: 'block' } },
+      ...rects, finder(0, 0), finder(n - 7, 0), finder(0, n - 7)
+    );
+  }
+  renderVals() {
+    return { smartMap: this.smartMap(), hallMap: this.hallMap(), qr: this.qr() };
+  }
+}
+</script>
+</body>
+</html>

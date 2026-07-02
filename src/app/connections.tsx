@@ -12,11 +12,11 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import { ScoreRing } from '@/components/score-ring';
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { HeaderIconButton, ScreenHeader, TAB_BAR_CLEARANCE } from '@/components/ui-kit';
+import { Light, Radius, Spacing } from '@/constants/theme';
 import { useAuth } from '@/features/auth/use-auth';
 import {
   useConnections,
@@ -29,7 +29,6 @@ import { useVisitorProfile, type VisitorProfile, getVisitorProfileByUid } from '
 type TabType = 'suggestions' | 'requests' | 'connected';
 
 export default function ConnectionsScreen() {
-  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { profile } = useVisitorProfile();
   const { visitors, loading: loadingVisitors } = useDiscoverableVisitors();
@@ -120,7 +119,7 @@ export default function ConnectionsScreen() {
   // Filtrar e ranquear sugestões
   const suggestions = React.useMemo(() => {
     if (!profile) return [];
-    
+
     // Filtra pessoas que já têm conexão (pendente, aceita ou recusada)
     const activeConnectionUids = new Set<string>();
     connections.forEach((c) => {
@@ -201,18 +200,14 @@ export default function ConnectionsScreen() {
 
   return (
     <View style={styles.screen}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + Spacing.two }]}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color={Brand.textPrimary} />
-        </Pressable>
-        <Text style={styles.headerTitle}>Conectar Pessoas</Text>
-        <Pressable onPress={startScanning} style={styles.backBtn}>
-          <Ionicons name="qr-code-outline" size={20} color={Brand.gold} />
-        </Pressable>
-      </View>
+      <ScreenHeader
+        title="Networking"
+        subtitle="Conecte-se com quem faz sentido para você"
+        onBack={() => router.back()}
+        right={<HeaderIconButton icon="qr-code-outline" onPress={startScanning} />}
+      />
 
-      {/* Modal do Scanner */}
+      {/* Modal do Scanner (câmera — fundo escuro por design) */}
       <Modal
         visible={scannerVisible}
         animationType="slide"
@@ -233,7 +228,7 @@ export default function ConnectionsScreen() {
         </View>
       </Modal>
 
-      {/* Tabs */}
+      {/* Tabs em card claro sobreposto */}
       <View style={styles.tabsContainer}>
         <Pressable
           style={[styles.tabBtn, activeTab === 'suggestions' && styles.tabBtnActive]}
@@ -260,19 +255,19 @@ export default function ConnectionsScreen() {
 
       {loading ? (
         <View style={styles.centerScreen}>
-          <ActivityIndicator color={Brand.gold} size="large" />
+          <ActivityIndicator color={Light.gold} size="large" />
         </View>
       ) : (
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: TAB_BAR_CLEARANCE }]}
           showsVerticalScrollIndicator={false}>
-          
+
           {/* TAB 1: Sugestões */}
           {activeTab === 'suggestions' && (
             <View style={styles.tabContent}>
               {suggestions.length === 0 ? (
                 <View style={styles.emptyContainer}>
-                  <Ionicons name="people-outline" size={48} color={Brand.textMuted} />
+                  <Ionicons name="people-outline" size={48} color={Light.textFaint} />
                   <Text style={styles.emptyText}>
                     Nenhuma sugestão de perfil com fit comercial disponível no momento.
                   </Text>
@@ -284,17 +279,17 @@ export default function ConnectionsScreen() {
                       <View style={{ flex: 1 }}>
                         <Text style={styles.cardName}>{item.profile.name}</Text>
                         <Text style={styles.cardSub}>
-                          {item.profile.role} · <Text style={{ color: Brand.gold }}>{item.profile.company}</Text>
+                          {item.profile.role} · <Text style={styles.companyText}>{item.profile.company}</Text>
                         </Text>
                       </View>
-                      <ScoreRing score={item.fit.score} size={50} stroke={4} />
+                      <ScoreRing score={item.fit.score} size={50} stroke={4} trackColor={Light.border} />
                     </View>
 
                     {item.fit.reasons.length > 0 && (
                       <View style={styles.reasonsContainer}>
                         {item.fit.reasons.map((r, i) => (
                           <View key={i} style={styles.reasonRow}>
-                            <Ionicons name="sparkles" size={11} color={Brand.gold} />
+                            <Ionicons name="sparkles" size={11} color={Light.gold} />
                             <Text style={styles.reasonText}>{r}</Text>
                           </View>
                         ))}
@@ -326,7 +321,7 @@ export default function ConnectionsScreen() {
                     <Pressable
                       style={styles.actionBtn}
                       onPress={() => handleRequestConnection(item.uid, item.profile.name)}>
-                      <Ionicons name="person-add-outline" size={14} color={Brand.bgPrimary} />
+                      <Ionicons name="person-add-outline" size={14} color="#fff" />
                       <Text style={styles.actionBtnText}>Solicitar Conexão</Text>
                     </Pressable>
                   </View>
@@ -351,23 +346,23 @@ export default function ConnectionsScreen() {
                           <Text style={styles.cardName}>{c.fromName || otherProfile?.name || 'Participante'}</Text>
                           {otherProfile && (
                             <Text style={styles.cardSub}>
-                              {otherProfile.role} · <Text style={{ color: Brand.gold }}>{otherProfile.company}</Text>
+                              {otherProfile.role} · <Text style={styles.companyText}>{otherProfile.company}</Text>
                             </Text>
                           )}
                         </View>
                       </View>
                       <View style={styles.rowActions}>
                         <Pressable
-                          style={[styles.smallBtn, { backgroundColor: Brand.success }]}
+                          style={[styles.smallBtn, { backgroundColor: Light.success }]}
                           onPress={() => handleAccept(c.id, c.fromName || 'Participante')}>
-                          <Ionicons name="checkmark" size={14} color={Brand.bgPrimary} />
+                          <Ionicons name="checkmark" size={14} color="#fff" />
                           <Text style={styles.smallBtnText}>Aceitar</Text>
                         </Pressable>
                         <Pressable
-                          style={[styles.smallBtn, { backgroundColor: Brand.danger }]}
+                          style={[styles.smallBtn, { backgroundColor: Light.danger }]}
                           onPress={() => handleDecline(c.id, c.fromName || 'Participante')}>
                           <Ionicons name="close" size={14} color="#FFFFFF" />
-                          <Text style={[styles.smallBtnText, { color: '#FFFFFF' }]}>Recusar</Text>
+                          <Text style={styles.smallBtnText}>Recusar</Text>
                         </Pressable>
                       </View>
                     </View>
@@ -385,7 +380,7 @@ export default function ConnectionsScreen() {
                   <View key={c.id} style={[styles.card, { opacity: 0.85 }]}>
                     <Text style={styles.cardName}>{c.toName || 'Participante'}</Text>
                     <View style={styles.waitingBadge}>
-                      <Ionicons name="time-outline" size={12} color={Brand.gold} />
+                      <Ionicons name="time-outline" size={12} color={Light.gold} />
                       <Text style={styles.waitingBadgeText}>Aguardando resposta</Text>
                     </View>
                   </View>
@@ -399,7 +394,7 @@ export default function ConnectionsScreen() {
             <View style={styles.tabContent}>
               {accepted.length === 0 ? (
                 <View style={styles.emptyContainer}>
-                  <Ionicons name="people" size={48} color={Brand.textMuted} />
+                  <Ionicons name="people" size={48} color={Light.textFaint} />
                   <Text style={styles.emptyText}>
                     Nenhuma conexão estabelecida ainda. Envie ou aceite pedidos para revelar contatos.
                   </Text>
@@ -418,7 +413,7 @@ export default function ConnectionsScreen() {
                           <Text style={styles.cardName}>{displayName || otherProfile?.name || 'Profissional'}</Text>
                           {otherProfile && (
                             <Text style={styles.cardSub}>
-                              {otherProfile.role} · <Text style={{ color: Brand.gold }}>{otherProfile.company}</Text>
+                              {otherProfile.role} · <Text style={styles.companyText}>{otherProfile.company}</Text>
                             </Text>
                           )}
                         </View>
@@ -429,12 +424,12 @@ export default function ConnectionsScreen() {
                           {otherProfile.shareContact ? (
                             <>
                               <View style={styles.contactRow}>
-                                <Ionicons name="mail-outline" size={13} color={Brand.textSecondary} />
+                                <Ionicons name="mail-outline" size={13} color={Light.textMuted} />
                                 <Text style={styles.contactText}>{otherProfile.email || 'Não informado'}</Text>
                               </View>
                               {otherProfile.phone ? (
                                 <View style={styles.contactRow}>
-                                  <Ionicons name="call-outline" size={13} color={Brand.textSecondary} />
+                                  <Ionicons name="call-outline" size={13} color={Light.textMuted} />
                                   <Text style={styles.contactText}>{otherProfile.phone}</Text>
                                 </View>
                               ) : null}
@@ -448,7 +443,7 @@ export default function ConnectionsScreen() {
                             <Pressable
                               style={styles.linkedinLink}
                               onPress={() => Linking.openURL(otherProfile.linkedin!)}>
-                              <Ionicons name="logo-linkedin" size={13} color={Brand.techBlue} />
+                              <Ionicons name="logo-linkedin" size={13} color="#2F6BFF" />
                               <Text style={styles.linkedinText}>Ver LinkedIn</Text>
                             </Pressable>
                           ) : null}
@@ -466,7 +461,7 @@ export default function ConnectionsScreen() {
                                 otherProfile.phone
                               )
                             }>
-                            <Ionicons name="chatbubble-ellipses-outline" size={13} color={Brand.gold} />
+                            <Ionicons name="chatbubble-ellipses-outline" size={13} color={Light.gold} />
                             <Text style={styles.actionBtnOutlineText}>Mensagem</Text>
                           </Pressable>
                           <Pressable
@@ -480,7 +475,7 @@ export default function ConnectionsScreen() {
                                 otherProfile.phone
                               )
                             }>
-                            <Ionicons name="download-outline" size={13} color={Brand.gold} />
+                            <Ionicons name="download-outline" size={13} color={Light.gold} />
                             <Text style={styles.actionBtnOutlineText}>Exportar .vcf</Text>
                           </Pressable>
                         </View>
@@ -499,176 +494,155 @@ export default function ConnectionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Brand.bgPrimary },
+  screen: { flex: 1, backgroundColor: Light.bg },
   centerScreen: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.four,
-    height: 64,
-    borderBottomWidth: 1,
-    borderBottomColor: Brand.border,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: Radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Brand.bgCard,
-    borderWidth: 1,
-    borderColor: Brand.border,
-  },
-  headerTitle: { color: Brand.textPrimary, fontSize: 18, fontWeight: '800' },
-  
+
   tabsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: 10,
-    gap: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: Brand.border,
+    marginTop: -30,
+    marginHorizontal: 16,
+    backgroundColor: Light.surface,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: Light.border,
+    padding: 6,
+    gap: 6,
+    shadowColor: Light.navyDeep,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 4,
   },
   tabBtn: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 9,
     alignItems: 'center',
-    borderRadius: Radius.pill,
-    backgroundColor: Brand.bgCard,
-    borderWidth: 1,
-    borderColor: Brand.border,
+    borderRadius: 12,
+    backgroundColor: Light.surfaceAlt,
   },
-  tabBtnActive: {
-    backgroundColor: '#0E172F',
-    borderColor: 'rgba(47, 107, 255, 0.4)',
-  },
-  tabBtnText: { color: Brand.textMuted, fontSize: 12.5, fontWeight: '600' },
-  tabBtnTextActive: { color: Brand.textPrimary, fontWeight: '700' },
+  tabBtnActive: { backgroundColor: Light.navy },
+  tabBtnText: { color: Light.textMuted, fontSize: 12, fontWeight: '700' },
+  tabBtnTextActive: { color: '#fff' },
 
-  scrollContent: { padding: Spacing.four, gap: Spacing.three },
-  tabContent: { gap: Spacing.three },
+  scrollContent: { padding: 16, gap: 12 },
+  tabContent: { gap: 12 },
   sectionTitle: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 13,
     fontWeight: '800',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
-  noDataText: { color: Brand.textMuted, fontSize: 13, marginVertical: 4 },
+  noDataText: { color: Light.textMuted, fontSize: 13, marginVertical: 4 },
 
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing.six,
-    gap: Spacing.two,
-  },
-  emptyText: { color: Brand.textMuted, fontSize: 13.5, textAlign: 'center', lineHeight: 20 },
+  emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 10 },
+  emptyText: { color: Light.textMuted, fontSize: 13.5, textAlign: 'center', lineHeight: 20 },
 
   card: {
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
-    borderRadius: Radius.md,
-    padding: Spacing.three,
-    gap: Spacing.three,
+    borderColor: Light.border,
+    borderRadius: 16,
+    padding: 14,
+    gap: 12,
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  cardName: { color: Brand.textPrimary, fontSize: 16, fontWeight: '700' },
-  cardSub: { color: Brand.textSecondary, fontSize: 13, marginTop: 2 },
+  cardName: { color: Light.navyDeep, fontSize: 16, fontWeight: '700' },
+  cardSub: { color: Light.textMuted, fontSize: 13, marginTop: 2 },
+  companyText: { color: Light.gold, fontWeight: '700' },
 
   reasonsContainer: {
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.surfaceAlt,
     padding: 10,
-    borderRadius: Radius.sm,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     gap: 6,
   },
   reasonRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  reasonText: { color: Brand.textSecondary, fontSize: 12.5 },
+  reasonText: { color: Light.text, fontSize: 12.5 },
 
-  infoText: { color: Brand.textSecondary, fontSize: 12.5, lineHeight: 18 },
-  infoLabel: { color: Brand.gold, fontWeight: '700' },
+  infoText: { color: Light.textMuted, fontSize: 12.5, lineHeight: 18 },
+  infoLabel: { color: Light.gold, fontWeight: '700' },
 
   tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   tagChip: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: Radius.sm,
-    backgroundColor: Brand.bgElevated,
+    borderRadius: 8,
+    backgroundColor: Light.surfaceAlt,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
   },
-  tagChipText: { color: Brand.textSecondary, fontSize: 11, fontWeight: '500' },
+  tagChipText: { color: Light.textMuted, fontSize: 11, fontWeight: '600' },
 
   actionBtn: {
-    backgroundColor: Brand.gold,
-    height: 38,
-    borderRadius: Radius.sm,
+    backgroundColor: Light.navy,
+    height: 40,
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
   },
-  actionBtnText: { color: Brand.bgPrimary, fontSize: 13.5, fontWeight: '800' },
+  actionBtnText: { color: '#fff', fontSize: 13.5, fontWeight: '800' },
 
   rowActions: { flexDirection: 'row', gap: Spacing.two },
   smallBtn: {
     flex: 1,
-    height: 36,
-    borderRadius: Radius.sm,
+    height: 38,
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
   },
-  smallBtnText: { color: Brand.bgPrimary, fontSize: 13, fontWeight: '800' },
+  smallBtnText: { color: '#fff', fontSize: 13, fontWeight: '800' },
 
   waitingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255, 193, 7, 0.1)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: Radius.pill,
+    backgroundColor: '#FBF6E9',
+    borderWidth: 1,
+    borderColor: Light.goldPillBorder,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
   },
-  waitingBadgeText: { color: Brand.gold, fontSize: 11, fontWeight: '700' },
+  waitingBadgeText: { color: Light.goldTextStrong, fontSize: 11, fontWeight: '700' },
 
   contactDetails: {
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.surfaceAlt,
     padding: 10,
-    borderRadius: Radius.sm,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     gap: 8,
   },
   contactRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  contactText: { color: Brand.textPrimary, fontSize: 13 },
-  lockText: { color: Brand.textMuted, fontSize: 12, fontStyle: 'italic' },
+  contactText: { color: Light.navyDeep, fontSize: 13 },
+  lockText: { color: Light.textMuted, fontSize: 12, fontStyle: 'italic' },
   linkedinLink: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start' },
-  linkedinText: { color: Brand.techBlue, fontSize: 12, fontWeight: '700' },
+  linkedinText: { color: '#2F6BFF', fontSize: 12, fontWeight: '700' },
 
   actionBtnOutline: {
     flex: 1,
     height: 38,
     borderWidth: 1,
-    borderColor: Brand.borderGold,
-    borderRadius: Radius.sm,
+    borderColor: Light.goldPillBorder,
+    backgroundColor: '#FBF6E9',
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
   },
-  actionBtnOutlineText: { color: Brand.gold, fontSize: 13, fontWeight: '800' },
+  actionBtnOutlineText: { color: Light.goldTextStrong, fontSize: 13, fontWeight: '800' },
 
-  // Scanner
-  scannerContainer: {
-    flex: 1,
-    backgroundColor: '#000000',
-  },
+  // Scanner (fundo escuro por design — é a câmera)
+  scannerContainer: { flex: 1, backgroundColor: '#000000' },
   scannerOverlay: {
     ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -690,7 +664,7 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     borderWidth: 2,
-    borderColor: Brand.gold,
+    borderColor: Light.gold,
     borderRadius: Radius.md,
     backgroundColor: 'transparent',
     marginBottom: 40,
@@ -703,9 +677,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
-  closeScannerText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
-  },
+  closeScannerText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
 });

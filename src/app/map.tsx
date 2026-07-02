@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Light, Radius, Spacing } from '@/constants/theme';
 import { ExhibitorLogo } from '@/components/exhibitor-logo';
 import { useExhibitors } from '@/features/exhibitors/use-exhibitors';
 import { htmlSource } from '@/features/floor-plan/floor-plan-html';
@@ -306,6 +307,7 @@ export default function MapScreen() {
 
   return (
     <View style={styles.screen}>
+      <StatusBar style="dark" />
       <View style={styles.mapFrame}>
         {!clientReady ? (
           <View style={styles.mapPlaceholder} />
@@ -340,7 +342,7 @@ export default function MapScreen() {
       <View style={[styles.topOverlay, { paddingTop: insets.top + Spacing.two }]}>
         <View style={styles.searchRow}>
           <View style={styles.searchBox}>
-            <Ionicons name="search-outline" size={18} color={Brand.textMuted} />
+            <Ionicons name="search-outline" size={18} color={Light.textMuted} />
             <TextInput
               value={query}
               onChangeText={(value) => {
@@ -349,7 +351,7 @@ export default function MapScreen() {
                 setSelectedMapStand(null);
               }}
               placeholder="Buscar empresa, produto ou estande"
-              placeholderTextColor={Brand.textMuted}
+              placeholderTextColor={Light.textMuted}
               style={styles.searchInput}
               returnKeyType="search"
               autoCapitalize="none"
@@ -364,7 +366,7 @@ export default function MapScreen() {
                   setSelectedMapStand(null);
                   postMapMessage({ type: 'RESET_VIEW' });
                 }}>
-                <Ionicons name="close" size={16} color={Brand.textPrimary} />
+                <Ionicons name="close" size={16} color={Light.navyDeep} />
               </Pressable>
             ) : null}
           </View>
@@ -444,12 +446,12 @@ export default function MapScreen() {
               <Text style={styles.detailTitle} numberOfLines={1}>{selectedBooth.company}</Text>
               <Text style={styles.detailText} numberOfLines={2}>{selectedBooth.about || selectedBooth.industry}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={Brand.textMuted} style={{ marginLeft: 4 }} />
+            <Ionicons name="chevron-forward" size={20} color={Light.textMuted} style={{ marginLeft: 4 }} />
           </Pressable>
         ) : highlightedStandNumber ? (
           <View style={styles.cardPressable}>
             <View style={styles.detailLogoWrapper}>
-              <Ionicons name="cube-outline" size={24} color={Brand.gold} />
+              <Ionicons name="cube-outline" size={24} color={Light.gold} />
             </View>
             <View style={styles.detailCopy}>
               <Text style={styles.kicker}>{selectedMapStand?.zone ?? 'Estande destacado'}</Text>
@@ -462,7 +464,7 @@ export default function MapScreen() {
         ) : (
           <View style={styles.cardPressable}>
             <View style={styles.detailLogoWrapper}>
-              <Ionicons name="map-outline" size={24} color={Brand.textMuted} />
+              <Ionicons name="map-outline" size={24} color={Light.textMuted} />
             </View>
             <View style={styles.detailCopy}>
               <Text style={styles.kicker}>
@@ -480,19 +482,19 @@ export default function MapScreen() {
 
 const styles = StyleSheet.create({
   screen: {
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
     flex: 1,
   },
   mapFrame: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
   },
   webview: {
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
     flex: 1,
   },
   mapPlaceholder: {
-    backgroundColor: Brand.bgPrimary,
+    backgroundColor: Light.bg,
     flex: 1,
   },
   mapIframe: {
@@ -514,8 +516,8 @@ const styles = StyleSheet.create({
   },
   searchBox: {
     alignItems: 'center',
-    backgroundColor: 'rgba(13, 23, 42, 0.94)',
-    borderColor: Brand.border,
+    backgroundColor: Light.surface,
+    borderColor: Light.border,
     borderRadius: Radius.pill,
     borderWidth: 1,
     flex: 1,
@@ -524,16 +526,21 @@ const styles = StyleSheet.create({
     minHeight: 46,
     paddingLeft: Spacing.three,
     paddingRight: Spacing.two,
+    shadowColor: Light.navyDeep,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    elevation: 4,
   },
   searchInput: {
-    color: Brand.textPrimary,
+    color: Light.text,
     flex: 1,
     fontSize: 14,
     minHeight: 44,
   },
   clearButton: {
     alignItems: 'center',
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surfaceAlt,
     borderRadius: Radius.pill,
     height: 30,
     justifyContent: 'center',
@@ -545,18 +552,23 @@ const styles = StyleSheet.create({
   },
   filterChip: {
     alignItems: 'center',
-    backgroundColor: 'rgba(13, 23, 42, 0.9)',
-    borderColor: Brand.border,
+    backgroundColor: Light.surface,
+    borderColor: Light.border,
     borderRadius: Radius.pill,
     borderWidth: 1,
     flexDirection: 'row',
     gap: 6,
     minHeight: 34,
     paddingHorizontal: Spacing.three,
+    shadowColor: Light.navyDeep,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 2,
   },
   filterChipActive: {
-    backgroundColor: Brand.goldSoft,
-    borderColor: Brand.borderGold,
+    backgroundColor: Light.navy,
+    borderColor: Light.navy,
   },
   filterDot: {
     borderRadius: 4,
@@ -564,23 +576,28 @@ const styles = StyleSheet.create({
     width: 8,
   },
   filterText: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 12,
     fontWeight: '700',
   },
   filterTextActive: {
-    color: Brand.textPrimary,
+    color: '#fff',
   },
   resultsPanel: {
-    backgroundColor: 'rgba(13, 23, 42, 0.96)',
-    borderColor: Brand.border,
+    backgroundColor: Light.surface,
+    borderColor: Light.border,
     borderRadius: Radius.md,
     borderWidth: 1,
     overflow: 'hidden',
+    shadowColor: Light.navyDeep,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 22,
+    elevation: 4,
   },
   resultItem: {
     alignItems: 'center',
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    borderBottomColor: Light.border,
     borderBottomWidth: 1,
     flexDirection: 'row',
     gap: Spacing.two,
@@ -588,12 +605,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
   },
   resultItemActive: {
-    backgroundColor: Brand.goldSoft,
+    backgroundColor: '#FBF6E9',
   },
   resultStandBadge: {
     alignItems: 'center',
-    backgroundColor: Brand.bgPrimary,
-    borderColor: Brand.borderGold,
+    backgroundColor: Light.surfaceAlt,
+    borderColor: Light.goldPillBorder,
     borderRadius: Radius.sm,
     borderWidth: 1,
     height: 32,
@@ -602,7 +619,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   resultStandText: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 12,
     fontWeight: '900',
   },
@@ -610,23 +627,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   resultTitle: {
-    color: Brand.textPrimary,
+    color: Light.navyDeep,
     fontSize: 13.5,
     fontWeight: '800',
   },
   resultMeta: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 12,
     marginTop: 2,
   },
   emptyText: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 13,
     padding: Spacing.three,
   },
   bottomSheet: {
-    backgroundColor: 'rgba(13, 23, 42, 0.96)',
-    borderColor: Brand.border,
+    backgroundColor: Light.surface,
+    borderColor: Light.border,
     borderTopLeftRadius: Radius.lg,
     borderTopRightRadius: Radius.lg,
     borderWidth: 1,
@@ -637,10 +654,15 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.two,
     position: 'absolute',
     right: 0,
+    shadowColor: Light.navyDeep,
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 24,
+    elevation: 10,
   },
   bottomHandle: {
     alignSelf: 'center',
-    backgroundColor: Brand.border,
+    backgroundColor: Light.border,
     borderRadius: Radius.pill,
     height: 4,
     marginBottom: Spacing.two,
@@ -657,19 +679,19 @@ const styles = StyleSheet.create({
     width: 10,
   },
   bottomKicker: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 11,
     fontWeight: '900',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   bottomTitle: {
-    color: Brand.textPrimary,
+    color: Light.navyDeep,
     fontSize: 18,
     fontWeight: '900',
   },
   bottomText: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 13,
     lineHeight: 18,
   },
@@ -683,12 +705,12 @@ const styles = StyleSheet.create({
   detailLogoWrapper: {
     width: 52,
     height: 52,
-    backgroundColor: Brand.bgElevated,
+    backgroundColor: Light.surfaceAlt,
     borderRadius: Radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     overflow: 'hidden',
   },
   detailLogoImg: {
@@ -696,7 +718,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   detailLogoText: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 16,
     fontWeight: '900',
   },
@@ -704,20 +726,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   kicker: {
-    color: Brand.gold,
+    color: Light.gold,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   detailTitle: {
-    color: Brand.textPrimary,
+    color: Light.navyDeep,
     fontSize: 16,
     fontWeight: '900',
     marginTop: 2,
   },
   detailText: {
-    color: Brand.textSecondary,
+    color: Light.textMuted,
     fontSize: 12.5,
     marginTop: 2,
     lineHeight: 16,

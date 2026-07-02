@@ -15,11 +15,14 @@ export function ScoreRing({
   size = 58,
   stroke = 5,
   label = 'fit',
+  trackColor = Brand.bgElevated,
 }: {
   score: number;
   size?: number;
   stroke?: number;
   label?: string;
+  /** Cor do anel de fundo — passe um tom claro em telas de fundo claro. */
+  trackColor?: string;
 }) {
   const color = scoreColor(score);
   const radius = (size - stroke) / 2;
@@ -33,7 +36,7 @@ export function ScoreRing({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={Brand.bgElevated}
+          stroke={trackColor}
           strokeWidth={stroke}
           fill="none"
         />

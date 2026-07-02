@@ -39,6 +39,51 @@ export const Brand = {
   danger: '#EF4444',
 } as const;
 
+/**
+ * Paleta CLARA "showcase" — novo design do app (fundo claro, header navy, cards
+ * brancos arredondados, acentos em dourado). Extraída do board de design e da
+ * tela de referência `home-v2`. Migração das telas: usar estes tokens + o kit
+ * em `components/ui-kit`.
+ */
+export const Light = {
+  // Fundos
+  bg: '#F8FAFC',
+  surface: '#FFFFFF',
+  surfaceAlt: '#F4F7FB',
+  iconSoftBg: '#F4F7FB',
+
+  // Marca (navy + dourado)
+  navy: '#0C2345',
+  navyDeep: '#071A33',
+  gold: '#C9A24C',
+  goldLight: '#D8B25A',
+
+  // Pílula dourada (AI Insight)
+  goldPillBorder: '#F0E4C4',
+  goldText: '#7A6320',
+  goldTextStrong: '#8A6D15',
+
+  // Texto
+  text: '#071A33',
+  textNavy: '#0C2345',
+  textMuted: '#94A3B8',
+  textFaint: '#C4CDDA',
+
+  // Bordas / linhas
+  border: '#EEF1F6',
+
+  // Estados
+  success: '#159A5B',
+  danger: '#EF4444',
+  warning: '#C9A24C',
+} as const;
+
+/** Pares de cor para `LinearGradient` no design claro. */
+export const LightGradient = {
+  header: [Light.navy, Light.navyDeep] as const,
+  goldPill: ['#FBF6E9', '#F8F1DF'] as const,
+} as const;
+
 export const Colors = {
   light: {
     text: '#000000',
