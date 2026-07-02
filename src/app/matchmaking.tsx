@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, Switch, Alert } from 'react-native';
 
 import { ExhibitorLogo } from '@/components/exhibitor-logo';
 import { ScoreRing } from '@/components/score-ring';
@@ -11,7 +11,7 @@ import { Light, Radius, Spacing } from '@/constants/theme';
 import { useAuth } from '@/features/auth/use-auth';
 import { useExhibitors } from '@/features/exhibitors/use-exhibitors';
 import { isProfileUsable, rankExhibitorsWithGemini, type RankedExhibitor } from '@/features/matchmaking/score';
-import { DEMO_VISITOR_PROFILE, useVisitorProfile } from '@/features/visitor/visitor-profile';
+import { DEMO_VISITOR_PROFILE, useVisitorProfile, saveVisitorProfile } from '@/features/visitor/visitor-profile';
 
 /** Acima deste fit, é "Recomendado"; abaixo, "Oportunidade a explorar". */
 const RECOMMENDED_THRESHOLD = 70;
@@ -144,16 +144,68 @@ export default function MatchmakingScreen() {
             </View>
           </LinearGradient>
 
-          {/* Aviso para completar o perfil */}
-          {!usable && (
-            <Pressable style={styles.completeCta} onPress={() => router.push('/profile')}>
-              <Ionicons name="person-add-outline" size={16} color={Light.gold} />
-              <Text style={styles.completeText}>
-                Complete seu perfil para matches mais precisos
+          {/* Card explicativo e opção de compartilhamento */}
+          <Card style={styles.infoCard}>
+            <View style={styles.infoCardHeader}>
+              <Ionicons name="information-circle-outline" size={20} color={Light.gold} />
+              <Text style={styles.infoCardTitle}>Como funciona o Matchmaking?</Text>
+            </View>
+            
+            <Text style={styles.infoCardDesc}>
+              Nosso sistema analisa os perfis para ajudar você a aproveitar ao máximo o evento:
+            </Text>
+            
+            <View style={styles.featureItem}>
+              <Ionicons name="business" size={16} color={Light.navy} />
+              <Text style={styles.featureText}>
+                <Text style={{ fontWeight: 'bold', color: Light.textNavy }}>Indicação de Estandes (IA)</Text>: Cruzamos seus interesses e gargalos para indicar estandes úteis no pavilhão.
               </Text>
-              <Ionicons name="chevron-forward" size={16} color={Light.textMuted} />
-            </Pressable>
-          )}
+            </View>
+            
+            <View style={styles.featureItem}>
+              <Ionicons name="people" size={16} color={Light.navy} />
+              <Text style={styles.featureText}>
+                <Text style={{ fontWeight: 'bold', color: Light.textNavy }}>Networking de Pessoas</Text>: Sugerimos conexões com outros profissionais da feira para troca de contatos.
+              </Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.sharingOption}>
+              <View style={{ flex: 1, paddingRight: 8 }}>
+                <Text style={styles.sharingTitle}>Participar do Networking de Pessoas</Text>
+                <Text style={styles.sharingDesc}>
+                  Se desativado, seu perfil ficará invisível para os outros visitantes. Você continuará recebendo as indicações de estandes da IA de forma 100% privada.
+                </Text>
+              </View>
+              <Switch
+                value={profile?.discoverable ?? false}
+                onValueChange={async (val) => {
+                  if (!profile) return;
+                  try {
+                    await saveVisitorProfile({ ...profile, discoverable: val });
+                  } catch (err) {
+                    Alert.alert('Erro ao atualizar', (err as Error).message);
+                  }
+                }}
+                trackColor={{ false: Light.border, true: Light.gold }}
+                thumbColor="#fff"
+              />
+            </View>
+
+            {!usable && (
+              <View style={styles.ctaBox}>
+                <View style={styles.warningRow}>
+                  <Ionicons name="alert-circle-outline" size={16} color={Light.warning} />
+                  <Text style={styles.warningText}>Seu perfil está incompleto para gerar matches!</Text>
+                </View>
+                <Pressable style={styles.ctaButton} onPress={() => router.push('/profile')}>
+                  <Text style={styles.ctaButtonText}>Preencher Preferências</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#fff" />
+                </Pressable>
+              </View>
+            )}
+          </Card>
 
           {/* Segmented */}
           <View style={styles.segment}>
@@ -348,5 +400,98 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: 260,
     lineHeight: 20,
+  },
+
+  // Onboarding / Info Card Styles
+  infoCard: {
+    padding: Spacing.four,
+    gap: Spacing.two,
+    borderColor: Light.border,
+    backgroundColor: Light.surface,
+  },
+  infoCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  infoCardTitle: {
+    color: Light.textNavy,
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  infoCardDesc: {
+    color: Light.text,
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: Spacing.two,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.two,
+    marginBottom: 8,
+  },
+  featureText: {
+    color: Light.textMuted,
+    fontSize: 12.5,
+    lineHeight: 18,
+    flex: 1,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Light.border,
+    marginVertical: Spacing.two,
+  },
+  sharingOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.two,
+  },
+  sharingTitle: {
+    color: Light.textNavy,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  sharingDesc: {
+    color: Light.textMuted,
+    fontSize: 11.5,
+    lineHeight: 17,
+    marginTop: 2,
+  },
+  ctaBox: {
+    backgroundColor: '#FFFBEB',
+    borderColor: '#FEF3C7',
+    borderWidth: 1,
+    borderRadius: Radius.sm,
+    padding: Spacing.three,
+    marginTop: Spacing.three,
+    gap: Spacing.two,
+  },
+  warningRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  warningText: {
+    color: '#B45309',
+    fontSize: 12.5,
+    fontWeight: '700',
+    flex: 1,
+  },
+  ctaButton: {
+    backgroundColor: Light.gold,
+    borderRadius: Radius.pill,
+    paddingVertical: 10,
+    paddingHorizontal: Spacing.three,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.two,
+  },
+  ctaButtonText: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '800',
   },
 });

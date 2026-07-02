@@ -11,11 +11,12 @@ import {
   StyleSheet,
   Text,
   View,
+  Switch,
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import { ScoreRing } from '@/components/score-ring';
-import { HeaderIconButton, ScreenHeader, TAB_BAR_CLEARANCE } from '@/components/ui-kit';
+import { Card, HeaderIconButton, ScreenHeader, TAB_BAR_CLEARANCE } from '@/components/ui-kit';
 import { Light, Radius, Spacing } from '@/constants/theme';
 import { useAuth } from '@/features/auth/use-auth';
 import {
@@ -23,14 +24,16 @@ import {
   useDiscoverableVisitors,
 } from '@/features/connections/use-connections';
 import { rankPeople } from '@/features/matchmaking/people-score';
+import { isProfileUsable } from '@/features/matchmaking/score';
 import { exportLeadVCard, leadMessageUrl } from '@/features/visitor/leads';
-import { useVisitorProfile, type VisitorProfile, getVisitorProfileByUid } from '@/features/visitor/visitor-profile';
+import { useVisitorProfile, type VisitorProfile, getVisitorProfileByUid, saveVisitorProfile } from '@/features/visitor/visitor-profile';
 
 type TabType = 'suggestions' | 'requests' | 'connected';
 
 export default function ConnectionsScreen() {
   const { user } = useAuth();
   const { profile } = useVisitorProfile();
+  const usable = isProfileUsable(profile);
   const { visitors, loading: loadingVisitors } = useDiscoverableVisitors();
   const {
     connections,
@@ -261,6 +264,69 @@ export default function ConnectionsScreen() {
         <ScrollView
           contentContainerStyle={[styles.scrollContent, { paddingBottom: TAB_BAR_CLEARANCE }]}
           showsVerticalScrollIndicator={false}>
+
+          {/* Card explicativo e opção de compartilhamento */}
+          <Card style={styles.infoCard}>
+            <View style={styles.infoCardHeader}>
+              <Ionicons name="information-circle-outline" size={20} color={Light.gold} />
+              <Text style={styles.infoCardTitle}>Como funciona o Matchmaking?</Text>
+            </View>
+            
+            <Text style={styles.infoCardDesc}>
+              Nosso sistema analisa os perfis para ajudar você a aproveitar ao máximo o evento:
+            </Text>
+            
+            <View style={styles.featureItem}>
+              <Ionicons name="business" size={16} color={Light.navy} />
+              <Text style={styles.featureText}>
+                <Text style={{ fontWeight: 'bold', color: Light.textNavy }}>Indicação de Estandes (IA)</Text>: Cruzamos seus interesses e gargalos para indicar estandes úteis no pavilhão.
+              </Text>
+            </View>
+            
+            <View style={styles.featureItem}>
+              <Ionicons name="people" size={16} color={Light.navy} />
+              <Text style={styles.featureText}>
+                <Text style={{ fontWeight: 'bold', color: Light.textNavy }}>Networking de Pessoas</Text>: Sugerimos conexões com outros profissionais da feira para troca de contatos.
+              </Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.sharingOption}>
+              <View style={{ flex: 1, paddingRight: 8 }}>
+                <Text style={styles.sharingTitle}>Participar do Networking de Pessoas</Text>
+                <Text style={styles.sharingDesc}>
+                  Se desativado, seu perfil ficará invisível para os outros visitantes. Você continuará recebendo as indicações de estandes da IA de forma 100% privada.
+                </Text>
+              </View>
+              <Switch
+                value={profile?.discoverable ?? false}
+                onValueChange={async (val) => {
+                  if (!profile) return;
+                  try {
+                    await saveVisitorProfile({ ...profile, discoverable: val });
+                  } catch (err) {
+                    Alert.alert('Erro ao atualizar', (err as Error).message);
+                  }
+                }}
+                trackColor={{ false: Light.border, true: Light.gold }}
+                thumbColor="#fff"
+              />
+            </View>
+
+            {!usable && (
+              <View style={styles.ctaBox}>
+                <View style={styles.warningRow}>
+                  <Ionicons name="alert-circle-outline" size={16} color={Light.warning} />
+                  <Text style={styles.warningText}>Seu perfil está incompleto para gerar matches!</Text>
+                </View>
+                <Pressable style={styles.ctaButton} onPress={() => router.push('/profile')}>
+                  <Text style={styles.ctaButtonText}>Preencher Preferências</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#fff" />
+                </Pressable>
+              </View>
+            )}
+          </Card>
 
           {/* TAB 1: Sugestões */}
           {activeTab === 'suggestions' && (
@@ -678,4 +744,98 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   closeScannerText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
+
+  // Onboarding / Info Card Styles
+  infoCard: {
+    padding: Spacing.four,
+    gap: Spacing.two,
+    borderColor: Light.border,
+    backgroundColor: Light.surface,
+    marginBottom: Spacing.three,
+  },
+  infoCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  infoCardTitle: {
+    color: Light.textNavy,
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  infoCardDesc: {
+    color: Light.text,
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: Spacing.two,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.two,
+    marginBottom: 8,
+  },
+  featureText: {
+    color: Light.textMuted,
+    fontSize: 12.5,
+    lineHeight: 18,
+    flex: 1,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Light.border,
+    marginVertical: Spacing.two,
+  },
+  sharingOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.two,
+  },
+  sharingTitle: {
+    color: Light.textNavy,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  sharingDesc: {
+    color: Light.textMuted,
+    fontSize: 11.5,
+    lineHeight: 17,
+    marginTop: 2,
+  },
+  ctaBox: {
+    backgroundColor: '#FFFBEB',
+    borderColor: '#FEF3C7',
+    borderWidth: 1,
+    borderRadius: Radius.sm,
+    padding: Spacing.three,
+    marginTop: Spacing.three,
+    gap: Spacing.two,
+  },
+  warningRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  warningText: {
+    color: '#B45309',
+    fontSize: 12.5,
+    fontWeight: '700',
+    flex: 1,
+  },
+  ctaButton: {
+    backgroundColor: Light.gold,
+    borderRadius: Radius.pill,
+    paddingVertical: 10,
+    paddingHorizontal: Spacing.three,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.two,
+  },
+  ctaButtonText: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '800',
+  },
 });
