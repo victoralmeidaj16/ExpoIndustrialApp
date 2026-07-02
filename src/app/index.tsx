@@ -80,11 +80,7 @@ export default function HomeScreen() {
   const { profile, loading: profileLoading } = useVisitorProfile();
 
   useEffect(() => {
-    if (!configured || initializing) return;
-    if (!user) {
-      router.replace('/profile');
-      return;
-    }
+    if (!configured || initializing || !user) return;
     if (!profileLoading && (!profile || (!profile.onboardingCompleted && !profile.onboardingSkipped))) {
       router.replace('/onboarding');
     }

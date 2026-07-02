@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Tabs, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View, ActivityIndicator } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -71,37 +71,74 @@ function CustomTabBar({ state, navigation }: any) {
   );
 }
 
+import { useEffect } from 'react';
+import { useAuth } from '@/features/auth/use-auth';
+
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { user, configured, initializing } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!configured || initializing) return;
+
+    const isPublicRoute =
+      pathname === '/profile' ||
+      pathname === '/terms' ||
+      pathname === '/privacy' ||
+      pathname.startsWith('/portal') ||
+      pathname === '/preencher' ||
+      pathname === '/expositor';
+
+    if (!user && !isPublicRoute) {
+      router.replace('/profile');
+    }
+  }, [user, configured, initializing, pathname]);
+
+  if (initializing) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Light.bg }}>
+        <ActivityIndicator color={Light.gold} size="large" />
+      </View>
+    );
+  }
+
+  return <>{children}</>;
+}
+
 export default function TabLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <AuthProvider>
-        <PushGate />
-        <StatusBar style="light" />
-        <Tabs
-          tabBar={(props) => <CustomTabBar {...props} />}
-          screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: Light.bg } }}>
-          <Tabs.Screen name="index" options={{ title: 'Início' }} />
-          <Tabs.Screen name="map" options={{ title: 'Mapa' }} />
-          <Tabs.Screen name="agenda" options={{ title: 'Agenda' }} />
-          <Tabs.Screen name="exhibitors" options={{ title: 'Expositores' }} />
-          <Tabs.Screen name="connections" options={{ title: 'Networking' }} />
-          <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
-          {/* Rotas acessíveis por navegação, mas fora da barra de abas */}
-        <Tabs.Screen name="matchmaking" options={{ href: null }} />
-        <Tabs.Screen name="home-v2" options={{ href: null }} />
-        <Tabs.Screen name="company-profile-v2" options={{ href: null }} />
-        <Tabs.Screen name="map-skia" options={{ href: null }} />
-        <Tabs.Screen name="map-3d" options={{ href: null }} />
-        <Tabs.Screen name="privacy" options={{ href: null }} />
-        <Tabs.Screen name="terms" options={{ href: null }} />
-        <Tabs.Screen name="exhibitor" options={{ href: null }} />
-        <Tabs.Screen name="visitor" options={{ href: null }} />
-        <Tabs.Screen name="assistant" options={{ href: null }} />
-        <Tabs.Screen name="portal" options={{ href: null }} />
-        <Tabs.Screen name="expositor" options={{ href: null }} />
-        <Tabs.Screen name="preencher" options={{ href: null }} />
-        <Tabs.Screen name="onboarding" options={{ href: null }} />
-        </Tabs>
+        <AuthGuard>
+          <PushGate />
+          <StatusBar style="light" />
+          <Tabs
+            tabBar={(props) => <CustomTabBar {...props} />}
+            screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: Light.bg } }}>
+            <Tabs.Screen name="index" options={{ title: 'Início' }} />
+            <Tabs.Screen name="map" options={{ title: 'Mapa' }} />
+            <Tabs.Screen name="agenda" options={{ title: 'Agenda' }} />
+            <Tabs.Screen name="exhibitors" options={{ title: 'Expositores' }} />
+            <Tabs.Screen name="connections" options={{ title: 'Networking' }} />
+            <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
+            {/* Rotas acessíveis por navegação, mas fora da barra de abas */}
+            <Tabs.Screen name="matchmaking" options={{ href: null }} />
+            <Tabs.Screen name="home-v2" options={{ href: null }} />
+            <Tabs.Screen name="company-profile-v2" options={{ href: null }} />
+            <Tabs.Screen name="map-skia" options={{ href: null }} />
+            <Tabs.Screen name="map-3d" options={{ href: null }} />
+            <Tabs.Screen name="privacy" options={{ href: null }} />
+            <Tabs.Screen name="terms" options={{ href: null }} />
+            <Tabs.Screen name="exhibitor" options={{ href: null }} />
+            <Tabs.Screen name="visitor" options={{ href: null }} />
+            <Tabs.Screen name="assistant" options={{ href: null }} />
+            <Tabs.Screen name="portal" options={{ href: null }} />
+            <Tabs.Screen name="expositor" options={{ href: null }} />
+            <Tabs.Screen name="preencher" options={{ href: null }} />
+            <Tabs.Screen name="onboarding" options={{ href: null }} />
+          </Tabs>
+        </AuthGuard>
       </AuthProvider>
     </GestureHandlerRootView>
   );
