@@ -1,43 +1,51 @@
 /**
- * Carga inicial dos patrocinadores no Firestore.
+ * Carga inicial dos patrocinadores no Firestore usando o Firebase Admin SDK.
  *
  * Uso:
  *   node --env-file=.env --import tsx scripts/seed-sponsors.ts
  */
-import { initializeApp } from 'firebase/app';
-import { doc, getFirestore, writeBatch } from 'firebase/firestore';
+import { applicationDefault, cert, getApps, initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
-import { SPONSORS_COLLECTION, SPONSOR_SEED } from '../src/features/sponsors/sponsor';
+const SPONSORS_COLLECTION = 'sponsors';
 
-const firebaseConfig = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-};
+const SPONSOR_SEED = [
+  { id: 'intel', name: 'Intel', logoText: 'INTEL', tier: 'DIAMOND', order: 0 },
+  { id: 'cisco', name: 'Cisco', logoText: 'CISCO', tier: 'DIAMOND', order: 1 },
+  { id: 'microsoft', name: 'Microsoft', logoText: 'MICROSOFT', tier: 'GOLD', order: 0 },
+  { id: 'dell', name: 'Dell', logoText: 'DELL', tier: 'GOLD', order: 1 },
+  { id: 'sap', name: 'SAP', logoText: 'SAP', tier: 'SILVER', order: 0 },
+  { id: 'oracle', name: 'Oracle', logoText: 'ORACLE', tier: 'SILVER', order: 1 },
+];
 
-if (!firebaseConfig.projectId) {
-  throw new Error('Preencha EXPO_PUBLIC_FIREBASE_PROJECT_ID no .env antes de rodar o seed.');
+function initializeAdmin() {
+  if (getApps().length) return;
+
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  if (serviceAccountJson) {
+    initializeApp({ credential: cert(JSON.parse(serviceAccountJson)) });
+    return;
+  }
+
+  initializeApp({ credential: applicationDefault() });
 }
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+initializeAdmin();
+const db = getFirestore();
 
 async function seed() {
-  const batch = writeBatch(db);
+  const batch = db.batch();
 
   for (const sponsor of SPONSOR_SEED) {
     const { id, ...data } = sponsor;
-    batch.set(doc(db, SPONSORS_COLLECTION, id), data, { merge: true });
+    batch.set(db.collection(SPONSORS_COLLECTION).doc(id), data, { merge: true });
   }
 
   await batch.commit();
-  console.log(`Patrocinadores publicados: ${SPONSOR_SEED.length}.`);
+  console.log(`Patrocinadores publicados via Admin: ${SPONSOR_SEED.length}.`);
 }
 
 seed().catch((err) => {
-  console.error('Falha no seed de patrocinadores:', err);
+  console.error('Falha no seed de patrocinadores via Admin:', err);
   process.exit(1);
 });
