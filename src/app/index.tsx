@@ -22,7 +22,6 @@ import { useAuth } from '@/features/auth/use-auth';
 import { useEventConfig } from '@/features/event/use-event-config';
 import { useExhibitors } from '@/features/exhibitors/use-exhibitors';
 import { useMaterials } from '@/features/materials/use-materials';
-import { type SponsorTier } from '@/features/sponsors/sponsor';
 import { useSponsors } from '@/features/sponsors/use-sponsors';
 import { useVisitorProfile } from '@/features/visitor/visitor-profile';
 
@@ -37,6 +36,7 @@ const KPIS: { icon: IconName; value: string; label: string }[] = [
 const QUICK_ACTIONS: { icon: IconName; label: string; route?: string }[] = [
   { icon: 'qr-code-outline', label: 'Meu Crachá', route: '/profile' },
   { icon: 'map-outline', label: 'Mapa Smart', route: '/map' },
+  { icon: 'lock-open-outline', label: 'Eventos pagos', route: '/paid-events' },
   { icon: 'sparkles-outline', label: 'Match IA', route: '/matchmaking' },
   { icon: 'people-outline', label: 'Networking', route: '/connections' },
   { icon: 'calendar-outline', label: 'Agenda', route: '/agenda' },
@@ -62,12 +62,6 @@ const RECOMMENDATIONS = [
     accent: '#00A9C7',
   },
 ];
-
-const TIER_COLOR: Record<SponsorTier, string> = {
-  DIAMOND: Light.gold,
-  GOLD: '#2F6BFF',
-  SILVER: Light.textMuted,
-};
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -254,26 +248,13 @@ export default function HomeScreen() {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.sponsorsRow}>
-          {sponsors.map((sponsor) => (
-            <View
-              key={sponsor.id}
-              style={[
-                styles.sponsorCard,
-                sponsor.tier === 'DIAMOND' && styles.sponsorCardDiamond,
-                sponsor.tier === 'GOLD' && styles.sponsorCardGold,
-              ]}>
-              <View style={styles.sponsorTierBadge}>
-                <Text style={[styles.sponsorTierText, { color: TIER_COLOR[sponsor.tier] }]}>
-                  {sponsor.tier}
-                </Text>
+          {sponsors
+            .filter((sponsor) => Boolean(sponsor.logoUrl))
+            .map((sponsor) => (
+              <View key={sponsor.id} style={styles.sponsorCard}>
+                <Image source={{ uri: sponsor.logoUrl }} style={styles.sponsorLogo} resizeMode="cover" />
               </View>
-              {sponsor.logoUrl ? (
-                <Image source={{ uri: sponsor.logoUrl }} style={styles.sponsorLogo} resizeMode="contain" />
-              ) : (
-                <Text style={styles.sponsorName}>{sponsor.logoText}</Text>
-              )}
-            </View>
-          ))}
+            ))}
         </ScrollView>
 
         {/* Materiais para download (geridos no painel do organizador) */}
@@ -589,38 +570,11 @@ const styles = StyleSheet.create({
     borderColor: Light.border,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: Spacing.two,
-    position: 'relative',
-  },
-  sponsorCardDiamond: {
-    borderColor: Light.gold,
-    backgroundColor: '#FBF6E9',
-  },
-  sponsorCardGold: {
-    borderColor: '#2F6BFF',
-    backgroundColor: 'rgba(47, 107, 255, 0.05)',
-  },
-  sponsorTierBadge: {
-    position: 'absolute',
-    top: 6,
-    left: 10,
-  },
-  sponsorTierText: {
-    fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-  },
-  sponsorName: {
-    color: Light.navyDeep,
-    fontSize: 16,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-    marginTop: 10,
+    overflow: 'hidden',
   },
   sponsorLogo: {
     width: '100%',
-    height: 42,
-    marginTop: 10,
+    height: '100%',
   },
   onboardingBanner: {
     borderRadius: Radius.md,

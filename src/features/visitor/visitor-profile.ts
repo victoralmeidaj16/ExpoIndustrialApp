@@ -249,7 +249,7 @@ export async function captureLeadProfile(lead: LeadCapture): Promise<void> {
       company: lead.company.trim(),
       role: lead.role.trim(),
       phone: lead.phone.trim(),
-      email: lead.email.trim(),
+      email: lead.email.trim().toLowerCase(),
       ownerUid: uid,
       leadCapturedAt: serverTimestamp(),
       leadSource: 'signup',

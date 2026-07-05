@@ -199,7 +199,7 @@ export default function MatchmakingScreen() {
                   <Ionicons name="alert-circle-outline" size={16} color={Light.warning} />
                   <Text style={styles.warningText}>Seu perfil está incompleto para gerar matches!</Text>
                 </View>
-                <Pressable style={styles.ctaButton} onPress={() => router.push('/profile')}>
+                <Pressable style={styles.ctaButton} onPress={() => router.push('/match-preferences')}>
                   <Text style={styles.ctaButtonText}>Preencher Preferências</Text>
                   <Ionicons name="arrow-forward" size={16} color="#fff" />
                 </Pressable>

@@ -109,5 +109,27 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    // Eventos pagos da feira. O evento em si é público; os participantes e
+    // materiais exclusivos ficam em subcoleções protegidas por email autenticado.
+    match /paidEvents/{eventId} {
+      allow read: if true;
+      allow write: if isAdmin();
+
+      match /attendees/{emailLower} {
+        allow read: if isAdmin()
+                    || (request.auth != null
+                        && request.auth.token.email == emailLower);
+        allow write: if isAdmin();
+      }
+
+      match /materials/{materialId} {
+        allow read: if isAdmin()
+                    || (request.auth != null
+                        && exists(/databases/$(database)/documents/paidEvents/$(eventId)/attendees/$(request.auth.token.email))
+                        && get(/databases/$(database)/documents/paidEvents/$(eventId)/attendees/$(request.auth.token.email)).data.status == 'paid');
+        allow write: if isAdmin();
+      }
+    }
   }
 }

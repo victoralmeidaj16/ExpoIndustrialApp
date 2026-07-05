@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -14,7 +15,7 @@ import {
 
 import { ScreenHeader, TAB_BAR_CLEARANCE } from '@/components/ui-kit';
 import { Light } from '@/constants/theme';
-import { TRACKS, type Session } from '@/features/agenda/session';
+import { getSessionImageSource, TRACKS, type Session } from '@/features/agenda/session';
 import { useAgendaPreferences, useSessions } from '@/features/agenda/use-sessions';
 
 const ALL_TRACKS = 'Todas';
@@ -155,6 +156,22 @@ export default function AgendaScreen() {
           return (
             <View style={[styles.sessionCard, isFav && styles.sessionCardFav]}>
               <Pressable
+                onPress={() => router.push({ pathname: '/event/[id]', params: { id: item.id } })}>
+                <ImageBackground
+                  source={getSessionImageSource(item)}
+                  style={styles.sessionImage}
+                  imageStyle={styles.sessionImageInner}
+                  resizeMode="cover">
+                  <View style={styles.sessionImageOverlay} />
+                  <View style={styles.imageTopRow}>
+                    <View style={[styles.trackLabelHero, { backgroundColor: accentColor }]}>
+                      <Text style={styles.trackLabelHeroText}>{item.track.toUpperCase()}</Text>
+                    </View>
+                    <Text style={styles.imageTime}>{item.dateLabel} · {item.time}</Text>
+                  </View>
+                </ImageBackground>
+              </Pressable>
+              <Pressable
                 style={styles.cardHeader}
                 onPress={() => setExpandedId((prev) => (prev === item.id ? null : item.id))}>
                 <View style={[styles.cardAccent, { backgroundColor: accentColor }]} />
@@ -247,6 +264,12 @@ export default function AgendaScreen() {
                         color={Light.gold}
                       />
                       <Text style={styles.secondaryBtnText}>{hasReminder ? 'Remover lembrete' : 'Lembrete'}</Text>
+                    </Pressable>
+                    <Pressable
+                      style={styles.secondaryBtn}
+                      onPress={() => router.push({ pathname: '/event/[id]', params: { id: item.id } })}>
+                      <Ionicons name="open-outline" size={14} color={Light.gold} />
+                      <Text style={styles.secondaryBtnText}>Ver evento</Text>
                     </Pressable>
                     <Pressable
                       style={styles.secondaryBtn}
@@ -348,6 +371,43 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   sessionCardFav: { borderColor: 'rgba(201,162,76,0.5)' },
+  sessionImage: {
+    height: 132,
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: Light.navy,
+  },
+  sessionImageInner: {},
+  sessionImageOverlay: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: 'rgba(7,26,51,0.42)',
+  },
+  imageTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  trackLabelHero: {
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 999,
+  },
+  trackLabelHeroText: { color: '#fff', fontSize: 10, fontWeight: '900', letterSpacing: 0.7 },
+  imageTime: {
+    color: '#fff',
+    fontSize: 11.5,
+    fontWeight: '800',
+    backgroundColor: 'rgba(0,0,0,0.32)',
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
   cardHeader: { flexDirection: 'row', paddingRight: 12 },
   cardAccent: { width: 5, alignSelf: 'stretch' },
   cardInfo: { flex: 1, paddingVertical: 12, paddingLeft: 12, gap: 6 },

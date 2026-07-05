@@ -3,7 +3,8 @@
     "allow": [
       "Bash(node -e \"console.log\\('file-system:', require\\('./node_modules/expo-file-system/package.json'\\).version\\); console.log\\('sharing:', require\\('./node_modules/expo-sharing/package.json'\\).version\\)\")",
       "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('app.json','utf8'\\)\\); console.log\\('app.json valid JSON'\\)\")",
-      "Bash(grep -rniE \"mock|hardcoded|fake|dummy|RECOMMEND|FEATURED|const [A-Z_]{4,} = \\\\[\" src/app src/features)"
+      "Bash(grep -rniE \"mock|hardcoded|fake|dummy|RECOMMEND|FEATURED|const [A-Z_]{4,} = \\\\[\" src/app src/features)",
+      "Bash(node -e ' *)"
     ]
   },
   "enabledPlugins": {

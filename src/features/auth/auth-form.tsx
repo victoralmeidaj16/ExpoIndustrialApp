@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Brand, Light, Radius, Spacing } from '@/constants/theme';
 import { authErrorMessage, useAuth } from '@/features/auth/use-auth';
 import { captureLeadProfile } from '@/features/visitor/visitor-profile';
 
@@ -252,8 +252,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { color: Brand.textPrimary, fontSize: 24, fontWeight: '800' },
-  subtitle: { color: Brand.textSecondary, fontSize: 14.5, lineHeight: 20, marginTop: -6 },
+  title: { color: Light.navyDeep, fontSize: 24, fontWeight: '800' },
+  subtitle: { color: Light.textMuted, fontSize: 14.5, lineHeight: 20, marginTop: -6 },
 
   warn: {
     flexDirection: 'row',
@@ -266,15 +266,15 @@ const styles = StyleSheet.create({
   warnText: { color: Brand.warning, fontSize: 12.5, flex: 1 },
 
   field: { gap: 6 },
-  label: { color: Brand.textSecondary, fontSize: 13, fontWeight: '600' },
+  label: { color: Light.textNavy, fontSize: 13, fontWeight: '700' },
   input: {
-    backgroundColor: Brand.bgCard,
+    backgroundColor: Light.surface,
     borderWidth: 1,
-    borderColor: Brand.border,
+    borderColor: Light.border,
     borderRadius: Radius.sm,
     paddingHorizontal: Spacing.three,
     paddingVertical: 14,
-    color: Brand.textPrimary,
+    color: Light.navyDeep,
     fontSize: 15,
   },
   error: { color: Brand.danger, fontSize: 13.5 },
@@ -290,11 +290,10 @@ const styles = StyleSheet.create({
   submitText: { color: '#0A1021', fontSize: 16, fontWeight: '800' },
 
   switch: { alignItems: 'center', paddingVertical: Spacing.two },
-  switchText: { color: Brand.textSecondary, fontSize: 14 },
+  switchText: { color: Light.textMuted, fontSize: 14 },
   switchLink: { color: Brand.gold, fontWeight: '700' },
 
   footer: { alignItems: 'center', gap: 6, marginTop: Spacing.three, opacity: 0.7 },
-  footerLabel: { color: Brand.textMuted, fontSize: 9.5, fontWeight: '700', letterSpacing: 2 },
+  footerLabel: { color: Light.textMuted, fontSize: 9.5, fontWeight: '700', letterSpacing: 2 },
   footerLogo: { width: 84, height: 34 },
 });
-

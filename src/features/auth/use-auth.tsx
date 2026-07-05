@@ -51,11 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       configured: isFirebaseConfigured,
       async signIn(email, password) {
         if (!auth) throw NOT_CONFIGURED;
-        await signInWithEmailAndPassword(auth, email.trim(), password);
+        await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
       },
       async signUp(email, password) {
         if (!auth) throw NOT_CONFIGURED;
-        await createUserWithEmailAndPassword(auth, email.trim(), password);
+        await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
       },
       async signOut() {
         if (!auth) throw NOT_CONFIGURED;

@@ -25,6 +25,7 @@ export type Session = {
   day: number;
   dateLabel: string;
   description: string;
+  imageUrl?: string;
   capacity: number;
   registeredCount: number;
 };
@@ -48,6 +49,7 @@ export const sessionConverter: FirestoreDataConverter<Session> = {
       day: typeof data.day === 'number' ? data.day : 1,
       dateLabel: data.dateLabel ?? '',
       description: data.description ?? '',
+      imageUrl: data.imageUrl ?? '',
       capacity: typeof data.capacity === 'number' ? data.capacity : 0,
       registeredCount: typeof data.registeredCount === 'number' ? data.registeredCount : 0,
     };
@@ -67,6 +69,7 @@ export function emptySession(): Omit<Session, 'id'> {
     day: 1,
     dateLabel: '',
     description: '',
+    imageUrl: '',
     capacity: 0,
     registeredCount: 0,
   };

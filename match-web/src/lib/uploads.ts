@@ -32,6 +32,15 @@ export async function uploadSponsorLogo(sponsorId: string, file: File): Promise<
   return getDownloadURL(storageRef);
 }
 
+/** Sobe a imagem de capa de uma sessão/evento para `sessions/{uid}/{sessionId}`. */
+export async function uploadSessionCover(sessionId: string, file: File): Promise<string> {
+  if (!storage) throw new Error('Firebase Storage não configurado.');
+  const uid = requireUid();
+  const storageRef = ref(storage, `sessions/${uid}/${sessionId}`);
+  await uploadBytes(storageRef, file, { contentType: file.type });
+  return getDownloadURL(storageRef);
+}
+
 /** Sobe um material para `materials/{uid}/{id}`; devolve URL e caminho. */
 export async function uploadMaterialFile(
   id: string,

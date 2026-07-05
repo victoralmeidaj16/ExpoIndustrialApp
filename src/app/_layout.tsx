@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { Tabs, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, Pressable, StyleSheet, View, ActivityIndicator } from 'react-native';
@@ -44,6 +45,7 @@ function CustomTabBar({ state, navigation }: any) {
           const isFocused = state.index === index;
 
           const onPress = () => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,
@@ -124,6 +126,7 @@ export default function TabLayout() {
             <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
             {/* Rotas acessíveis por navegação, mas fora da barra de abas */}
             <Tabs.Screen name="matchmaking" options={{ href: null }} />
+            <Tabs.Screen name="match-preferences" options={{ href: null }} />
             <Tabs.Screen name="home-v2" options={{ href: null }} />
             <Tabs.Screen name="company-profile-v2" options={{ href: null }} />
             <Tabs.Screen name="map-skia" options={{ href: null }} />
@@ -131,8 +134,10 @@ export default function TabLayout() {
             <Tabs.Screen name="privacy" options={{ href: null }} />
             <Tabs.Screen name="terms" options={{ href: null }} />
             <Tabs.Screen name="exhibitor" options={{ href: null }} />
+            <Tabs.Screen name="event" options={{ href: null }} />
             <Tabs.Screen name="visitor" options={{ href: null }} />
             <Tabs.Screen name="assistant" options={{ href: null }} />
+            <Tabs.Screen name="paid-events" options={{ href: null }} />
             <Tabs.Screen name="portal" options={{ href: null }} />
             <Tabs.Screen name="expositor" options={{ href: null }} />
             <Tabs.Screen name="preencher" options={{ href: null }} />

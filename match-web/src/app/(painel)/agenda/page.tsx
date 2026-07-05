@@ -1,11 +1,13 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 
 import { PageHeader } from '@/components/app-shell';
 import { Badge, Button, Card, Field, Input, Select, Spinner, Textarea } from '@/components/ui';
 import { emptySession, TRACKS, type Session } from '@/domain/session';
 import { deleteSession, upsertSession, useSessions } from '@/features/sessions/use-sessions';
+import { uploadSessionCover } from '@/lib/uploads';
 
 export default function AgendaPage() {
   const { sessions, loading } = useSessions();
@@ -104,6 +106,7 @@ function SessionDialog({ session, onClose }: { session: Session | null; onClose:
   const [form, setForm] = useState<Omit<Session, 'id'>>(
     session ? { ...session } : emptySession(),
   );
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
 
   function set<K extends keyof Omit<Session, 'id'>>(key: K, value: Omit<Session, 'id'>[K]) {
@@ -113,7 +116,16 @@ function SessionDialog({ session, onClose }: { session: Session | null; onClose:
   async function handleSave() {
     setBusy(true);
     try {
-      await upsertSession(session?.id ?? null, form);
+      let nextForm = form;
+      const id = session?.id ?? null;
+      if (coverFile) {
+        const sessionId = id ?? crypto.randomUUID();
+        const imageUrl = await uploadSessionCover(sessionId, coverFile);
+        nextForm = { ...form, imageUrl };
+        await upsertSession(sessionId, nextForm);
+      } else {
+        await upsertSession(id, nextForm);
+      }
       onClose();
     } finally {
       setBusy(false);
@@ -192,6 +204,33 @@ function SessionDialog({ session, onClose }: { session: Session | null; onClose:
           <Field label="Descrição">
             <Textarea value={form.description} onChange={(e) => set('description', e.target.value)} />
           </Field>
+          <Field label="Imagem de capa" hint="Aparece no card da agenda e no hero da página do evento.">
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)}
+            />
+          </Field>
+          {(coverFile || form.imageUrl) && (
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+              <Image
+                src={coverFile ? URL.createObjectURL(coverFile) : form.imageUrl}
+                alt="Prévia da capa do evento"
+                width={960}
+                height={320}
+                className="h-40 w-full object-cover"
+                unoptimized
+              />
+              {form.imageUrl && !coverFile ? (
+                <button
+                  type="button"
+                  className="w-full border-t border-slate-200 px-3 py-2 text-left text-xs font-semibold text-red-600"
+                  onClick={() => set('imageUrl', '')}>
+                  Remover imagem atual
+                </button>
+              ) : null}
+            </div>
+          )}
         </div>
         <div className="mt-5 flex justify-end gap-2">
           <Button variant="secondary" onClick={onClose} disabled={busy}>
