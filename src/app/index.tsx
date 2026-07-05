@@ -15,6 +15,7 @@ import {
 import { useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ScalePressable } from '@/components/ScalePressable';
 import { ExhibitorLogo } from '@/components/exhibitor-logo';
 import { TAB_BAR_CLEARANCE } from '@/components/ui-kit';
 import { Light, Radius, Spacing } from '@/constants/theme';
@@ -126,7 +127,7 @@ export default function HomeScreen() {
 
         {/* Banner de Onboarding Incompleto */}
         {profile && profile.onboardingSkipped && !profile.onboardingCompleted && (
-          <Pressable
+          <ScalePressable
             style={styles.onboardingBanner}
             onPress={() => router.push('/onboarding')}>
             <LinearGradient
@@ -147,7 +148,7 @@ export default function HomeScreen() {
               </View>
               <Ionicons name="chevron-forward" size={18} color={Light.goldLight} />
             </LinearGradient>
-          </Pressable>
+          </ScalePressable>
         )}
 
         {/* KPIs */}
@@ -164,7 +165,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Assistente IA */}
-        <Pressable style={styles.aiBar} onPress={() => router.push('/assistant')}>
+        <ScalePressable style={styles.aiBar} onPress={() => router.push('/assistant')}>
           <View style={styles.aiIcon}>
             <Ionicons name="sparkles" size={16} color={Light.gold} />
           </View>
@@ -172,13 +173,13 @@ export default function HomeScreen() {
           <View style={styles.micButton}>
             <Ionicons name="mic" size={18} color="#fff" />
           </View>
-        </Pressable>
+        </ScalePressable>
 
         {/* Ações rápidas */}
         <SectionHeader title="Ações rápidas" />
         <View style={styles.quickRow}>
           {QUICK_ACTIONS.map((action) => (
-            <Pressable
+            <ScalePressable
               key={action.label}
               style={styles.quickItem}
               onPress={() => action.route && router.push(action.route as never)}>
@@ -186,7 +187,7 @@ export default function HomeScreen() {
                 <Ionicons name={action.icon} size={26} color={Light.navy} />
               </View>
               <Text style={styles.quickLabel}>{action.label}</Text>
-            </Pressable>
+            </ScalePressable>
           ))}
         </View>
 
@@ -201,7 +202,7 @@ export default function HomeScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.featuredRow}>
           {featured.map((exhibitor) => (
-            <Pressable
+            <ScalePressable
               key={exhibitor.id}
               style={styles.featuredCard}
               onPress={() => router.push(`/exhibitor/${exhibitor.id}`)}>
@@ -211,7 +212,7 @@ export default function HomeScreen() {
                 style={styles.featuredLogo}
                 textSize={15}
               />
-            </Pressable>
+            </ScalePressable>
           ))}
         </ScrollView>
 
@@ -219,7 +220,7 @@ export default function HomeScreen() {
         <SectionHeader title="Recomendado para hoje" actionLabel="Ver mais" />
         <View style={styles.recoList}>
           {RECOMMENDATIONS.map((item) => (
-            <Pressable
+            <ScalePressable
               key={item.title}
               style={styles.recoCard}
               onPress={() => {
@@ -238,7 +239,7 @@ export default function HomeScreen() {
                 <Text style={styles.recoMeta}>{item.meta}</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={Light.textMuted} />
-            </Pressable>
+            </ScalePressable>
           ))}
         </View>
 
@@ -263,7 +264,7 @@ export default function HomeScreen() {
             <SectionHeader title="Materiais para download" />
             <View style={styles.materialsList}>
               {materials.map((material) => (
-                <Pressable
+                <ScalePressable
                   key={material.id}
                   style={styles.materialCard}
                   onPress={() => Linking.openURL(material.fileUrl)}>
@@ -281,7 +282,7 @@ export default function HomeScreen() {
                     ) : null}
                   </View>
                   <Ionicons name="download-outline" size={20} color={Light.textMuted} />
-                </Pressable>
+                </ScalePressable>
               ))}
             </View>
           </>
@@ -295,10 +296,10 @@ export default function HomeScreen() {
             style={styles.realizationLogo}
             resizeMode="contain"
           />
-          <Pressable style={styles.portalLink} onPress={() => router.push('/portal')}>
+          <ScalePressable style={styles.portalLink} onPress={() => router.push('/portal')}>
             <Ionicons name="briefcase-outline" size={15} color={Light.gold} />
             <Text style={styles.portalLinkText}>Portal do expositor</Text>
-          </Pressable>
+          </ScalePressable>
         </View>
       </ScrollView>
     </View>
@@ -307,10 +308,10 @@ export default function HomeScreen() {
 
 function HeaderIcon({ icon, badge, onPress }: { icon: IconName; badge?: boolean; onPress?: () => void }) {
   return (
-    <Pressable style={styles.headerIcon} onPress={onPress}>
+    <ScalePressable style={styles.headerIcon} onPress={onPress}>
       <Ionicons name={icon} size={20} color={Light.navyDeep} />
       {badge && <View style={styles.headerBadge} />}
-    </Pressable>
+    </ScalePressable>
   );
 }
 
@@ -327,9 +328,9 @@ function SectionHeader({
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {actionLabel && (
-        <Pressable onPress={onAction}>
+        <ScalePressable onPress={onAction}>
           <Text style={styles.sectionAction}>{actionLabel}</Text>
-        </Pressable>
+        </ScalePressable>
       )}
     </View>
   );

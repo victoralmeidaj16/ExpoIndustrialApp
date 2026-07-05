@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import { ScreenHeader, TAB_BAR_CLEARANCE } from '@/components/ui-kit';
+import { ScalePressable } from '@/components/ScalePressable';
 import { Light } from '@/constants/theme';
 import { getSessionImageSource, TRACKS, type Session } from '@/features/agenda/session';
 import { useAgendaPreferences, useSessions } from '@/features/agenda/use-sessions';
@@ -105,13 +106,13 @@ export default function AgendaScreen() {
           {days.map((day) => {
             const isActive = activeDay === day.num;
             return (
-              <Pressable
+              <ScalePressable
                 key={day.num}
                 style={[styles.dayButton, isActive && styles.dayButtonActive]}
                 onPress={() => setSelectedDay(day.num)}>
                 <Text style={[styles.dayText, isActive && styles.dayTextActive]}>{day.label}</Text>
                 <Text style={[styles.dateText, isActive && styles.dateTextActive]}>{day.date}</Text>
-              </Pressable>
+              </ScalePressable>
             );
           })}
         </View>
@@ -120,7 +121,7 @@ export default function AgendaScreen() {
           {TRACK_FILTERS.map((track) => {
             const isActive = selectedTrack === track;
             return (
-              <Pressable
+              <ScalePressable
                 key={track}
                 style={[styles.trackChip, isActive && styles.trackChipActive, track === FAVORITES_TRACK && styles.favChip]}
                 onPress={() => setSelectedTrack(track)}>
@@ -133,7 +134,7 @@ export default function AgendaScreen() {
                   />
                 )}
                 <Text style={[styles.trackText, isActive && styles.trackTextActive]}>{track}</Text>
-              </Pressable>
+              </ScalePressable>
             );
           })}
         </ScrollView>
@@ -155,7 +156,7 @@ export default function AgendaScreen() {
 
           return (
             <View style={[styles.sessionCard, isFav && styles.sessionCardFav]}>
-              <Pressable
+              <ScalePressable
                 onPress={() => router.push({ pathname: '/event/[id]', params: { id: item.id } })}>
                 <ImageBackground
                   source={getSessionImageSource(item)}
@@ -170,8 +171,8 @@ export default function AgendaScreen() {
                     <Text style={styles.imageTime}>{item.dateLabel} · {item.time}</Text>
                   </View>
                 </ImageBackground>
-              </Pressable>
-              <Pressable
+              </ScalePressable>
+              <ScalePressable
                 style={styles.cardHeader}
                 onPress={() => setExpandedId((prev) => (prev === item.id ? null : item.id))}>
                 <View style={[styles.cardAccent, { backgroundColor: accentColor }]} />
@@ -202,13 +203,13 @@ export default function AgendaScreen() {
                 </View>
 
                 <View style={styles.cardActions}>
-                  <Pressable style={styles.actionBtn} onPress={() => toggleFavorite(item.id)}>
+                  <ScalePressable style={styles.actionBtn} onPress={() => toggleFavorite(item.id)}>
                     <Ionicons
                       name={isFav ? 'star' : 'star-outline'}
                       size={20}
                       color={isFav ? Light.gold : Light.textFaint}
                     />
-                  </Pressable>
+                  </ScalePressable>
                   <Ionicons
                     name={isExpanded ? 'chevron-up' : 'chevron-down'}
                     size={18}
@@ -216,7 +217,7 @@ export default function AgendaScreen() {
                     style={{ marginTop: 8 }}
                   />
                 </View>
-              </Pressable>
+              </ScalePressable>
 
               {isExpanded && (
                 <View style={styles.detailsContainer}>
@@ -245,7 +246,7 @@ export default function AgendaScreen() {
                   </View>
 
                   <View style={styles.buttonRow}>
-                    <Pressable
+                    <ScalePressable
                       style={[styles.secondaryBtn, isRegistered && styles.secondaryBtnActive]}
                       onPress={() => onToggleRegistration(item)}>
                       <Ionicons
@@ -256,27 +257,27 @@ export default function AgendaScreen() {
                       <Text style={[styles.secondaryBtnText, isRegistered && styles.secondaryBtnTextActive]}>
                         {isRegistered ? 'Inscrito' : 'Inscrever-se'}
                       </Text>
-                    </Pressable>
-                    <Pressable style={styles.secondaryBtn} onPress={() => toggleReminder(item.id)}>
+                    </ScalePressable>
+                    <ScalePressable style={styles.secondaryBtn} onPress={() => toggleReminder(item.id)}>
                       <Ionicons
                         name={hasReminder ? 'notifications' : 'notifications-outline'}
                         size={14}
                         color={Light.gold}
                       />
                       <Text style={styles.secondaryBtnText}>{hasReminder ? 'Remover lembrete' : 'Lembrete'}</Text>
-                    </Pressable>
-                    <Pressable
+                    </ScalePressable>
+                    <ScalePressable
                       style={styles.secondaryBtn}
                       onPress={() => router.push({ pathname: '/event/[id]', params: { id: item.id } })}>
                       <Ionicons name="open-outline" size={14} color={Light.gold} />
                       <Text style={styles.secondaryBtnText}>Ver evento</Text>
-                    </Pressable>
-                    <Pressable
+                    </ScalePressable>
+                    <ScalePressable
                       style={styles.secondaryBtn}
                       onPress={() => router.push({ pathname: '/map', params: { search: item.location } })}>
                       <Ionicons name="map-outline" size={14} color={Light.gold} />
                       <Text style={styles.secondaryBtnText}>Ver mapa</Text>
-                    </Pressable>
+                    </ScalePressable>
                   </View>
                 </View>
               )}

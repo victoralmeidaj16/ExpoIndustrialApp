@@ -1,5 +1,5 @@
 /**
- * Carga inicial dos expositores no Firestore.
+ * Carga inicial dos expositores no Firestore usando o Firebase Admin SDK (para ter permissão de escrita).
  *
  * Lê o array `BOOTHS` (a fonte atual) e grava um documento por estande na
  * coleção `exhibitors`, já com `status: 'published'`. Idempotente: rodar de
@@ -8,46 +8,44 @@
  * Como rodar (com o `.env` preenchido):
  *   node --env-file=.env --import tsx scripts/seed-exhibitors.ts
  */
-import { initializeApp } from 'firebase/app';
-import { doc, getFirestore, writeBatch } from 'firebase/firestore';
+import { applicationDefault, cert, getApps, initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
 import { BOOTHS } from '../src/features/venue/venue';
 
-const firebaseConfig = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-};
+function initializeAdmin() {
+  if (getApps().length) return;
 
-if (!firebaseConfig.projectId) {
-  console.error('✖ Falta configurar o .env (EXPO_PUBLIC_FIREBASE_*). Veja .env.example.');
-  process.exit(1);
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  if (serviceAccountJson) {
+    initializeApp({ credential: cert(JSON.parse(serviceAccountJson)) });
+    return;
+  }
+
+  initializeApp({ credential: applicationDefault() });
 }
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+initializeAdmin();
+const db = getFirestore();
 
 async function seed() {
-  const batch = writeBatch(db);
+  const batch = db.batch();
 
   for (const booth of BOOTHS) {
     const { id, ...data } = booth;
     batch.set(
-      doc(db, 'exhibitors', id),
+      db.collection('exhibitors').doc(id),
       { ...data, status: 'published', ownerUid: null },
       { merge: true },
     );
   }
 
   await batch.commit();
-  console.log(`✓ ${BOOTHS.length} expositores gravados na coleção "exhibitors".`);
+  console.log(`✓ ${BOOTHS.length} expositores gravados via Admin na coleção "exhibitors".`);
   process.exit(0);
 }
 
 seed().catch((err) => {
-  console.error('✖ Falha no seed:', err);
+  console.error('✖ Falha no seed via Admin:', err);
   process.exit(1);
 });

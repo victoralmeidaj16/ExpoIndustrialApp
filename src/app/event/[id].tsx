@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HeaderIconButton, TAB_BAR_CLEARANCE } from '@/components/ui-kit';
+import { ScalePressable } from '@/components/ScalePressable';
 import { Light, Radius, Spacing } from '@/constants/theme';
 import { getSessionImageSource } from '@/features/agenda/session';
 import { useAgendaPreferences, useSessions } from '@/features/agenda/use-sessions';
@@ -59,9 +60,9 @@ export default function EventDetailScreen() {
           <>
             <Ionicons name="calendar-outline" size={40} color={Light.textMuted} />
             <Text style={styles.emptyTitle}>Evento não encontrado.</Text>
-            <Pressable style={styles.backButtonInline} onPress={() => router.back()}>
+            <ScalePressable style={styles.backButtonInline} onPress={() => router.back()}>
               <Text style={styles.backButtonInlineText}>Voltar</Text>
-            </Pressable>
+            </ScalePressable>
           </>
         )}
       </View>
@@ -144,7 +145,7 @@ export default function EventDetailScreen() {
           <Text style={styles.description}>{session.description}</Text>
 
           <View style={styles.actionGrid}>
-            <Pressable
+            <ScalePressable
               style={[styles.primaryAction, isRegistered && styles.primaryActionActive]}
               onPress={onToggleRegistration}>
               <Ionicons
@@ -155,9 +156,9 @@ export default function EventDetailScreen() {
               <Text style={[styles.primaryActionText, isRegistered && styles.primaryActionTextActive]}>
                 {isRegistered ? 'Inscrito' : 'Inscrever-se'}
               </Text>
-            </Pressable>
+            </ScalePressable>
 
-            <Pressable style={styles.secondaryAction} onPress={() => toggleReminder(session.id)}>
+            <ScalePressable style={styles.secondaryAction} onPress={() => toggleReminder(session.id)}>
               <Ionicons
                 name={hasReminder ? 'notifications' : 'notifications-outline'}
                 size={18}
@@ -166,14 +167,14 @@ export default function EventDetailScreen() {
               <Text style={styles.secondaryActionText}>
                 {hasReminder ? 'Lembrete ativo' : 'Ativar lembrete'}
               </Text>
-            </Pressable>
+            </ScalePressable>
 
-            <Pressable
+            <ScalePressable
               style={styles.secondaryAction}
               onPress={() => router.push({ pathname: '/map', params: { search: session.location } })}>
               <Ionicons name="map-outline" size={18} color={Light.gold} />
               <Text style={styles.secondaryActionText}>Ver no mapa</Text>
-            </Pressable>
+            </ScalePressable>
           </View>
 
           <Text style={styles.sectionTitle}>Materiais</Text>
