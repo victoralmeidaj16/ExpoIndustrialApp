@@ -110,6 +110,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /notifications/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Eventos pagos da feira. O evento em si é público; os participantes e
     // materiais exclusivos ficam em subcoleções protegidas por email autenticado.
     match /paidEvents/{eventId} {

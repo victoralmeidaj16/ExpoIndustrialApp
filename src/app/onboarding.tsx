@@ -47,14 +47,47 @@ export default function OnboardingScreen() {
 
   useEffect(() => {
     if (!loading && !initialized) {
-      const initialForm = profile ?? { ...EMPTY_VISITOR_PROFILE };
+      const initialForm = profile ? { ...profile } : { ...EMPTY_VISITOR_PROFILE };
       if (!initialForm.email && user?.email) {
         initialForm.email = user.email;
       }
+
+      const fetchSymplaData = async () => {
+        if (!user?.email || !configured) return;
+        try {
+          const { doc, getDoc } = await import('firebase/firestore');
+          const { db } = await import('@/lib/firebase');
+          if (!db) return;
+
+          const cleanEmail = user.email.trim().toLowerCase();
+          const docRef = doc(db, 'paidEvents', 'sympla-3486582', 'attendees', cleanEmail);
+          const snap = await getDoc(docRef);
+          if (snap.exists()) {
+            const data = snap.data();
+            if (data) {
+              setForm((prev) => {
+                const next = { ...prev };
+                if (!next.name && data.fullName) next.name = data.fullName;
+                if (!next.phone && data.phone) next.phone = data.phone;
+                if (!next.company && data.company) next.company = data.company;
+                if (!next.role && (data.role || data.jobRole)) next.role = data.role || data.jobRole;
+                return next;
+              });
+            }
+          }
+        } catch (err) {
+          console.error('Erro ao preencher dados onboarding via Sympla:', err);
+        }
+      };
+
+      if (!profile) {
+        fetchSymplaData();
+      }
+
       setForm(initialForm);
       setInitialized(true);
     }
-  }, [profile, loading, initialized, user]);
+  }, [profile, loading, initialized, user, configured]);
 
   const set = <K extends keyof VisitorProfile>(key: K, value: VisitorProfile[K]) =>
     setForm((f) => ({ ...f, [key]: value }));

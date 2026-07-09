@@ -423,7 +423,14 @@ export default function MapScreen() {
         ) : null}
       </View>
 
-      <View style={[styles.bottomSheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) }]}>
+      <View
+        style={[
+          styles.bottomSheet,
+          {
+            bottom: Math.max(insets.bottom, 12) + 64 + 10,
+            paddingBottom: Spacing.three,
+          },
+        ]}>
         <View style={styles.bottomHandle} />
         {selectedBooth ? (
           <Pressable
@@ -644,20 +651,18 @@ const styles = StyleSheet.create({
   bottomSheet: {
     backgroundColor: Light.surface,
     borderColor: Light.border,
-    borderTopLeftRadius: Radius.lg,
-    borderTopRightRadius: Radius.lg,
+    borderRadius: 20,
     borderWidth: 1,
-    bottom: 0,
     gap: 4,
-    left: 0,
+    left: 16,
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.two,
     position: 'absolute',
-    right: 0,
+    right: 16,
     shadowColor: Light.navyDeep,
-    shadowOffset: { width: 0, height: -8 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 24,
+    shadowRadius: 16,
     elevation: 10,
   },
   bottomHandle: {

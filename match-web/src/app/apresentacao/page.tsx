@@ -740,8 +740,8 @@ export default function PresentationPage() {
             <span className="text-white font-bold">Expo Industrial Sul 2026</span>
           </div>
           <div className="flex gap-6">
-            <a href="/terms" className="hover:text-white transition-colors">Termos de Uso</a>
-            <a href="/privacy" className="hover:text-white transition-colors">Política de Privacidade</a>
+            <a href="https://expo-industrial-sul.vercel.app/terms" className="hover:text-white transition-colors">Termos de Uso</a>
+            <a href="https://expo-industrial-sul.vercel.app/privacy" className="hover:text-white transition-colors">Política de Privacidade</a>
           </div>
           <div>
             <span>© 2026 Todos os direitos reservados. Ecossistema digital da Expo Industrial Sul.</span>

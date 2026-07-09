@@ -29,6 +29,7 @@ function paidEventFromDoc(id: string, data: Record<string, unknown>): PaidEvent 
     dateLabel: (data.dateLabel as string) ?? '',
     location: (data.location as string) ?? '',
     higestorEventId: (data.higestorEventId as string) ?? '',
+    paymentUrl: (data.paymentUrl as string) ?? '',
     order: typeof data.order === 'number' ? data.order : 0,
     createdAt: typeof data.createdAt === 'number' ? data.createdAt : 0,
   };

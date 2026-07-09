@@ -99,6 +99,14 @@ export default function PaidEventsScreen() {
                     <Text style={styles.lockedText}>
                       Use no app o mesmo email cadastrado na compra Higestor para liberar os materiais.
                     </Text>
+                    {event.paymentUrl ? (
+                      <Pressable
+                        style={styles.paymentBtn}
+                        onPress={() => Linking.openURL(event.paymentUrl!)}>
+                        <Ionicons name="card-outline" size={16} color="#fff" />
+                        <Text style={styles.paymentBtnText}>Inscrever-se / Pagar (HiGestor)</Text>
+                      </Pressable>
+                    ) : null}
                   </View>
                 )}
               </View>
@@ -180,4 +188,19 @@ const styles = StyleSheet.create({
   emptyMaterials: { color: Light.textMuted, fontSize: 12 },
   lockedBox: { backgroundColor: Light.surfaceAlt, borderRadius: Radius.sm, padding: Spacing.three },
   lockedText: { color: Light.textMuted, fontSize: 12, lineHeight: 17 },
+  paymentBtn: {
+    backgroundColor: Light.navy,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: Radius.pill,
+    gap: 6,
+    marginTop: Spacing.two,
+  },
+  paymentBtnText: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '800',
+  },
 });

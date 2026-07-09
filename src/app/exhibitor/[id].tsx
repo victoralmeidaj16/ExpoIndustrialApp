@@ -17,7 +17,7 @@ import { getVisitorProfileByUid, DEMO_VISITOR_PROFILE } from '@/features/visitor
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
-const TABS = ['Produtos', 'Soluções', 'Vídeos', 'Downloads'] as const;
+const TABS = ['Produtos', 'Soluções'] as const;
 
 export default function ExhibitorScreen() {
   const insets = useSafeAreaInsets();

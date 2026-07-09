@@ -7,6 +7,7 @@ export type PaidEvent = {
   dateLabel: string;
   location: string;
   higestorEventId?: string;
+  paymentUrl?: string;
   order: number;
   createdAt: number;
 };
