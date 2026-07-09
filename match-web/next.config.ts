@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Exporta o painel como site estático (SPA client-side com Firebase).
-  output: "export",
+  // Build padrão na Vercel (sem "export"): as rotas de API (ex.: webhook
+  // Sympla) precisam rodar server-side; páginas continuam SPA client-side.
   images: {
     unoptimized: true,
   },

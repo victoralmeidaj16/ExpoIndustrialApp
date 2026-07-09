@@ -1,25 +1,50 @@
 import { NextResponse } from 'next/server';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { cert, getApps, initializeApp } from 'firebase-admin/app';
+import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
 /**
  * Webhook para receber novos cadastros/pedidos da Sympla em tempo real.
  * Suporta integração direta ou via Zapier/Pluga.
  *
  * Endpoint: POST /api/webhooks/sympla
+ *
+ * Usa o Firebase Admin SDK (as Security Rules exigem admin para escrever em
+ * paidEvents/{id}/attendees). Requer a env FIREBASE_SERVICE_ACCOUNT_JSON com o
+ * JSON da service account. Se SYMPLA_WEBHOOK_SECRET estiver definida, o
+ * header "x-webhook-secret" (ou query ?secret=) precisa bater com ela.
  */
+
+function getAdminDb(): Firestore {
+  if (getApps().length === 0) {
+    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+    if (!serviceAccountJson) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT_JSON não configurada');
+    }
+    initializeApp({ credential: cert(JSON.parse(serviceAccountJson)) });
+  }
+  return getFirestore();
+}
+
 export async function POST(request: Request) {
   try {
-    if (!db) {
-      return NextResponse.json({ error: 'Firebase não configurado' }, { status: 500 });
+    const secret = process.env.SYMPLA_WEBHOOK_SECRET;
+    if (secret) {
+      const provided =
+        request.headers.get('x-webhook-secret') ||
+        new URL(request.url).searchParams.get('secret');
+      if (provided !== secret) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      }
     }
+
+    const db = getAdminDb();
 
     const body = await request.json();
     console.log('Webhook Sympla recebido:', JSON.stringify(body));
 
     // Mapeamento resiliente do payload (extraindo de qualquer nível comum de objetos)
     const data = body.data || body.participant || body;
-    
+
     const email = (data.email || data.userEmail || body.email || '').trim().toLowerCase();
     if (!email) {
       return NextResponse.json({ error: 'Email não encontrado no payload' }, { status: 400 });
@@ -28,7 +53,7 @@ export async function POST(request: Request) {
     const first_name = data.first_name || data.firstName || '';
     const last_name = data.last_name || data.lastName || '';
     const fullName = (data.fullName || data.name || `${first_name} ${last_name}`).trim();
-    
+
     const ticketQrCode = data.ticket_num_qr_code || data.ticketQrCode || data.ticket_number || data.ticketCode || '';
     const ticketNumber = data.ticket_number || ticketQrCode;
     const ticketName = data.ticket_name || data.ticketName || 'Acesso';
@@ -40,22 +65,29 @@ export async function POST(request: Request) {
 
     const paidEventId = `sympla-${eventId}`;
 
-    const docRef = doc(db, 'paidEvents', paidEventId, 'attendees', email);
-    await setDoc(docRef, {
-      status: 'paid',
-      userEmailLower: email,
-      fullName: fullName || 'Visitante Sympla',
-      ticketNumber,
-      ticketQrCode,
-      ticketName,
-      source: 'sympla',
-      symplaEventId: eventId,
-      company,
-      role,
-      phone,
-      syncedAt: Date.now(),
-      realtimeWebhook: true
-    }, { merge: true });
+    await db
+      .collection('paidEvents')
+      .doc(paidEventId)
+      .collection('attendees')
+      .doc(email)
+      .set(
+        {
+          status: 'paid',
+          userEmailLower: email,
+          fullName: fullName || 'Visitante Sympla',
+          ticketNumber,
+          ticketQrCode,
+          ticketName,
+          source: 'sympla',
+          symplaEventId: eventId,
+          company,
+          role,
+          phone,
+          syncedAt: Date.now(),
+          realtimeWebhook: true,
+        },
+        { merge: true }
+      );
 
     return NextResponse.json({ success: true, email, ticketQrCode });
   } catch (error: any) {
