@@ -168,6 +168,7 @@ export default function OnboardingScreen() {
               signup: 'Crie sua conta para gerar seu crachá, matches e recomendações.',
             }}
             onSuccess={() => router.replace('/')}
+            showSymplaSignup
           />
         </ScrollView>
       </KeyboardAvoidingView>

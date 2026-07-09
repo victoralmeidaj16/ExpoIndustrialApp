@@ -59,7 +59,8 @@
     "seed": "node --env-file=.env --import tsx scripts/seed-exhibitors.ts",
     "seed:sessions": "node --env-file=.env --import tsx scripts/seed-sessions.ts",
     "seed:sponsors": "node --env-file=.env --import tsx scripts/seed-sponsors.ts",
-    "sync:higestor:event": "node --env-file=.env --import tsx scripts/sync-higestor-event-access.ts"
+    "sync:higestor:event": "node --env-file=.env --import tsx scripts/sync-higestor-event-access.ts",
+    "sync:sympla:event": "node --env-file=.env --import tsx scripts/sync-sympla-event-access.ts"
   },
   "private": true
 }

@@ -214,7 +214,7 @@ function SessionDialog({ session, onClose }: { session: Session | null; onClose:
           {(coverFile || form.imageUrl) && (
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
               <Image
-                src={coverFile ? URL.createObjectURL(coverFile) : form.imageUrl}
+                src={coverFile ? URL.createObjectURL(coverFile) : (form.imageUrl || "")}
                 alt="Prévia da capa do evento"
                 width={960}
                 height={320}

@@ -3,9 +3,10 @@
  * Usado tanto pelo portal do expositor quanto pelo gate do perfil do visitante.
  */
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Image,
   Pressable,
   StyleSheet,
@@ -25,6 +26,7 @@ type Props = {
   subtitle?: { login: string; signup: string };
   icon?: keyof typeof Ionicons.glyphMap;
   onSuccess: () => void;
+  showSymplaSignup?: boolean;
 };
 
 /** Conta só os dígitos do telefone (ignora máscara/DDI). */
@@ -32,7 +34,7 @@ function phoneDigits(value: string) {
   return value.replace(/\D/g, '');
 }
 
-export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess }: Props) {
+export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, showSymplaSignup }: Props) {
   const { configured, signIn, signUp } = useAuth();
 
   const [mode, setMode] = useState<Mode>('login');
@@ -44,6 +46,52 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess }:
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Busca credencial da Sympla pelo email para auto-preencher os dados de cadastro
+  useEffect(() => {
+    if (!showSymplaSignup || mode !== 'signup' || !email || !configured) return;
+    const cleanEmail = email.trim().toLowerCase();
+    
+    // Validar se o email tem um formato básico antes de buscar no firestore
+    if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        const { doc, getDoc } = await import('firebase/firestore');
+        const { db } = await import('@/lib/firebase');
+        if (!db) return;
+        
+        const docRef = doc(db, 'paidEvents', 'sympla-3486582', 'attendees', cleanEmail);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data) {
+            if (data.fullName) setName(data.fullName);
+            if (data.phone) setPhone(data.phone);
+            if (data.company) setCompany(data.company);
+            if (data.role) setJobRole(data.role);
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao preencher dados pelo email da Sympla:', err);
+      }
+    }, 600); // 600ms debounce
+
+    return () => clearTimeout(timer);
+  }, [email, mode, showSymplaSignup, configured]);
+
+  async function handleOpenSympla() {
+    try {
+      const WebBrowser = await import('expo-web-browser');
+      await WebBrowser.openBrowserAsync('https://www.sympla.com.br/expoindustrial-sul-2026__3486582', {
+        toolbarColor: '#0A192F',
+        enableBarCollapsing: true,
+        showTitle: true,
+      });
+    } catch (err) {
+      Alert.alert('Erro', 'Não foi possível abrir o link de inscrição.');
+    }
+  }
 
   /** Valida os dados de lead exigidos no cadastro. Retorna a mensagem ou null. */
   function validateSignup(): string | null {
@@ -100,6 +148,17 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess }:
       </View>
       <Text style={styles.title}>{title}</Text>
       {subtitle && <Text style={styles.subtitle}>{subtitle[mode]}</Text>}
+
+      {showSymplaSignup && (
+        <Pressable style={styles.symplaCard} onPress={handleOpenSympla}>
+          <Ionicons name="ticket" size={20} color="#FF5A00" />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={styles.symplaTitle}>Precisa de credencial para a feira?</Text>
+            <Text style={styles.symplaText}>Toque aqui para se inscrever grátis no Sympla.</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={16} color="#FF5A00" />
+        </Pressable>
+      )}
 
       {!configured && (
         <View style={styles.warn}>
@@ -296,4 +355,25 @@ const styles = StyleSheet.create({
   footer: { alignItems: 'center', gap: 6, marginTop: Spacing.three, opacity: 0.7 },
   footerLabel: { color: Light.textMuted, fontSize: 9.5, fontWeight: '700', letterSpacing: 2 },
   footerLogo: { width: 84, height: 34 },
+  symplaCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#FFF5F0',
+    borderWidth: 1,
+    borderColor: '#FFD5C2',
+    borderRadius: Radius.md,
+    padding: Spacing.three,
+    marginTop: -Spacing.one,
+  },
+  symplaTitle: {
+    color: '#D4380D',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  symplaText: {
+    color: '#8C2500',
+    fontSize: 12.5,
+    lineHeight: 16,
+  },
 });

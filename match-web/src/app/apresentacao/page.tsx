@@ -157,7 +157,7 @@ export default function PresentationPage() {
               O companheiro de bolso do visitante. Oferece navegação por mapas 2D/3D interativos e sugere estandes com IA de matchmaking.
             </p>
             <a 
-              href="https://expo-industrial-sul.vercel.app/" 
+              href="https://expo-industrial-sul.vercel.app/profile" 
               target="_blank" 
               className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 mb-4"
             >
@@ -183,7 +183,7 @@ export default function PresentationPage() {
               Acesso exclusivo para as marcas cadastrarem seus perfis, logotipos, contatos comerciais, emitirem o QR Code do estande e acompanharem os leads captados no evento.
             </p>
             <a 
-              href="/portal/expositor/login" 
+              href="/portal/expositor/perfil" 
               className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 mb-4"
             >
               Acessar o Portal <ArrowRight className="h-3 w-3" />

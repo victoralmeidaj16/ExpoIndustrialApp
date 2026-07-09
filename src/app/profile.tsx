@@ -52,6 +52,9 @@ import {
 import { useSavedExhibitors } from '@/features/visitor/saved-exhibitors';
 
 
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+
 const BADGE_TYPE = 'VISITANTE';
 
 export default function ProfileScreen() {
@@ -66,6 +69,28 @@ export default function ProfileScreen() {
   const [form, setForm] = useState<VisitorProfile>(EMPTY_VISITOR_PROFILE);
   const [hydrated, setHydrated] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [symplaTicketCode, setSymplaTicketCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    const firestore = db;
+    if (!firestore || !user || !user.email) return;
+    const fetchSymplaTicket = async () => {
+      try {
+        const email = user.email!.toLowerCase().trim();
+        const docRef = doc(firestore, 'paidEvents', 'sympla-3486582', 'attendees', email);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data?.ticketQrCode) {
+            setSymplaTicketCode(data.ticketQrCode);
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao buscar ingresso Sympla:', err);
+      }
+    };
+    fetchSymplaTicket();
+  }, [user]);
 
   async function handleDeleteAccount() {
     if (!configured) {
@@ -193,6 +218,7 @@ export default function ProfileScreen() {
               signup: 'Crie sua conta de visitante para participar do evento.',
             }}
             onSuccess={() => router.replace('/')}
+            showSymplaSignup
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -281,7 +307,7 @@ export default function ProfileScreen() {
               <Image
                 source={{
                   uri: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                    `expoindustrialsul://visitor/${user?.uid || 'demo-user'}`
+                    symplaTicketCode || `expoindustrialsul://visitor/${user?.uid || 'demo-user'}`
                   )}`,
                 }}
                 style={styles.qrCodeImage}
@@ -317,7 +343,7 @@ export default function ProfileScreen() {
               <Image
                 source={{
                   uri: `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(
-                    `expoindustrialsul://visitor/${user?.uid || 'demo-user'}`
+                    symplaTicketCode || `expoindustrialsul://visitor/${user?.uid || 'demo-user'}`
                   )}`,
                 }}
                 style={styles.zoomQrImage}
@@ -326,6 +352,12 @@ export default function ProfileScreen() {
 
             <Text style={styles.zoomName}>{form.name}</Text>
             <Text style={styles.zoomMeta}>{form.role} · {form.company}</Text>
+            {symplaTicketCode ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8, backgroundColor: '#DCFCE7', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 }}>
+                <Ionicons name="checkmark-circle" size={14} color="#166534" />
+                <Text style={{ color: '#166534', fontSize: 11, fontWeight: '700' }}>CREDENCIAL SYMPLA INTEGRADA</Text>
+              </View>
+            ) : null}
 
             <Pressable style={styles.zoomCloseBtn} onPress={() => setZoomVisible(false)}>
               <Text style={styles.zoomCloseText}>Fechar</Text>

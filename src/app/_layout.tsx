@@ -7,7 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Light } from '@/constants/theme';
-import { AuthProvider } from '@/features/auth/use-auth';
+import { AuthProvider, useAuth } from '@/features/auth/use-auth';
 import { usePushRegistration } from '@/features/notifications/use-push-registration';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -30,8 +30,11 @@ const TAB_ICONS: Record<string, { active: IconName; inactive: IconName }> = {
 function CustomTabBar({ state, navigation }: any) {
   const insets = useSafeAreaInsets();
   const activeRoute = state.routes[state.index]?.name;
+  const { user } = useAuth();
 
-  if (activeRoute === 'preencher' || activeRoute === 'expositor') return null;
+  if (!user) return null;
+
+  if (activeRoute === 'preencher' || activeRoute === 'expositor' || activeRoute === 'welcome') return null;
 
   return (
     <View style={[styles.tabBarWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>
@@ -74,7 +77,6 @@ function CustomTabBar({ state, navigation }: any) {
 }
 
 import { useEffect } from 'react';
-import { useAuth } from '@/features/auth/use-auth';
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, configured, initializing } = useAuth();
@@ -85,6 +87,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!configured || initializing) return;
 
     const isPublicRoute =
+      pathname === '/welcome' ||
       pathname === '/profile' ||
       pathname === '/terms' ||
       pathname === '/privacy' ||
@@ -93,7 +96,9 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       pathname === '/expositor';
 
     if (!user && !isPublicRoute) {
-      router.replace('/profile');
+      router.replace('/welcome');
+    } else if (user && pathname === '/welcome') {
+      router.replace('/');
     }
   }, [user, configured, initializing, pathname]);
 
@@ -142,6 +147,7 @@ export default function TabLayout() {
             <Tabs.Screen name="expositor" options={{ href: null }} />
             <Tabs.Screen name="preencher" options={{ href: null }} />
             <Tabs.Screen name="onboarding" options={{ href: null }} />
+            <Tabs.Screen name="welcome" options={{ href: null }} />
           </Tabs>
         </AuthGuard>
       </AuthProvider>
