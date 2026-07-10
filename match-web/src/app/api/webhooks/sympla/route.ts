@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { cert, getApps, initializeApp } from 'firebase-admin/app';
-import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+
+import { getAdminDb } from '@/lib/admin-firebase';
 
 /**
  * Webhook para receber novos cadastros/pedidos da Sympla em tempo real.
@@ -13,17 +13,6 @@ import { getFirestore, type Firestore } from 'firebase-admin/firestore';
  * JSON da service account. Se SYMPLA_WEBHOOK_SECRET estiver definida, o
  * header "x-webhook-secret" (ou query ?secret=) precisa bater com ela.
  */
-
-function getAdminDb(): Firestore {
-  if (getApps().length === 0) {
-    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-    if (!serviceAccountJson) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT_JSON não configurada');
-    }
-    initializeApp({ credential: cert(JSON.parse(serviceAccountJson)) });
-  }
-  return getFirestore();
-}
 
 export async function POST(request: Request) {
   try {

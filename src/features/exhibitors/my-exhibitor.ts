@@ -25,7 +25,6 @@ export type ExhibitorFormData = {
   logoUrl?: string;
   industry: string;
   about: string;
-  products: string[];
   contactName: string;
   contactRole: string;
   contactEmail: string;
@@ -45,7 +44,6 @@ export const EMPTY_FORM: ExhibitorFormData = {
   logoUrl: '',
   industry: '',
   about: '',
-  products: [],
   contactName: '',
   contactRole: '',
   contactEmail: '',
@@ -67,7 +65,6 @@ export function toFormData(e: Exhibitor): ExhibitorFormData {
     logoUrl: e.logoUrl || '',
     industry: e.industry,
     about: e.about,
-    products: e.products,
     contactName: e.contactName || '',
     contactRole: e.contactRole || '',
     contactEmail: e.contactEmail || '',
@@ -142,7 +139,6 @@ export async function saveMyExhibitor(data: ExhibitorFormData): Promise<void> {
 
   const payload: Record<string, unknown> = {
     ...data,
-    products: data.products.filter((p) => p.trim().length > 0),
     segments: data.segments.filter((p) => p.trim().length > 0),
     targetAudience: data.targetAudience.filter((p) => p.trim().length > 0),
     lookingFor: data.lookingFor.filter((p) => p.trim().length > 0),

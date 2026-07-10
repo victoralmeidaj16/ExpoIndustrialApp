@@ -212,6 +212,7 @@ async function main() {
         dateLabel: process.env.PAID_EVENT_DATE_LABEL || '',
         location: process.env.PAID_EVENT_LOCATION || '',
         higestorEventId,
+        paymentUrl: process.env.PAID_EVENT_PAYMENT_URL || '',
         order: Number(process.env.PAID_EVENT_ORDER ?? 0),
         createdAt: Date.now(),
         updatedAt: Date.now(),

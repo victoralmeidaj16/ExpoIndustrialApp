@@ -12,6 +12,22 @@ import { db } from '@/lib/firebase';
 const TITLE_MAX = 60;
 const BODY_MAX = 178;
 
+type NotificationRecord = {
+  id: string;
+  title?: string;
+  body?: string;
+  status?: 'pending' | 'processing' | 'sent' | 'failed';
+  scheduledAt?: number | null;
+  createdAt?: { seconds?: number } | null;
+  sentAt?: number | null;
+  failedAt?: number | null;
+  targetCount?: number;
+  deliveredCount?: number;
+  failedCount?: number;
+  removedTokenCount?: number;
+  errorMessage?: string;
+};
+
 export default function AvisosPage() {
   const { visitors, loading } = useVisitors();
   const [title, setTitle] = useState('');
@@ -23,7 +39,7 @@ export default function AvisosPage() {
   // Estados de Agendamento
   const [isScheduled, setIsScheduled] = useState(false);
   const [scheduledAt, setScheduledAt] = useState('');
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
   const [loadingNotifs, setLoadingNotifs] = useState(true);
 
   // Destinatários = todos os tokens de visitantes que optaram por receber.
@@ -58,7 +74,7 @@ export default function AvisosPage() {
     return onSnapshot(
       q,
       (snap) => {
-        const list = snap.docs.map((d) => ({
+        const list: NotificationRecord[] = snap.docs.map((d) => ({
           id: d.id,
           ...d.data(),
         }));
@@ -283,9 +299,29 @@ export default function AvisosPage() {
           <div className="space-y-4">
             {notifications.map((notif) => {
               const isPending = notif.status === 'pending';
+              const isProcessing = notif.status === 'processing';
+              const isFailed = notif.status === 'failed';
               const dateToShow = isPending
-                ? new Date(notif.scheduledAt).toLocaleString('pt-BR')
-                : new Date(notif.sentAt || notif.createdAt?.seconds * 1000 || Date.now()).toLocaleString('pt-BR');
+                ? new Date(notif.scheduledAt ?? Date.now()).toLocaleString('pt-BR')
+                : new Date(
+                    notif.sentAt ||
+                      notif.failedAt ||
+                      (notif.createdAt?.seconds ? notif.createdAt.seconds * 1000 : Date.now()),
+                  ).toLocaleString('pt-BR');
+              const statusLabel = isPending
+                ? 'Agendado'
+                : isProcessing
+                ? 'Processando'
+                : isFailed
+                ? 'Falhou'
+                : 'Enviado';
+              const statusClass = isPending
+                ? 'bg-amber-100 text-amber-800'
+                : isProcessing
+                ? 'bg-blue-100 text-blue-800'
+                : isFailed
+                ? 'bg-red-100 text-red-800'
+                : 'bg-green-100 text-green-800';
 
               return (
                 <div
@@ -295,21 +331,23 @@ export default function AvisosPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                       <span
-                        className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-md ${
-                          isPending ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'
-                        }`}
+                        className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-md ${statusClass}`}
                       >
-                        {isPending ? 'Agendado' : 'Enviado'}
+                        {statusLabel}
                       </span>
                       <span className="text-xs text-slate-400 font-semibold">{dateToShow}</span>
-                      {!isPending && (
+                      {!isPending && !isProcessing && (
                         <span className="text-xs text-slate-400 font-semibold">
-                          • {notif.targetCount ?? 0} destinatário(s)
+                          • {notif.deliveredCount ?? notif.targetCount ?? 0} entregue(s)
+                          {notif.failedCount ? ` · ${notif.failedCount} falha(s)` : ''}
                         </span>
                       )}
                     </div>
                     <h3 className="font-extrabold text-slate-900 text-sm">{notif.title}</h3>
                     <p className="text-xs text-slate-600 mt-1 leading-relaxed">{notif.body}</p>
+                    {isFailed && notif.errorMessage ? (
+                      <p className="text-xs text-red-600 mt-2 font-semibold">{notif.errorMessage}</p>
+                    ) : null}
                   </div>
                   {isPending && (
                     <Button

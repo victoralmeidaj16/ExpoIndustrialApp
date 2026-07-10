@@ -14,6 +14,7 @@ const NAV = [
   { href: '/agenda', label: 'Agenda', icon: '🗓' },
   { href: '/patrocinadores', label: 'Patrocinadores', icon: '★' },
   { href: '/materiais', label: 'Materiais', icon: '📎' },
+  { href: '/eventos-pagos', label: 'Eventos pagos', icon: '🎟' },
   { href: '/visitantes', label: 'Visitantes', icon: '👥' },
   { href: '/avisos', label: 'Avisos', icon: '🔔' },
   { href: '/evento', label: 'Evento', icon: '⚙' },

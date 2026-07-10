@@ -17,13 +17,10 @@ import { getVisitorProfileByUid, DEMO_VISITOR_PROFILE } from '@/features/visitor
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
-const TABS = ['Produtos', 'Soluções'] as const;
-
 export default function ExhibitorScreen() {
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { exhibitor: booth, loading } = useExhibitor(id);
-  const [tab, setTab] = useState<(typeof TABS)[number]>('Produtos');
   const { isSaved, toggle } = useSavedExhibitors();
   const saved = booth ? isSaved(booth.id) : false;
   const toggleSaved = () => booth && toggle(booth.id);
@@ -188,37 +185,6 @@ export default function ExhibitorScreen() {
               <TagGroup title="Busca na feira" items={booth.lookingFor ?? []} />
               <TagGroup title="Palavras-chave" items={booth.keywords ?? []} />
             </>
-          )}
-
-          {/* Abas */}
-          <View style={styles.tabs}>
-            {TABS.map((t) => (
-              <Pressable key={t} style={styles.tabItem} onPress={() => setTab(t)}>
-                <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>{t}</Text>
-                {tab === t && <View style={styles.tabUnderline} />}
-              </Pressable>
-            ))}
-          </View>
-
-          {/* Conteúdo da aba */}
-          {tab === 'Produtos' ? (
-            <View style={styles.productGrid}>
-              {booth.products.map((p) => (
-                <View key={p} style={styles.productCard}>
-                  <View style={styles.productIcon}>
-                    <Ionicons name="cube-outline" size={20} color={Light.navy} />
-                  </View>
-                  <Text style={styles.productName}>{p}</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View style={styles.placeholderBox}>
-              <Ionicons name="folder-open-outline" size={22} color={Light.textMuted} />
-              <Text style={styles.placeholderText}>
-                {tab} disponíveis no estande durante o evento.
-              </Text>
-            </View>
           )}
 
           {/* Contatos de negócio */}

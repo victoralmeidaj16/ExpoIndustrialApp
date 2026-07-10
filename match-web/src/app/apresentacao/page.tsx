@@ -281,7 +281,7 @@ export default function PresentationPage() {
                       <div className="h-6 w-6 rounded-full bg-amber-50 text-[#c5a85c] flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</div>
                       <div>
                         <h5 className="font-bold text-slate-800 text-sm">Configuração de Perfil Comercial</h5>
-                        <p className="text-xs text-slate-500 mt-0.5">Insere nome da empresa, logotipo, descrição institucional, segmento comercial, catálogo de produtos, site corporativo, redes sociais e palavras-chave de interesse para o matchmaking.</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Insere nome da empresa, logotipo, descrição institucional, segmento comercial, site corporativo, LinkedIn, Instagram e palavras-chave de interesse para o matchmaking. Vídeos e arquivos para download não entram no preenchimento do expositor.</p>
                       </div>
                     </div>
 
@@ -333,8 +333,8 @@ export default function PresentationPage() {
                     <div className="flex gap-3">
                       <div className="h-6 w-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
                       <div>
-                        <h5 className="font-bold text-slate-800 text-sm">Cadastro de Lead Obrigatório</h5>
-                        <p className="text-xs text-slate-500 mt-0.5">Ao abrir o app pela primeira vez, o visitante deve preencher Nome Completo, E-mail, WhatsApp, Empresa e Cargo para acessar as áreas internas da feira.</p>
+                        <h5 className="font-bold text-slate-800 text-sm">Cadastro Integrado da Inscrição</h5>
+                        <p className="text-xs text-slate-500 mt-0.5">O acesso do visitante parte da inscrição feita no Simpla/R Gestor. Os dados principais são reaproveitados no app para reduzir retrabalho, ficando apenas validações ou complementos rápidos quando necessário.</p>
                       </div>
                     </div>
 
@@ -645,6 +645,96 @@ export default function PresentationPage() {
           <h4 className="text-lg font-extrabold text-[#0c1527] border-b border-slate-100 pb-3 mb-6">Dúvidas da Organização</h4>
           
           <div className="space-y-4">
+            <div className="bg-white border border-slate-200/60 rounded-xl overflow-hidden shadow-xs">
+              <button 
+                onClick={() => toggleFaq(8)}
+                className="w-full px-6 py-4 text-left font-bold text-slate-800 text-sm md:text-base flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span>O visitante precisa se cadastrar de novo no aplicativo?</span>
+                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${openFaq === 8 ? "rotate-180" : ""}`} />
+              </button>
+              {openFaq === 8 && (
+                <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                  A proposta é evitar um novo cadastro completo. O app deve aproveitar as informações já preenchidas na inscrição pelo Simpla/R Gestor, como nome, e-mail, telefone, empresa e cargo. Quando algum dado estiver incompleto, o visitante poderá apenas revisar ou complementar o perfil dentro do aplicativo.
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200/60 rounded-xl overflow-hidden shadow-xs">
+              <button 
+                onClick={() => toggleFaq(9)}
+                className="w-full px-6 py-4 text-left font-bold text-slate-800 text-sm md:text-base flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span>Depois da inscrição ou pagamento, como o acesso ao app é liberado?</span>
+                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${openFaq === 9 ? "rotate-180" : ""}`} />
+              </button>
+              {openFaq === 9 && (
+                <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                  O fluxo previsto é integrar a confirmação do R Gestor/Simpla com a base do evento. Após a inscrição validada, o visitante passa a existir na lista oficial de participantes e pode acessar o app com os dados vinculados à inscrição. O link de pagamento e a liberação após confirmação ainda devem ser validados no fluxo do R Gestor.
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200/60 rounded-xl overflow-hidden shadow-xs">
+              <button 
+                onClick={() => toggleFaq(10)}
+                className="w-full px-6 py-4 text-left font-bold text-slate-800 text-sm md:text-base flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span>Como o visitante recebe o link para acessar ou baixar o aplicativo?</span>
+                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${openFaq === 10 ? "rotate-180" : ""}`} />
+              </button>
+              {openFaq === 10 && (
+                <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                  A etapa planejada é automatizar o envio de e-mail após a inscrição confirmada. Esse e-mail deve conter o link de acesso ou download do aplicativo, reduzindo a necessidade de envio manual pela organização e garantindo que cada participante receba a orientação no momento certo.
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200/60 rounded-xl overflow-hidden shadow-xs">
+              <button 
+                onClick={() => toggleFaq(11)}
+                className="w-full px-6 py-4 text-left font-bold text-slate-800 text-sm md:text-base flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span>Qual é a diferença entre o cadastro do visitante e o cadastro do expositor?</span>
+                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${openFaq === 11 ? "rotate-180" : ""}`} />
+              </button>
+              {openFaq === 11 && (
+                <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                  Visitantes entram pelo fluxo de inscrição do evento, via Simpla/R Gestor. Já os expositores são tratados pela organização através de contrato direto. Depois da contratação, cada expositor recebe acesso ao Portal do Expositor para preencher ou revisar os dados da empresa, logotipo, links e informações do estande.
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200/60 rounded-xl overflow-hidden shadow-xs">
+              <button 
+                onClick={() => toggleFaq(12)}
+                className="w-full px-6 py-4 text-left font-bold text-slate-800 text-sm md:text-base flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span>Como cada expositor recebe o link para preencher os dados da empresa?</span>
+                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${openFaq === 12 ? "rotate-180" : ""}`} />
+              </button>
+              {openFaq === 12 && (
+                <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                  Após a confirmação comercial do expositor, a organização envia o link do Portal do Expositor. Por esse link, a empresa acessa o formulário para informar os dados institucionais, redes sociais, contatos comerciais e vínculo com o estande. Esses dados ficam disponíveis para revisão no Painel do Organizador antes de aparecerem no app.
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200/60 rounded-xl overflow-hidden shadow-xs">
+              <button 
+                onClick={() => toggleFaq(13)}
+                className="w-full px-6 py-4 text-left font-bold text-slate-800 text-sm md:text-base flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span>É possível deixar notificações programadas antes do evento?</span>
+                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${openFaq === 13 ? "rotate-180" : ""}`} />
+              </button>
+              {openFaq === 13 && (
+                <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                  Sim. O painel administrativo deve permitir cadastrar avisos com título, mensagem e horário de disparo. Assim, a organização pode preparar comunicações com antecedência, como contagem regressiva, lembretes de programação, avisos operacionais e comunicados importantes durante os dias da feira.
+                </div>
+              )}
+            </div>
+
             <div className="bg-white border border-slate-200/60 rounded-xl overflow-hidden shadow-xs">
               <button 
                 onClick={() => toggleFaq(4)}

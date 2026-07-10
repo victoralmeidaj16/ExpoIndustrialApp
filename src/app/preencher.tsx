@@ -28,13 +28,12 @@ import {
   type ExhibitorFormData,
 } from '@/features/exhibitors/my-exhibitor';
 
-type ArrayFieldKey = 'products' | 'segments' | 'targetAudience' | 'lookingFor' | 'keywords';
+type ArrayFieldKey = 'segments' | 'targetAudience' | 'lookingFor' | 'keywords';
 
 const PUBLISHING_CHECKS = [
   { key: 'company', label: 'Nome da empresa' },
   { key: 'industry', label: 'Setor / indústria' },
   { key: 'about', label: 'Descrição institucional' },
-  { key: 'products', label: 'Produtos ou soluções' },
   { key: 'contactEmail', label: 'E-mail comercial' },
   { key: 'contactPhone', label: 'Telefone / WhatsApp' },
 ] as const;
@@ -72,7 +71,6 @@ function normalizeForm(data: ExhibitorFormData): ExhibitorFormData {
     website: normalizeWebsite(data.website),
     instagram: normalizeInstagram(data.instagram),
     linkedin: data.linkedin.trim(),
-    products: cleanList(data.products),
     segments: cleanList(data.segments),
     targetAudience: cleanList(data.targetAudience),
     lookingFor: cleanList(data.lookingFor),
@@ -497,20 +495,11 @@ export default function ExhibitorWebForm() {
                 style={[styles.input, styles.textarea]}
                 value={form.about}
                 onChangeText={(value) => set('about', value)}
-                placeholder="Descreva soluções, diferenciais e o que será apresentado no evento."
+                placeholder="Descreva a empresa, diferenciais e atuação no mercado."
                 placeholderTextColor={Light.textMuted}
                 multiline
               />
             </Field>
-
-            <ArrayField
-              label="Produtos / soluções"
-              items={form.products}
-              placeholder="Adicionar produto ou solução"
-              onAdd={(value) => addArrayItem('products', value)}
-              onChange={(index, value) => setArrayItem('products', index, value)}
-              onRemove={(index) => removeArrayItem('products', index)}
-            />
           </Section>
 
           <Section

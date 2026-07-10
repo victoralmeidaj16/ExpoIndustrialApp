@@ -244,7 +244,7 @@ export default function ExpositorPerfilPage() {
             <textarea
               value={about}
               onChange={(e) => setAbout(e.target.value)}
-              placeholder="Descreva as soluções, produtos e o foco da empresa na feira."
+              placeholder="Descreva a empresa, diferenciais e atuação no mercado."
               required
               rows={4}
               className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3.5 py-3 text-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 outline-none text-sm"

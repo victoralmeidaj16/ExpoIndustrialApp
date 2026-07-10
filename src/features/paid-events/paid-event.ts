@@ -17,7 +17,7 @@ export type PaidEventAccess = {
   userEmailLower: string;
   fullName: string;
   cpfLast4?: string;
-  source: 'higestor' | 'manual';
+  source: 'higestor' | 'sympla' | 'manual';
   syncedAt: number;
 };
 
