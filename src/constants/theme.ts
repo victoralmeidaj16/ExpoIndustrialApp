@@ -1,5 +1,5 @@
 /**
- * Tema da marca Expo Industrial Sul.
+ * Tema da marca ExpoIndustrialSul.
  * Paleta industrial dark com acentos em dourado executivo e azul tecnológico,
  * extraída do board de design do app.
  */

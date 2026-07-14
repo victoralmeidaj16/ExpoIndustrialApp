@@ -200,7 +200,7 @@ let MOCK_FORUMS = [
 ];
 
 let MOCK_AGENDA = [
-  { id: 1, day: 16, month: "NOV", title: "Abertura Oficial da Expo Industrial Sul 2026", time: "09:00", type: "Feira" },
+  { id: 1, day: 16, month: "NOV", title: "Abertura Oficial da ExpoIndustrialSul 2026", time: "09:00", type: "Feira" },
   { id: 2, day: 17, month: "NOV", title: "Painel Ápice: O Futuro da Indústria 4.0 no Sul", time: "14:00", type: "Palestra" },
   { id: 3, day: 18, month: "NOV", title: "Encontro Rodada de Negócios B2B", time: "10:00", type: "Matchmaking" },
   { id: 4, day: 19, month: "NOV", title: "Workshop WEG de Eficiência Operacional", time: "16:00", type: "Workshop" }
@@ -839,7 +839,7 @@ function getIaResponse(prompt) {
     Deseja abrir a Biblioteca para escolher?`;
   }
 
-  return `Entendi o seu interesse sobre "${prompt}". Como assistente inteligente do ecossistema Ápice + Expo Industrial Sul, posso ajudar você a formular soluções, indicar fornecedores específicos de tecnologias industriais 4.0 ou preparar uma agenda personalizada para a feira em Novembro.`;
+  return `Entendi o seu interesse sobre "${prompt}". Como assistente inteligente do ecossistema Ápice + ExpoIndustrialSul, posso ajudar você a formular soluções, indicar fornecedores específicos de tecnologias industriais 4.0 ou preparar uma agenda personalizada para a feira em Novembro.`;
 }
 
 // CRIAÇÃO DE POSTS NO FEED
@@ -993,7 +993,7 @@ async function syncWithFirestore() {
             stand: "Patrocínio",
             category: "patrocinador",
             tech: "automacao",
-            desc: `Parceiro Diamante da Expo Industrial Sul.`,
+            desc: `Parceiro Diamante da ExpoIndustrialSul.`,
             tags: ["Patrocinador", data.tier || "GOLD"],
             products: [],
             logo: logoHtml,

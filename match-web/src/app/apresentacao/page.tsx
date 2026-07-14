@@ -60,6 +60,14 @@ const UserCheck = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>
 );
 
+const Calendar = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+);
+
+const FileText = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+);
+
 export default function PresentationPage() {
   const [activeTab, setActiveTab] = useState<"expositor" | "visitante" | "admin">("expositor");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -82,7 +90,7 @@ export default function PresentationPage() {
               <span className="text-[#c5a85c] font-black text-lg">EI</span>
             </div>
             <div>
-              <span className="font-extrabold text-lg text-[#0c1527] block tracking-tight">Expo Industrial Sul</span>
+              <span className="font-extrabold text-lg text-[#0c1527] block tracking-tight">ExpoIndustrialSul</span>
               <span className="text-xs font-bold uppercase tracking-widest text-[#c5a85c]">Ecossistema Digital</span>
             </div>
           </div>
@@ -114,7 +122,7 @@ export default function PresentationPage() {
             Ambiente de apresentação e homologação
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tight text-[#0c1527] leading-[1.1] mb-6">
-            O Futuro da Expo Industrial Sul é <span className="bg-gradient-to-r from-[#0c1527] to-[#c5a85c] bg-clip-text text-transparent">Digital & Conectado</span>
+            ExpoIndustrialSul é <span className="bg-gradient-to-r from-[#0c1527] to-[#c5a85c] bg-clip-text text-transparent">Digital & Conectado</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto mb-10">
             Conheça o ecossistema integrado que une o Aplicativo do Evento, o Portal do Expositor e o Painel do Organizador para potencializar a geração de negócios e a coleta estratégica de dados durante a feira.
@@ -465,7 +473,7 @@ export default function PresentationPage() {
           <h3 className="text-3xl font-extrabold text-[#0c1527]">O que estará no aplicativo da feira</h3>
         </div>
 
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
           <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-xs flex flex-col">
             <Layers className="h-8 w-8 text-[#0c1527] mb-4" />
             <h5 className="font-bold text-[#0c1527] text-sm">Crachá Digital</h5>
@@ -482,6 +490,18 @@ export default function PresentationPage() {
             <Sparkles className="h-8 w-8 text-[#0c1527] mb-4" />
             <h5 className="font-bold text-[#0c1527] text-sm">Recomendações por IA</h5>
             <p className="text-xs text-slate-500 mt-2 leading-relaxed">Cruzamento de interesses para sugerir quais expositores o visitante deve conhecer e contatar no evento.</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-xs flex flex-col">
+            <Calendar className="h-8 w-8 text-[#0c1527] mb-4" />
+            <h5 className="font-bold text-[#0c1527] text-sm">Programação de Eventos Simultâneos</h5>
+            <p className="text-xs text-slate-500 mt-2 leading-relaxed">Agenda completa das palestras, painéis e atividades que acontecem ao mesmo tempo, para o visitante planejar seus horários e não perder nada.</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-xs flex flex-col">
+            <FileText className="h-8 w-8 text-[#0c1527] mb-4" />
+            <h5 className="font-bold text-[#0c1527] text-sm">Materiais dos Palestrantes</h5>
+            <p className="text-xs text-slate-500 mt-2 leading-relaxed">Acesso aos conteúdos e materiais das palestras diretamente no app, para consultar e baixar as apresentações a qualquer momento.</p>
           </div>
         </div>
       </section>
@@ -827,14 +847,14 @@ export default function PresentationPage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <span className="text-[#c5a85c] font-black text-sm">EI</span>
-            <span className="text-white font-bold">Expo Industrial Sul 2026</span>
+            <span className="text-white font-bold">ExpoIndustrialSul 2026</span>
           </div>
           <div className="flex gap-6">
             <a href="https://expo-industrial-sul.vercel.app/terms" className="hover:text-white transition-colors">Termos de Uso</a>
             <a href="https://expo-industrial-sul.vercel.app/privacy" className="hover:text-white transition-colors">Política de Privacidade</a>
           </div>
           <div>
-            <span>© 2026 Todos os direitos reservados. Ecossistema digital da Expo Industrial Sul.</span>
+            <span>© 2026 Todos os direitos reservados. Ecossistema digital da ExpoIndustrialSul.</span>
           </div>
         </div>
       </footer>

@@ -20,20 +20,11 @@ import { getSessionImageSource } from '@/features/agenda/session';
 import { useAgendaPreferences, useSessions } from '@/features/agenda/use-sessions';
 
 function getTrackColor(track: string) {
-  switch (track) {
-    case 'Automação':
-      return '#2F6BFF';
-    case 'PPCP':
-      return Light.gold;
-    case 'S&OP':
-      return '#00A9C7';
-    case 'ESG':
-      return '#159A5B';
-    case 'Manutenção':
-      return '#EF4444';
-    default:
-      return Light.textMuted;
-  }
+  if (track.includes('PPCP') || track.includes('S&OP')) return Light.gold;
+  if (track.includes('5S') || track.includes('Qualidade') || track.includes('ESG')) return '#159A5B';
+  if (track.includes('Manutenção') || track.includes('Indústria 4.0') || track.includes('Automação')) return '#2F6BFF';
+  if (track.includes('Reforma Tributária')) return '#7C3AED';
+  return Light.textMuted;
 }
 
 export default function EventDetailScreen() {

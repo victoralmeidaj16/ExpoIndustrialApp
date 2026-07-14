@@ -5,7 +5,14 @@ import {
 
 export const SESSIONS_COLLECTION = 'sessions';
 
-export type SessionTrack = 'Automação' | 'PPCP' | 'S&OP' | 'ESG' | 'Manutenção';
+export const TRACKS = [
+  'VII Encontro Brasileiro de PPCP & Gestão Industrial + I Encontro Brasileiro de S&OP, S&OE & IBP',
+  'VII Encontro do Programa 5S e Excelência Operacional + II Fórum da Qualidade e ESG',
+  'Seminário de Manutenção e Confiabilidade + Seminário de Indústria 4.0, Automação e Transformação Digital',
+  'Seminário Desafios e Oportunidades da Reforma Tributária C-Level Meeting',
+] as const;
+
+export type SessionTrack = (typeof TRACKS)[number];
 
 export type Session = {
   id: string;
@@ -24,18 +31,16 @@ export type Session = {
   registeredCount: number;
 };
 
-export const TRACKS: SessionTrack[] = ['Automação', 'PPCP', 'S&OP', 'ESG', 'Manutenção'];
-
 export const SESSION_SEED: Session[] = [
   {
     id: 'session-17300',
-    title: 'VII Encontro Brasileiro de PPCP & Gestão Industrial + I Encontro Brasileiro de S&OP/S&OE/IBP',
+    title: 'VII Encontro Brasileiro de PPCP & Gestão Industrial + I Encontro Brasileiro de S&OP, S&OE & IBP',
     speaker: 'Painel de Especialistas',
     role: 'Palestrantes e Executivos',
     company: '7+ Club / Convidados',
     time: '08:00 - 18:00',
     location: 'Expocentro Edmundo Doubrawa',
-    track: 'PPCP',
+    track: TRACKS[0],
     day: 1,
     dateLabel: '16 Nov',
     capacity: 500,
@@ -44,13 +49,13 @@ export const SESSION_SEED: Session[] = [
   },
   {
     id: 'session-17299',
-    title: 'VII Encontro do Programa 5S & Excelência Operacional + Fórum da Qualidade/ESG - 2026',
+    title: 'VII Encontro do Programa 5S e Excelência Operacional + II Fórum da Qualidade e ESG',
     speaker: 'Auditório Principal',
     role: 'Especialistas do Setor',
     company: 'Comissão Organizadora',
     time: '08:00 - 18:00',
     location: 'Expocentro Edmundo Doubrawa',
-    track: 'ESG',
+    track: TRACKS[1],
     day: 3,
     dateLabel: '18 Nov',
     capacity: 500,
@@ -59,13 +64,13 @@ export const SESSION_SEED: Session[] = [
   },
   {
     id: 'session-18696',
-    title: 'Seminário Indústria 4.0, Automação e Transformação Digital + Seminário Manutenção e Confiabilidade',
+    title: 'Seminário de Manutenção e Confiabilidade + Seminário de Indústria 4.0, Automação e Transformação Digital',
     speaker: 'Líderes de Tecnologia',
     role: 'Pesquisadores e Engenheiros',
     company: 'Parceiros Tecnológicos',
     time: '08:00 - 18:00',
     location: 'Expocentro Edmundo Doubrawa',
-    track: 'Automação',
+    track: TRACKS[2],
     day: 3,
     dateLabel: '18 Nov',
     capacity: 500,
@@ -90,7 +95,7 @@ export const sessionConverter: FirestoreDataConverter<Session> = {
       company: data.company ?? '',
       time: data.time ?? '',
       location: data.location ?? '',
-      track: data.track ?? 'Automação',
+      track: (data.track as SessionTrack) ?? TRACKS[0],
       day: typeof data.day === 'number' ? data.day : 1,
       dateLabel: data.dateLabel ?? '',
       description: data.description ?? '',

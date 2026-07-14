@@ -28,7 +28,7 @@ export type VisitorProfile = {
   website?: string;
 
   // Novos campos
-  roleType?: 'Decisor' | 'Técnico/Operação' | 'Comercial' | 'Acadêmico' | '';
+  roleType?: 'Diretor/Decisor Final' | 'Gestor/Formador de Opinião' | 'Técnico/Operação' | 'Comercial' | 'Acadêmico' | '';
   sector?: string[];
   marketRole?: 'Comprador' | 'Fornecedor' | 'Serviço' | 'Ambos' | '';
   objectives?: string[];
@@ -72,18 +72,18 @@ export const DEMO_VISITOR_PROFILE: VisitorProfile = {
   name: 'Victor Almeida',
   role: 'Diretor de Operações',
   company: 'Sul Metalúrgica',
-  area: 'Metal-mecânica',
+  area: 'Metalurgia e produtos de metal',
   budget: 'R$ 100k - R$ 500k',
-  bottlenecks: ['OEE Baixo', 'Gestão de S&OP Ineficiente'],
+  bottlenecks: ['OEE baixo', 'PPCP ineficiente'],
   phone: '(47) 98888-1111',
   email: 'victor.almeida@sulmetalurgica.com.br',
   linkedin: 'https://linkedin.com/in/victor-almeida-sul',
   website: 'https://sulmetalurgica.com.br',
-  roleType: 'Decisor',
-  sector: ['Metal-mecânica'],
+  roleType: 'Diretor/Decisor Final',
+  sector: ['Metalurgia e produtos de metal'],
   marketRole: 'Comprador',
   objectives: ['Encontrar fornecedores', 'Networking'],
-  interests: ['Automação', 'PPCP', 'S&OP'],
+  interests: ['Automação Industrial', 'PPCP', 'S&OP / S&OE / IBP'],
   lookingFor: 'Fornecedores de braços robóticos e sistemas MES',
   offering: 'Peças estampadas sob medida e serviços de usinagem',
   photoUrl: '',
@@ -100,17 +100,47 @@ export const BUDGET_OPTIONS = [
   'Acima de R$ 2M',
 ] as const;
 
+/** Máximo de gargalos que o participante pode marcar. */
+export const MAX_BOTTLENECKS = 5;
+/** Máximo de áreas de interesse que o participante pode marcar. */
+export const MAX_INTERESTS = 3;
+
 export const BOTTLENECK_OPTIONS = [
-  'OEE Baixo',
-  'Gestão de S&OP Ineficiente',
-  'Tempo de Setup Alto',
-  'Falta de Sensores (IoT)',
-  'Desperdício de Energia',
-  'Manutenção Corretiva Alta',
+  'Baixa produtividade',
+  'OEE baixo',
+  'Paradas não planejadas',
+  'Manutenção corretiva elevada',
+  'Baixa confiabilidade dos equipamentos',
+  'Tempo de setup alto',
+  'Desorganização e desperdícios (5S)',
+  'Baixa maturidade em Excelência Operacional',
+  'Problemas na Gestão da Qualidade',
+  'Não conformidades, refugos e retrabalho',
+  'Baixo nível de automação industrial',
+  'Dificuldade na transformação digital',
+  'Dificuldade na adoção de Inteligência Artificial',
+  'Baixa digitalização dos processos',
+  'Falta de integração entre ERP, MES, APS e chão de fábrica',
+  'PPCP ineficiente',
+  'S&OP / S&OE pouco estruturado',
+  'Baixa acuracidade das previsões de demanda',
+  'Problemas na cadeia de suprimentos (Supply Chain)',
+  'Baixa rastreabilidade dos processos',
+  'Falta de indicadores em tempo real',
+  'Alto consumo de energia',
+  'Desafios na agenda ESG',
+  'Baixa segurança operacional',
+  'Escassez de mão de obra qualificada',
+  'Alto custo operacional',
+  'Baixa capacidade de inovação',
+  'Dificuldade na gestão de projetos de melhoria',
+  'Baixo engajamento das equipes',
+  'Outros',
 ] as const;
 
 export const ROLE_TYPES = [
-  'Decisor',
+  'Diretor/Decisor Final',
+  'Gestor/Formador de Opinião',
   'Técnico/Operação',
   'Comercial',
   'Acadêmico',
@@ -125,33 +155,55 @@ export const MARKET_ROLES = [
 
 export const OBJECTIVES = [
   'Encontrar fornecedores',
-  'Vender/gerar leads',
+  'Gerar leads',
   'Networking',
   'Tendências',
   'Recrutar',
   'Parcerias/investimento',
+  'Expor soluções',
+  'Realizar benchmark',
+  'Palestras técnicas',
+  'Cases reais',
+  'Conhecimento geral',
 ] as const;
 
 export const INTERESTS = [
-  'Automação',
-  'Robótica',
   'PPCP',
-  'S&OP',
-  'ESG',
-  'Energia',
-  'Manutenção',
-  'IoT',
+  'S&OP / S&OE / IBP',
+  'Supply Chain e Logística',
+  'Indústria 4.0',
+  'Automação Industrial',
+  'Inteligência Artificial (IA)',
+  'Transformação Digital',
+  'Manutenção e Confiabilidade',
+  'Programa 5S',
+  'Lean Manufacturing',
+  'Excelência Operacional',
+  'Gestão da Qualidade',
+  'Energia e Eficiência Energética',
+  'ESG e Sustentabilidade',
+  'Robótica Industrial',
+  'IoT Industrial',
+  'Tecnologias e Softwares Industriais',
+  'Gestão de Processos',
+  'Engenharia Industrial',
+  'Cibersegurança Industrial',
 ] as const;
 
 export const SECTORS = [
-  'Metal-mecânica',
-  'Eletroeletrônica',
-  'Plásticos e Borracha',
-  'Automotiva',
-  'Alimentos e Bebidas',
-  'Química e Petroquímica',
-  'Logística e Cadeia de Suprimentos',
-  'Outro',
+  'Alimentos e bebidas',
+  'Têxtil e vestuário',
+  'Couro e calçados',
+  'Madeira, papel e celulose',
+  'Química (inclui farmacêutica, higiene/limpeza, tintas etc.)',
+  'Borracha e plásticos',
+  'Metalurgia e produtos de metal',
+  'Máquinas e equipamentos',
+  'Material elétrico e eletrônico (inclui TI/eletroeletrônicos)',
+  'Automotiva e outros transportes',
+  'Móveis e outros produtos diversos',
+  'Outros tipos de indústria',
+  'Serviços (treinamento, consultoria, assessoria, diagnósticos, etc)',
 ] as const;
 
 function fromDoc(data: Record<string, unknown>): VisitorProfile {

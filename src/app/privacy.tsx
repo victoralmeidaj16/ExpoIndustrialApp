@@ -27,7 +27,7 @@ export default function PrivacyScreen() {
         <Text style={styles.paragraph}>
           A sua privacidade é de extrema importância para nós. Esta Política de Privacidade descreve
           como coletamos, usamos, armazenamos e protegemos as suas informações ao utilizar o
-          aplicativo **Expo Industrial Sul**.
+          aplicativo **ExpoIndustrialSul**.
         </Text>
 
         <Text style={styles.sectionTitle}>1. Informações que Coletamos</Text>

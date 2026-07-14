@@ -32,6 +32,8 @@ import {
   BUDGET_OPTIONS,
   DEMO_VISITOR_PROFILE,
   EMPTY_VISITOR_PROFILE,
+  MAX_BOTTLENECKS,
+  MAX_INTERESTS,
   saveVisitorProfile,
   useVisitorProfile,
   type VisitorProfile,
@@ -164,6 +166,20 @@ export default function ProfileScreen() {
     key: K,
     item: string
   ) => {
+    const current = (form[key] as string[]) ?? [];
+    if (!current.includes(item)) {
+      const limit =
+        key === 'bottlenecks' ? MAX_BOTTLENECKS : key === 'interests' ? MAX_INTERESTS : undefined;
+      if (limit && current.length >= limit) {
+        Alert.alert(
+          'Limite atingido',
+          `Você pode selecionar no máximo ${limit} ${
+            key === 'bottlenecks' ? 'gargalos' : 'áreas de interesse'
+          }. Desmarque uma opção para trocar.`
+        );
+        return;
+      }
+    }
     setForm((f) => {
       const arr = (f[key] as string[]) ?? [];
       const updated = arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
@@ -549,7 +565,7 @@ export default function ProfileScreen() {
             })}
           </View>
 
-          <Text style={styles.label}>Gargalos Atuais da sua Fábrica</Text>
+          <Text style={styles.label}>Gargalos Atuais da sua Fábrica (até {MAX_BOTTLENECKS})</Text>
           <View style={styles.optionsGrid}>
             {BOTTLENECK_OPTIONS.map((opt) => {
               const isSelected = (form.bottlenecks ?? []).includes(opt);
@@ -566,7 +582,7 @@ export default function ProfileScreen() {
             })}
           </View>
 
-          <Text style={styles.label}>Áreas de Interesse</Text>
+          <Text style={styles.label}>Áreas de Interesse (até {MAX_INTERESTS})</Text>
           <View style={styles.optionsGrid}>
             {INTERESTS.map((opt) => {
               const isSelected = (form.interests ?? []).includes(opt);
@@ -719,9 +735,6 @@ export default function ProfileScreen() {
                   <Text style={styles.leadRole}>
                     {lead.role} · <Text style={styles.leadCompany}>{lead.company}</Text>
                   </Text>
-                </View>
-                <View style={styles.sourceBadge}>
-                  <Text style={styles.sourceBadgeText}>{lead.source}</Text>
                 </View>
                 <Pressable
                   hitSlop={8}
@@ -1083,15 +1096,6 @@ const styles = StyleSheet.create({
   leadName: { color: Light.navyDeep, fontSize: 15.5, fontWeight: '700' },
   leadRole: { color: Light.textMuted, fontSize: 12.5, marginTop: 2 },
   leadCompany: { color: Light.gold, fontWeight: '700' },
-  sourceBadge: {
-    backgroundColor: '#FBF6E9',
-    borderWidth: 1,
-    borderColor: Light.goldPillBorder,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: Radius.pill,
-  },
-  sourceBadgeText: { color: Light.goldTextStrong, fontSize: 9.5, fontWeight: '700' },
   leadContactRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',

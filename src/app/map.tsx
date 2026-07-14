@@ -317,7 +317,7 @@ export default function MapScreen() {
               mapRef.current = node;
             }}
             srcDoc={embeddedMapHtml}
-            title="Mapa 3D real da Expo Industrial Sul"
+            title="Mapa 3D real da ExpoIndustrialSul"
             style={styles.mapIframe as any}
             onLoad={() => setMapReady(true)}
           />

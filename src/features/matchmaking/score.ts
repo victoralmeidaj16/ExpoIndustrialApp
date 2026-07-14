@@ -17,22 +17,70 @@ import { type VisitorProfile } from '@/features/visitor/visitor-profile';
 
 /** Palavras-chave que ligam um gargalo do visitante ao domínio do expositor. */
 const BOTTLENECK_KEYWORDS: Record<string, string[]> = {
-  'OEE Baixo': ['oee', 'automação', 'mes', 'scada', 'eficiência', 'produtividade', 'digital'],
-  'Gestão de S&OP Ineficiente': ['mes', 'planejamento', 's&op', 'ppcp', 'software', 'digital', 'gêmeo'],
-  'Tempo de Setup Alto': ['automação', 'robótica', 'servo', 'cobot', 'célula', 'acionamento'],
-  'Falta de Sensores (IoT)': ['sensor', 'iot', 'monitoramento', 'scada', 'medição'],
-  'Desperdício de Energia': ['energia', 'eficiência', 'inversor', 'esg', 'ecostruxure', 'drives'],
-  'Manutenção Corretiva Alta': ['preditiv', 'manutenção', 'monitoramento', 'digital', 'gêmeo', 'iot'],
+  'Baixa produtividade': ['produtividade', 'oee', 'automação', 'eficiência', 'lean', 'mes'],
+  'OEE baixo': ['oee', 'automação', 'mes', 'scada', 'eficiência', 'produtividade', 'digital'],
+  'Paradas não planejadas': ['preditiv', 'manutenção', 'monitoramento', 'iot', 'sensor', 'disponibilidade'],
+  'Manutenção corretiva elevada': ['preditiv', 'manutenção', 'monitoramento', 'digital', 'gêmeo', 'iot'],
+  'Baixa confiabilidade dos equipamentos': ['confiabilidade', 'preditiv', 'manutenção', 'sensor', 'monitoramento'],
+  'Tempo de setup alto': ['automação', 'robótica', 'servo', 'cobot', 'célula', 'acionamento', 'setup', 'smed'],
+  'Desorganização e desperdícios (5S)': ['5s', 'lean', 'organização', 'desperdício', 'kaizen'],
+  'Baixa maturidade em Excelência Operacional': ['excelência', 'lean', 'kaizen', 'melhoria', 'operacional'],
+  'Problemas na Gestão da Qualidade': ['qualidade', 'inspeção', 'visão', 'mes', 'cep'],
+  'Não conformidades, refugos e retrabalho': ['qualidade', 'refugo', 'retrabalho', 'inspeção', 'visão', 'rastreabilidade'],
+  'Baixo nível de automação industrial': ['automação', 'robótica', 'clp', 'servo', 'acionamento', 'célula'],
+  'Dificuldade na transformação digital': ['digital', 'transformação', 'indústria 4.0', 'iot', 'software', 'nuvem'],
+  'Dificuldade na adoção de Inteligência Artificial': ['inteligência artificial', 'machine learning', 'visão', 'analytics', 'preditiv'],
+  'Baixa digitalização dos processos': ['digital', 'digitalização', 'mes', 'software', 'paperless'],
+  'Falta de integração entre ERP, MES, APS e chão de fábrica': ['erp', 'mes', 'aps', 'integração', 'software', 'scada', 'opc'],
+  'PPCP ineficiente': ['ppcp', 'planejamento', 'aps', 'mes', 'programação', 'produção'],
+  'S&OP / S&OE pouco estruturado': ['s&op', 's&oe', 'ibp', 'planejamento', 'demanda', 'aps'],
+  'Baixa acuracidade das previsões de demanda': ['demanda', 'previsão', 'forecast', 'planejamento', 's&op', 'analytics'],
+  'Problemas na cadeia de suprimentos (Supply Chain)': ['supply', 'suprimentos', 'logística', 'estoque', 'cadeia', 'wms'],
+  'Baixa rastreabilidade dos processos': ['rastreabilidade', 'traceability', 'mes', 'serialização', 'rfid'],
+  'Falta de indicadores em tempo real': ['indicadores', 'tempo real', 'dashboard', 'scada', 'mes', 'analytics'],
+  'Alto consumo de energia': ['energia', 'eficiência', 'inversor', 'esg', 'ecostruxure', 'drives'],
+  'Desafios na agenda ESG': ['esg', 'sustentabilidade', 'energia', 'carbono', 'ambiental'],
+  'Baixa segurança operacional': ['segurança', 'safety', 'nr-12', 'proteção'],
+  'Escassez de mão de obra qualificada': ['capacitação', 'treinamento', 'automação', 'robótica', 'cobot'],
+  'Alto custo operacional': ['custo', 'eficiência', 'produtividade', 'lean', 'otimização'],
+  'Baixa capacidade de inovação': ['inovação', 'tecnologia', 'digital', 'pesquisa'],
+  'Dificuldade na gestão de projetos de melhoria': ['projeto', 'melhoria', 'kaizen', 'lean', 'gestão'],
+  'Baixo engajamento das equipes': ['engajamento', 'treinamento', 'cultura', 'lean'],
+  Outros: [],
 };
 
 /** Etiqueta curta exibida no card para cada gargalo. */
 const BOTTLENECK_TAG: Record<string, string> = {
-  'OEE Baixo': 'OEE',
-  'Gestão de S&OP Ineficiente': 'PPCP / S&OP',
-  'Tempo de Setup Alto': 'Setup',
-  'Falta de Sensores (IoT)': 'IoT',
-  'Desperdício de Energia': 'Energia',
-  'Manutenção Corretiva Alta': 'Manutenção',
+  'Baixa produtividade': 'Produtividade',
+  'OEE baixo': 'OEE',
+  'Paradas não planejadas': 'Paradas',
+  'Manutenção corretiva elevada': 'Manutenção',
+  'Baixa confiabilidade dos equipamentos': 'Confiabilidade',
+  'Tempo de setup alto': 'Setup',
+  'Desorganização e desperdícios (5S)': '5S / Lean',
+  'Baixa maturidade em Excelência Operacional': 'Excelência Op.',
+  'Problemas na Gestão da Qualidade': 'Qualidade',
+  'Não conformidades, refugos e retrabalho': 'Refugo / Retrabalho',
+  'Baixo nível de automação industrial': 'Automação',
+  'Dificuldade na transformação digital': 'Transf. Digital',
+  'Dificuldade na adoção de Inteligência Artificial': 'IA',
+  'Baixa digitalização dos processos': 'Digitalização',
+  'Falta de integração entre ERP, MES, APS e chão de fábrica': 'Integração ERP/MES',
+  'PPCP ineficiente': 'PPCP',
+  'S&OP / S&OE pouco estruturado': 'S&OP',
+  'Baixa acuracidade das previsões de demanda': 'Previsão de Demanda',
+  'Problemas na cadeia de suprimentos (Supply Chain)': 'Supply Chain',
+  'Baixa rastreabilidade dos processos': 'Rastreabilidade',
+  'Falta de indicadores em tempo real': 'Indicadores',
+  'Alto consumo de energia': 'Energia',
+  'Desafios na agenda ESG': 'ESG',
+  'Baixa segurança operacional': 'Segurança',
+  'Escassez de mão de obra qualificada': 'Mão de Obra',
+  'Alto custo operacional': 'Custo',
+  'Baixa capacidade de inovação': 'Inovação',
+  'Dificuldade na gestão de projetos de melhoria': 'Projetos de Melhoria',
+  'Baixo engajamento das equipes': 'Engajamento',
+  Outros: 'Outros',
 };
 
 const CATEGORY_BOOST: Record<BoothCategory, number> = {
@@ -148,7 +196,7 @@ export async function computeFitWithGemini(
   }
 
   const prompt = `
-Você é um motor de matchmaking inteligente da feira industrial Expo Industrial Sul 2026.
+Você é um motor de matchmaking inteligente da feira industrial ExpoIndustrialSul 2026.
 Avalie a compatibilidade (fit) entre o perfil do visitante e o expositor.
 
 Dados do Visitante:

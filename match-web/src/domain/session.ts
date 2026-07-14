@@ -9,9 +9,14 @@ import {
 
 export const SESSIONS_COLLECTION = 'sessions';
 
-export type SessionTrack = 'Automação' | 'PPCP' | 'S&OP' | 'ESG' | 'Manutenção';
+export const TRACKS = [
+  'VII Encontro Brasileiro de PPCP & Gestão Industrial + I Encontro Brasileiro de S&OP, S&OE & IBP',
+  'VII Encontro do Programa 5S e Excelência Operacional + II Fórum da Qualidade e ESG',
+  'Seminário de Manutenção e Confiabilidade + Seminário de Indústria 4.0, Automação e Transformação Digital',
+  'Seminário Desafios e Oportunidades da Reforma Tributária C-Level Meeting',
+] as const;
 
-export const TRACKS: SessionTrack[] = ['Automação', 'PPCP', 'S&OP', 'ESG', 'Manutenção'];
+export type SessionTrack = (typeof TRACKS)[number];
 
 export type Session = {
   id: string;
@@ -45,7 +50,7 @@ export const sessionConverter: FirestoreDataConverter<Session> = {
       company: data.company ?? '',
       time: data.time ?? '',
       location: data.location ?? '',
-      track: (data.track as SessionTrack) ?? 'Automação',
+      track: (data.track as SessionTrack) ?? TRACKS[0],
       day: typeof data.day === 'number' ? data.day : 1,
       dateLabel: data.dateLabel ?? '',
       description: data.description ?? '',
@@ -65,7 +70,7 @@ export function emptySession(): Omit<Session, 'id'> {
     company: '',
     time: '',
     location: '',
-    track: 'Automação',
+    track: TRACKS[0],
     day: 1,
     dateLabel: '',
     description: '',

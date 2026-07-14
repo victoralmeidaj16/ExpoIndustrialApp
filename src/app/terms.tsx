@@ -25,7 +25,7 @@ export default function TermsScreen() {
         <Text style={styles.lastUpdated}>Última atualização: 30 de Junho de 2026</Text>
 
         <Text style={styles.paragraph}>
-          Bem-vindo ao **Expo Industrial Sul**. Ao baixar, acessar ou utilizar nosso aplicativo,
+          Bem-vindo ao **ExpoIndustrialSul**. Ao baixar, acessar ou utilizar nosso aplicativo,
           você concorda em estar vinculado a estes Termos de Uso. Caso não concorde com qualquer
           uma das condições descritas abaixo, solicitamos que não utilize a ferramenta.
         </Text>

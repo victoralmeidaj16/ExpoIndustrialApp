@@ -40,7 +40,7 @@ export default function CroquiPage() {
     <div>
       <PageHeader
         title="Mapa 3D — estandes da feira"
-        description="Mapa 3D real da Expo Industrial Sul. Use a lista lateral para localizar estandes, conferir dados do expositor e manter as informações do organizador atualizadas."
+        description="Mapa 3D real da ExpoIndustrialSul. Use a lista lateral para localizar estandes, conferir dados do expositor e manter as informações do organizador atualizadas."
       />
 
       {loading ? (
@@ -55,7 +55,7 @@ export default function CroquiPage() {
               <iframe
                 ref={mapFrameRef}
                 src={REAL_3D_MAP_URL}
-                title="Mapa 3D real da Expo Industrial Sul"
+                title="Mapa 3D real da ExpoIndustrialSul"
                 className="h-[820px] w-full border-0"
                 allow="fullscreen"
               />

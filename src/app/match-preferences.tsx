@@ -24,6 +24,8 @@ import {
   EMPTY_VISITOR_PROFILE,
   INTERESTS,
   MARKET_ROLES,
+  MAX_BOTTLENECKS,
+  MAX_INTERESTS,
   OBJECTIVES,
   saveVisitorProfile,
   SECTORS,
@@ -62,12 +64,26 @@ export default function MatchPreferencesScreen() {
   };
 
   const toggleArrayItem = (key: MultiKey, item: string) => {
-    setForm((current) => {
-      const values = (current[key] as string[]) ?? [];
+    const current = (form[key] as string[]) ?? [];
+    if (!current.includes(item)) {
+      const limit =
+        key === 'bottlenecks' ? MAX_BOTTLENECKS : key === 'interests' ? MAX_INTERESTS : undefined;
+      if (limit && current.length >= limit) {
+        Alert.alert(
+          'Limite atingido',
+          `Você pode selecionar no máximo ${limit} ${
+            key === 'bottlenecks' ? 'gargalos' : 'áreas de interesse'
+          }. Desmarque uma opção para trocar.`,
+        );
+        return;
+      }
+    }
+    setForm((prev) => {
+      const values = (prev[key] as string[]) ?? [];
       const updated = values.includes(item)
         ? values.filter((value) => value !== item)
         : [...values, item];
-      return { ...current, [key]: updated };
+      return { ...prev, [key]: updated };
     });
   };
 
@@ -169,7 +185,7 @@ export default function MatchPreferencesScreen() {
                 onToggle={(item) => toggleArrayItem('objectives', item)}
               />
 
-              <Text style={styles.label}>Gargalos da operação</Text>
+              <Text style={styles.label}>Gargalos da operação (até {MAX_BOTTLENECKS})</Text>
               <ChipGrid
                 options={BOTTLENECK_OPTIONS}
                 selected={form.bottlenecks ?? []}
@@ -178,7 +194,7 @@ export default function MatchPreferencesScreen() {
             </FieldGroup>
 
             <FieldGroup title="Interesses e orçamento">
-              <Text style={styles.label}>Áreas de interesse</Text>
+              <Text style={styles.label}>Áreas de interesse (até {MAX_INTERESTS})</Text>
               <ChipGrid
                 options={INTERESTS}
                 selected={form.interests ?? []}

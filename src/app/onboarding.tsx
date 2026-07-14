@@ -25,6 +25,8 @@ import {
   BOTTLENECK_OPTIONS,
   BUDGET_OPTIONS,
   EMPTY_VISITOR_PROFILE,
+  MAX_BOTTLENECKS,
+  MAX_INTERESTS,
   saveVisitorProfile,
   useVisitorProfile,
   type VisitorProfile,
@@ -96,6 +98,20 @@ export default function OnboardingScreen() {
     key: K,
     item: string
   ) => {
+    const current = (form[key] as string[]) ?? [];
+    if (!current.includes(item)) {
+      const limit =
+        key === 'bottlenecks' ? MAX_BOTTLENECKS : key === 'interests' ? MAX_INTERESTS : undefined;
+      if (limit && current.length >= limit) {
+        Alert.alert(
+          'Limite atingido',
+          `Você pode selecionar no máximo ${limit} ${
+            key === 'bottlenecks' ? 'gargalos' : 'áreas de interesse'
+          }. Desmarque uma opção para trocar.`
+        );
+        return;
+      }
+    }
     setForm((f) => {
       const arr = (f[key] as string[]) ?? [];
       const updated = arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
@@ -378,7 +394,7 @@ export default function OnboardingScreen() {
                 })}
               </View>
 
-              <Text style={styles.label}>Gargalos da Operação</Text>
+              <Text style={styles.label}>Gargalos da Operação (até {MAX_BOTTLENECKS})</Text>
               <View style={styles.optionsGrid}>
                 {BOTTLENECK_OPTIONS.map((opt) => {
                   const isSelected = (form.bottlenecks ?? []).includes(opt);
@@ -402,7 +418,7 @@ export default function OnboardingScreen() {
               <Text style={styles.stepTitle}>Foco de Interesse e Orçamento</Text>
               <Text style={styles.stepSubtitle}>Seus interesses de tecnologia e capacidade.</Text>
 
-              <Text style={styles.label}>Áreas de Interesse</Text>
+              <Text style={styles.label}>Áreas de Interesse (até {MAX_INTERESTS})</Text>
               <View style={styles.optionsGrid}>
                 {INTERESTS.map((opt) => {
                   const isSelected = (form.interests ?? []).includes(opt);
