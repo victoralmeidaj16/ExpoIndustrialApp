@@ -3,6 +3,8 @@ import {
   type QueryDocumentSnapshot,
 } from 'firebase/firestore';
 
+import { OFFICIAL_PAID_EVENTS } from '../paid-events/paid-event';
+
 export const SESSIONS_COLLECTION = 'sessions';
 
 export const TRACKS = [
@@ -27,6 +29,7 @@ export type Session = {
   dateLabel: string;
   description: string;
   imageUrl?: string;
+  registrationUrl?: string;
   capacity: number;
   registeredCount: number;
 };
@@ -45,6 +48,7 @@ export const SESSION_SEED: Session[] = [
     dateLabel: '16 Nov',
     capacity: 500,
     registeredCount: 0,
+    registrationUrl: OFFICIAL_PAID_EVENTS[0].paymentUrl,
     description: 'O principal encontro de Planejamento, Programação e Controle de Produção (PPCP) e Sales & Operations Planning (S&OP) do Sul do Brasil, reunindo líderes industriais para debater eficiência e excelência operacional.',
   },
   {
@@ -60,6 +64,7 @@ export const SESSION_SEED: Session[] = [
     dateLabel: '18 Nov',
     capacity: 500,
     registeredCount: 0,
+    registrationUrl: OFFICIAL_PAID_EVENTS[1].paymentUrl,
     description: 'Discussões aprofundadas sobre o Programa 5S, gestão da qualidade e a integração das práticas ESG na estratégia e operação industrial moderna.',
   },
   {
@@ -75,6 +80,7 @@ export const SESSION_SEED: Session[] = [
     dateLabel: '18 Nov',
     capacity: 500,
     registeredCount: 0,
+    registrationUrl: OFFICIAL_PAID_EVENTS[2].paymentUrl,
     description: 'Seminário focado em transformação digital, adoção de tecnologias da Indústria 4.0, automação industrial e as melhores práticas em manutenção e confiabilidade de ativos.',
   },
 ];
@@ -100,11 +106,21 @@ export const sessionConverter: FirestoreDataConverter<Session> = {
       dateLabel: data.dateLabel ?? '',
       description: data.description ?? '',
       imageUrl: data.imageUrl ?? '',
+      registrationUrl: data.registrationUrl ?? getSessionRegistrationUrl(snapshot.id, data.title ?? ''),
       capacity: typeof data.capacity === 'number' ? data.capacity : 0,
       registeredCount: typeof data.registeredCount === 'number' ? data.registeredCount : 0,
     };
   },
 };
+
+export function getSessionRegistrationUrl(id: string, title = ''): string {
+  if (id === 'session-17300' || title.includes('PPCP')) return OFFICIAL_PAID_EVENTS[0].paymentUrl;
+  if (id === 'session-17299' || title.includes('5S')) return OFFICIAL_PAID_EVENTS[1].paymentUrl;
+  if (id === 'session-18696' || title.includes('Manutenção') || title.includes('Indústria 4.0')) {
+    return OFFICIAL_PAID_EVENTS[2].paymentUrl;
+  }
+  return '';
+}
 
 export function getSessionImageSource(session: Pick<Session, 'imageUrl'>) {
   if (session.imageUrl) return { uri: session.imageUrl };

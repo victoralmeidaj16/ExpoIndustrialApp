@@ -14,6 +14,12 @@ import {
 } from './session';
 
 const LOCAL_PREFS_KEY = '@expoindustrial:agenda-preferences';
+const OLD_MOCK_SESSION_IDS = new Set([
+  'd1-1', 'd1-2', 'd1-3', 'd1-4', 'd1-5',
+  'd2-1', 'd2-2', 'd2-3',
+  'd3-1', 'd3-2',
+  'd4-1',
+]);
 
 type AgendaPreferences = {
   favoriteIds: string[];
@@ -52,6 +58,7 @@ export function useSessions(): {
       (snap) => {
         const docs = snap.docs
           .map((item) => item.data())
+          .filter((session) => !OLD_MOCK_SESSION_IDS.has(session.id))
           .sort((a, b) => a.day - b.day || a.time.localeCompare(b.time));
         setSessions(docs.length ? docs : SESSION_SEED);
         setSource(docs.length ? 'firestore' : 'seed');

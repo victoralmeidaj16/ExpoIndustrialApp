@@ -43,27 +43,6 @@ const QUICK_ACTIONS: { icon: IconName; label: string; route?: string }[] = [
   { icon: 'calendar-outline', label: 'Agenda', route: '/agenda' },
 ];
 
-const RECOMMENDATIONS = [
-  {
-    tag: 'Palestra',
-    title: 'Indústria 4.0 & ESG na prática',
-    meta: '14:00 · Auditório Central',
-    accent: '#2F6BFF',
-  },
-  {
-    tag: 'Match IA',
-    title: 'Siemens tem 95% de fit com sua operação',
-    meta: 'Automação & Robótica',
-    accent: Light.gold,
-  },
-  {
-    tag: 'Networking',
-    title: 'Rodada de compradores — PPCP',
-    meta: '16:30 · Sala Executiva',
-    accent: '#00A9C7',
-  },
-];
-
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { exhibitors } = useExhibitors();
@@ -215,33 +194,6 @@ export default function HomeScreen() {
             </ScalePressable>
           ))}
         </ScrollView>
-
-        {/* Recomendações de hoje */}
-        <SectionHeader title="Recomendado para hoje" actionLabel="Ver mais" />
-        <View style={styles.recoList}>
-          {RECOMMENDATIONS.map((item) => (
-            <ScalePressable
-              key={item.title}
-              style={styles.recoCard}
-              onPress={() => {
-                if (item.tag === 'Match IA') {
-                  router.push('/matchmaking');
-                } else if (item.tag === 'Networking') {
-                  router.push('/connections');
-                } else if (item.tag === 'Palestra') {
-                  router.push('/agenda');
-                }
-              }}>
-              <View style={[styles.recoAccent, { backgroundColor: item.accent }]} />
-              <View style={styles.recoBody}>
-                <Text style={[styles.recoTag, { color: item.accent }]}>{item.tag.toUpperCase()}</Text>
-                <Text style={styles.recoTitle}>{item.title}</Text>
-                <Text style={styles.recoMeta}>{item.meta}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={Light.textMuted} />
-            </ScalePressable>
-          ))}
-        </View>
 
         {/* Patrocinadores */}
         <SectionHeader title="Patrocinadores" />

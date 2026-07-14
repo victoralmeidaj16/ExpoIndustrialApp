@@ -6,6 +6,7 @@ import {
   Alert,
   FlatList,
   ImageBackground,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -68,6 +69,10 @@ export default function AgendaScreen() {
   });
 
   async function onToggleRegistration(session: Session) {
+    if (session.registrationUrl) {
+      await Linking.openURL(session.registrationUrl);
+      return;
+    }
     const result = await toggleRegistration(session.id);
     if (result === 'full') {
       Alert.alert('Sessão lotada', 'Não há vagas disponíveis para esta palestra.');
@@ -246,7 +251,7 @@ export default function AgendaScreen() {
                         color={isRegistered ? '#fff' : Light.gold}
                       />
                       <Text style={[styles.secondaryBtnText, isRegistered && styles.secondaryBtnTextActive]}>
-                        {isRegistered ? 'Inscrito' : 'Inscrever-se'}
+                        {item.registrationUrl ? 'Inscrever-se' : isRegistered ? 'Inscrito' : 'Inscrever-se'}
                       </Text>
                     </ScalePressable>
                     <ScalePressable style={styles.secondaryBtn} onPress={() => toggleReminder(item.id)}>

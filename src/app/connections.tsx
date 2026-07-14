@@ -26,7 +26,8 @@ import {
 import { rankPeople } from '@/features/matchmaking/people-score';
 import { isProfileUsable } from '@/features/matchmaking/score';
 import { exportLeadVCard, leadMessageUrl } from '@/features/visitor/leads';
-import { useVisitorProfile, type VisitorProfile, getVisitorProfileByUid, saveVisitorProfile } from '@/features/visitor/visitor-profile';
+import { useVisitorProfile, type VisitorProfile, saveVisitorProfile } from '@/features/visitor/visitor-profile';
+import { resolveVisitorQrCode } from '@/features/visitor/visitor-ticket-qr';
 
 type TabType = 'suggestions' | 'requests' | 'connected';
 
@@ -68,35 +69,25 @@ export default function ConnectionsScreen() {
     setScanned(true);
     setScannerVisible(false);
     try {
-      let visitorUid = '';
-      let isDeepLink = false;
+      const resolved = await resolveVisitorQrCode(data);
 
-      // Suporta esquemas expoindustrialsul://, expoindustrial://, ou URLs web
-      if (data.startsWith('expoindustrialsul://visitor/') || data.startsWith('expoindustrial://visitor/')) {
-        visitorUid = data.split('/').pop() || '';
-        isDeepLink = true;
-      } else if (data.includes('/visitor/')) {
-        visitorUid = data.split('/visitor/')[1]?.split('?')[0] || '';
-        isDeepLink = true;
-      }
-
-      if (isDeepLink && visitorUid) {
-        if (visitorUid === user?.uid) {
+      if (resolved) {
+        if (resolved.uid === user?.uid) {
           Alert.alert('Atenção', 'Você escaneou o seu próprio QR Code.');
           return;
         }
 
-        const visitorInfo = await getVisitorProfileByUid(visitorUid);
+        const visitorInfo = resolved.profile;
 
         if (visitorInfo) {
           // Verifica se há alguma solicitação pendente recebida deste usuário
-          const pendingReq = pendingReceived.find((r) => r.fromUid === visitorUid);
+          const pendingReq = pendingReceived.find((r) => r.fromUid === resolved.uid);
           if (pendingReq) {
             await acceptConnection(pendingReq.id);
             Alert.alert('Conectados! 🤝', `${visitorInfo.name} já tinha enviado um pedido. Agora vocês estão conectados e compartilham contatos!`);
           } else {
             const myName = profile?.name || user?.email || 'Visitante';
-            await requestConnection(visitorUid, visitorInfo.name, myName);
+            await requestConnection(resolved.uid, visitorInfo.name, myName);
             Alert.alert('Solicitação Enviada! ✉️', `Você solicitou conexão com ${visitorInfo.name}.`);
           }
         } else {

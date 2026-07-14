@@ -82,6 +82,34 @@ service cloud.firestore {
                     && request.resource.data.ownerUid == request.auth.uid;
     }
 
+    // Índice de QR Code de ingresso Sympla por hash SHA-256. Usado para resolver
+    // o QR do ingresso para o perfil do visitante sem expor o código bruto.
+    match /ticketQrLookups/{ticketQrHash} {
+      allow get: if request.auth != null;
+      allow list: if false;
+      allow create, update: if request.auth != null
+                            && request.resource.data.keys().hasOnly([
+                              'uid',
+                              'ownerUid',
+                              'eventId',
+                              'ticketQrHash',
+                              'userEmailLower',
+                              'source',
+                              'profile',
+                              'updatedAt'
+                            ])
+                            && request.resource.data.uid == request.auth.uid
+                            && request.resource.data.ownerUid == request.auth.uid
+                            && request.resource.data.eventId == 'sympla-3486582'
+                            && request.resource.data.ticketQrHash == ticketQrHash
+                            && request.resource.data.userEmailLower == request.auth.token.email
+                            && request.resource.data.source == 'sympla'
+                            && exists(/databases/$(database)/documents/paidEvents/sympla-3486582/attendees/$(request.auth.token.email))
+                            && get(/databases/$(database)/documents/paidEvents/sympla-3486582/attendees/$(request.auth.token.email)).data.ticketQrHash == ticketQrHash;
+      allow delete: if isAdmin()
+                    || (request.auth != null && resource.data.ownerUid == request.auth.uid);
+    }
+
     // Agenda pública do evento. Leitura pública; escrita só por admin (painel) ou
     // ferramenta de seed/console (Admin SDK ignora as rules).
     match /sessions/{id} {

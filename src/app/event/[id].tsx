@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -69,6 +70,10 @@ export default function EventDetailScreen() {
   const full = !isRegistered && seatsLeft === 0;
 
   async function onToggleRegistration() {
+    if (session.registrationUrl) {
+      await Linking.openURL(session.registrationUrl);
+      return;
+    }
     const result = await toggleRegistration(sessionId);
     if (result === 'full') {
       Alert.alert('Sessão lotada', 'Não há vagas disponíveis para este evento.');
@@ -145,7 +150,7 @@ export default function EventDetailScreen() {
                 color={isRegistered ? '#fff' : Light.navyDeep}
               />
               <Text style={[styles.primaryActionText, isRegistered && styles.primaryActionTextActive]}>
-                {isRegistered ? 'Inscrito' : 'Inscrever-se'}
+                {session.registrationUrl ? 'Inscrever-se no evento' : isRegistered ? 'Inscrito' : 'Inscrever-se'}
               </Text>
             </ScalePressable>
 

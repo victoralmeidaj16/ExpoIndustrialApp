@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
 
 import { getAdminDb } from '@/lib/admin-firebase';
 
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
     const fullName = (data.fullName || data.name || `${first_name} ${last_name}`).trim();
 
     const ticketQrCode = data.ticket_num_qr_code || data.ticketQrCode || data.ticket_number || data.ticketCode || '';
+    const ticketQrHash = hashTicketQrCode(ticketQrCode);
     const ticketNumber = data.ticket_number || ticketQrCode;
     const ticketName = data.ticket_name || data.ticketName || 'Acesso';
     const eventId = String(data.event_id || data.eventId || body.event_id || '3486582');
@@ -66,6 +68,7 @@ export async function POST(request: Request) {
           fullName: fullName || 'Visitante Sympla',
           ticketNumber,
           ticketQrCode,
+          ticketQrHash,
           ticketName,
           source: 'sympla',
           symplaEventId: eventId,
@@ -77,6 +80,22 @@ export async function POST(request: Request) {
         },
         { merge: true }
       );
+
+    if (ticketQrHash) {
+      await db
+        .collection('ticketQrLookups')
+        .doc(ticketQrHash)
+        .set(
+          {
+            eventId: paidEventId,
+            ticketQrHash,
+            userEmailLower: email,
+            source: 'sympla',
+            updatedAt: Date.now(),
+          },
+          { merge: true }
+        );
+    }
 
     return NextResponse.json({ success: true, email, ticketQrCode });
   } catch (error: any) {
@@ -92,4 +111,8 @@ function getCustomFieldValue(fields: any, name: string): string {
     (f: any) => f?.name?.trim()?.toLowerCase() === normalizedSearch
   );
   return found ? (found.value || '').trim() : '';
+}
+
+function hashTicketQrCode(value: string | null | undefined): string {
+  return createHash('sha256').update((value ?? '').trim()).digest('hex');
 }

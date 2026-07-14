@@ -97,14 +97,14 @@ export default function PaidEventsScreen() {
                 ) : (
                   <View style={styles.lockedBox}>
                     <Text style={styles.lockedText}>
-                      Use no app o mesmo email cadastrado na compra Higestor para liberar os materiais.
+                      Use no app o mesmo email cadastrado na inscrição para liberar os materiais.
                     </Text>
                     {event.paymentUrl ? (
                       <Pressable
                         style={styles.paymentBtn}
                         onPress={() => Linking.openURL(event.paymentUrl!)}>
                         <Ionicons name="card-outline" size={16} color="#fff" />
-                        <Text style={styles.paymentBtnText}>Inscrever-se / Pagar (HiGestor)</Text>
+                        <Text style={styles.paymentBtnText}>Inscrever-se no evento</Text>
                       </Pressable>
                     ) : null}
                   </View>

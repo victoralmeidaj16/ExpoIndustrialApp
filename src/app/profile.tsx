@@ -52,6 +52,7 @@ import {
   useSavedLeads,
 } from '@/features/visitor/leads';
 import { useSavedExhibitors } from '@/features/visitor/saved-exhibitors';
+import { publishSymplaTicketQrLookup } from '@/features/visitor/visitor-ticket-qr';
 
 
 import { db } from '@/lib/firebase';
@@ -93,6 +94,13 @@ export default function ProfileScreen() {
     };
     fetchSymplaTicket();
   }, [user]);
+
+  useEffect(() => {
+    if (!symplaTicketCode || !form.name) return;
+    publishSymplaTicketQrLookup(symplaTicketCode, form).catch((err) => {
+      console.error('Erro ao vincular QR Sympla ao perfil:', err);
+    });
+  }, [symplaTicketCode, form.name, form.role, form.company, form.email, form.phone]);
 
   async function handleDeleteAccount() {
     if (!configured) {

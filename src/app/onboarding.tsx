@@ -21,6 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Light, Radius, Spacing } from '@/constants/theme';
 import { AuthForm } from '@/features/auth/auth-form';
 import { useAuth } from '@/features/auth/use-auth';
+import { VISITATION_TICKET_URL } from '@/features/paid-events/paid-event';
 import {
   BOTTLENECK_OPTIONS,
   BUDGET_OPTIONS,
@@ -263,6 +264,21 @@ export default function OnboardingScreen() {
             <View style={styles.stepContent}>
               <Text style={styles.stepTitle}>Quem é você?</Text>
               <Text style={styles.stepSubtitle}>Dados obrigatórios para acesso ao app e crachá do evento.</Text>
+
+              <Pressable
+                style={styles.ticketCard}
+                onPress={() => Linking.openURL(VISITATION_TICKET_URL)}>
+                <View style={styles.ticketIcon}>
+                  <Ionicons name="ticket-outline" size={20} color={Light.gold} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.ticketTitle}>Ainda não tem ingresso gratuito?</Text>
+                  <Text style={styles.ticketText}>
+                    Inscreva-se na visitação da Expoindustrial Sul pelo Sympla.
+                  </Text>
+                </View>
+                <Ionicons name="open-outline" size={18} color={Light.gold} />
+              </Pressable>
 
               <Text style={styles.label}>Nome Completo</Text>
               <TextInput
@@ -603,6 +619,26 @@ const styles = StyleSheet.create({
   stepContent: { gap: Spacing.three },
   stepTitle: { color: Light.textNavy, fontSize: 22, fontWeight: '800' },
   stepSubtitle: { color: Light.textMuted, fontSize: 13.5, lineHeight: 20 },
+  ticketCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    backgroundColor: '#FBF6E9',
+    borderWidth: 1,
+    borderColor: Light.goldPillBorder,
+    borderRadius: Radius.md,
+    padding: Spacing.three,
+  },
+  ticketIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: Radius.sm,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ticketTitle: { color: Light.navyDeep, fontSize: 14, fontWeight: '800' },
+  ticketText: { color: Light.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 2 },
 
   label: {
     color: Light.goldTextStrong,

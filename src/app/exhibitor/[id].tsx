@@ -13,7 +13,7 @@ import { useExhibitor } from '@/features/exhibitors/use-exhibitors';
 import { CATEGORY_COLOR } from '@/features/venue/venue';
 import { addSavedLead } from '@/features/visitor/leads';
 import { useSavedExhibitors } from '@/features/visitor/saved-exhibitors';
-import { getVisitorProfileByUid, DEMO_VISITOR_PROFILE } from '@/features/visitor/visitor-profile';
+import { resolveVisitorQrCode } from '@/features/visitor/visitor-ticket-qr';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -45,42 +45,21 @@ export default function ExhibitorScreen() {
     setScanned(true);
     setScannerVisible(false);
     try {
-      let visitorUid = '';
-      let isDeepLink = false;
-
-      // Suporta esquemas expoindustrialsul://, expoindustrial://, ou URLs web
-      if (data.startsWith('expoindustrialsul://visitor/') || data.startsWith('expoindustrial://visitor/')) {
-        visitorUid = data.split('/').pop() || '';
-        isDeepLink = true;
-      } else if (data.includes('/visitor/')) {
-        visitorUid = data.split('/visitor/')[1]?.split('?')[0] || '';
-        isDeepLink = true;
-      }
-
-      if (isDeepLink && visitorUid) {
-        let visitorInfo;
-        if (visitorUid === 'demo-user') {
-          visitorInfo = DEMO_VISITOR_PROFILE;
-        } else {
-          visitorInfo = await getVisitorProfileByUid(visitorUid);
-        }
-
-        if (visitorInfo) {
-          await addSavedLead({
-            name: visitorInfo.name,
-            role: visitorInfo.role || 'Visitante',
-            company: visitorInfo.company || 'Empresa',
-            email: visitorInfo.email || '',
-            phone: visitorInfo.phone || '',
-            source: `Estande: ${booth?.company ?? 'não identificado'}`,
-            exhibitorId: booth?.id,
-            exhibitorName: booth?.company,
-            stand: booth?.stand,
-          });
-          Alert.alert('Sucesso!', `Contato de ${visitorInfo.name} salvo com sucesso!`);
-        } else {
-          Alert.alert('Erro', 'Perfil do visitante não encontrado.');
-        }
+      const resolved = await resolveVisitorQrCode(data);
+      if (resolved) {
+        const visitorInfo = resolved.profile;
+        await addSavedLead({
+          name: visitorInfo.name,
+          role: visitorInfo.role || 'Visitante',
+          company: visitorInfo.company || 'Empresa',
+          email: visitorInfo.email || '',
+          phone: visitorInfo.phone || '',
+          source: `Estande: ${booth?.company ?? 'não identificado'}`,
+          exhibitorId: booth?.id,
+          exhibitorName: booth?.company,
+          stand: booth?.stand,
+        });
+        Alert.alert('Sucesso!', `Contato de ${visitorInfo.name} salvo com sucesso!`);
       } else {
         // Fallback para o formato JSON legado
         const visitorInfo = JSON.parse(data);

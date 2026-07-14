@@ -12,6 +12,7 @@
  */
 import { applicationDefault, cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore, type WriteBatch } from 'firebase-admin/firestore';
+import { createHash } from 'node:crypto';
 
 const SYMPLA_API_BASE = 'https://api.sympla.com.br/public/v3';
 const PAGE_SIZE = 100;
@@ -60,6 +61,10 @@ function requiredEnv(name: string): string {
 
 function normalizeEmail(value: string | null | undefined): string {
   return (value ?? '').trim().toLowerCase();
+}
+
+function hashTicketQrCode(value: string | null | undefined): string {
+  return createHash('sha256').update((value ?? '').trim()).digest('hex');
 }
 
 function maskEmail(email: string): string {
@@ -181,6 +186,7 @@ async function main() {
       const company = getCustomFieldValue(customFields, 'EMPRESA');
       const role = getCustomFieldValue(customFields, ' CARGO') || getCustomFieldValue(customFields, 'CARGO');
       const cityState = getCustomFieldValue(customFields, 'Cidade/Estado');
+      const ticketQrHash = hashTicketQrCode(participant.ticket_num_qr_code);
 
       const docRef = db
         ?.collection('paidEvents')
@@ -194,6 +200,7 @@ async function main() {
         fullName: `${participant.first_name} ${participant.last_name}`.trim(),
         ticketNumber: participant.ticket_number,
         ticketQrCode: participant.ticket_num_qr_code,
+        ticketQrHash,
         ticketName: participant.ticket_name,
         source: 'sympla',
         symplaEventId,
@@ -212,6 +219,20 @@ async function main() {
         if (!db || !batch || !docRef) throw new Error('Firestore Admin não inicializado.');
         batch.set(docRef, data, { merge: true });
         batchCount += 1;
+        if (ticketQrHash) {
+          batch.set(
+            db.collection('ticketQrLookups').doc(ticketQrHash),
+            {
+              eventId: paidEventId,
+              ticketQrHash,
+              userEmailLower: email,
+              source: 'sympla',
+              updatedAt: Date.now(),
+            },
+            { merge: true },
+          );
+          batchCount += 1;
+        }
         if (batchCount >= 450) {
           await commitBatch(batch, batchCount);
           batch = db.batch();
