@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -116,6 +117,8 @@ function formatLeadDate(value?: number) {
 
 export default function ExhibitorWebForm() {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const compact = width < 1000;
   const { user, initializing, signOut } = useAuth();
   const { exhibitor, loading } = useMyExhibitor();
   const { leads, loading: leadsLoading } = useSavedLeads();
@@ -311,8 +314,8 @@ export default function ExhibitorWebForm() {
           styles.formContent,
           { paddingTop: Math.max(insets.top + Spacing.three, Spacing.four) },
         ]}>
-        <View style={styles.formShell}>
-          <View style={styles.sidebarPanel}>
+        <View style={[styles.formShell, compact && styles.formShellCompact]}>
+          <View style={[styles.sidebarPanel, compact && styles.fullWidthPanel]}>
             <View style={styles.sidebarHeader}>
               <View style={styles.brandRow}>
                 <Image
@@ -348,17 +351,17 @@ export default function ExhibitorWebForm() {
             </View>
           </View>
 
-          <View style={styles.mainPanel}>
+          <View style={[styles.mainPanel, compact && styles.fullWidthPanel]}>
             <View style={styles.formHeader}>
             <View style={styles.headerCopy}>
               <Text style={styles.brandLabel}>Expoindustrial Sul</Text>
-              <Text style={styles.formTitle}>Informações do expositor</Text>
+              <Text style={[styles.formTitle, compact && styles.formTitleCompact]}>Informações do expositor</Text>
               <Text style={styles.formSubtitle}>
                 Este formulário é otimizado para preenchimento via web. Os campos são usados no app
                 do evento, busca, perfil público e matchmaking.
               </Text>
             </View>
-            <View style={styles.headerActions}>
+            <View style={[styles.headerActions, compact && styles.headerActionsCompact]}>
               <Text selectable style={styles.userEmail}>
                 {user.email}
               </Text>
@@ -432,7 +435,7 @@ export default function ExhibitorWebForm() {
 
             <View style={styles.completionPanel}>
               <View style={styles.completionTop}>
-                <View>
+                <View style={styles.completionCopy}>
                   <Text style={styles.panelKicker}>Checklist</Text>
                   <Text style={styles.completionHint}>
                     {missingChecks.length
@@ -1000,6 +1003,24 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: Spacing.three,
   },
+  formShellCompact: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
+  fullWidthPanel: {
+    width: '100%',
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: 'auto',
+  },
+  formTitleCompact: {
+    fontSize: 26,
+    lineHeight: 32,
+  },
+  headerActionsCompact: {
+    width: '100%',
+    alignItems: 'flex-start',
+  },
   sidebarPanel: {
     flexGrow: 0,
     flexShrink: 1,
@@ -1285,6 +1306,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: Spacing.three,
   },
+  completionCopy: {
+    flex: 1,
+    minWidth: 0,
+  },
   completionHint: {
     color: TEXT_MUTED,
     fontSize: 13.5,
@@ -1365,6 +1390,7 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
   },
   exportButtonText: {
+    flexShrink: 1,
     color: '#0A1021',
     fontSize: 13,
     fontWeight: '900',
@@ -1397,6 +1423,7 @@ const styles = StyleSheet.create({
   },
   leadTop: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'flex-start',
     gap: Spacing.two,
   },
@@ -1417,7 +1444,7 @@ const styles = StyleSheet.create({
   },
   leadCopy: {
     flex: 1,
-    minWidth: 180,
+    minWidth: 0,
   },
   leadName: {
     color: TEXT_DARK,
