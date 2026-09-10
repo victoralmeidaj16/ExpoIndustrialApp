@@ -477,7 +477,7 @@ export default function ExhibitorWebForm() {
             ) : <Text style={styles.emptyLeadsText}>Salve o cadastro da empresa para começar a ler crachás.</Text>}
             {scannerVisible && exhibitor ? <BadgeScanner exhibitor={exhibitor} onClose={() => setScannerVisible(false)} /> : null}
             <View style={styles.leadsHeader}>
-              <View>
+              <View style={styles.leadsHeaderCopy}>
                 <Text style={styles.panelKicker}>Leads em tempo real</Text>
                 <Text style={styles.leadsTitle}>{leads.length} contato(s) captado(s)</Text>
                 <Text style={styles.leadsSubtitle}>
@@ -1373,6 +1373,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '900',
     marginTop: 4,
+  },
+  leadsHeaderCopy: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 240,
+    minWidth: 0,
   },
   leadsSubtitle: {
     color: TEXT_MUTED,
