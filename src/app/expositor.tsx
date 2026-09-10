@@ -27,6 +27,7 @@ import {
   uploadExhibitorLogo,
   type ExhibitorFormData,
 } from '@/features/exhibitors/my-exhibitor';
+import { BadgeScanner } from '@/features/visitor/badge-scanner';
 import { exportLeadsCsv, useSavedLeads } from '@/features/visitor/leads';
 
 type ArrayFieldKey = 'segments' | 'targetAudience' | 'lookingFor' | 'keywords';
@@ -120,6 +121,7 @@ export default function ExhibitorWebForm() {
   const { leads, loading: leadsLoading } = useSavedLeads();
 
   const [form, setForm] = useState<ExhibitorFormData>(EMPTY_FORM);
+  const [scannerVisible, setScannerVisible] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -464,6 +466,13 @@ export default function ExhibitorWebForm() {
           </View>
 
           <View style={styles.leadsPanel}>
+            {exhibitor ? (
+              <Pressable accessibilityRole="button" style={styles.exportButton} onPress={() => setScannerVisible(true)}>
+                <Ionicons name="qr-code-outline" size={20} color="#0A1021" />
+                <Text style={styles.exportButtonText}>Ler crachá / ingresso Sympla</Text>
+              </Pressable>
+            ) : <Text style={styles.emptyLeadsText}>Salve o cadastro da empresa para começar a ler crachás.</Text>}
+            {scannerVisible && exhibitor ? <BadgeScanner exhibitor={exhibitor} onClose={() => setScannerVisible(false)} /> : null}
             <View style={styles.leadsHeader}>
               <View>
                 <Text style={styles.panelKicker}>Leads em tempo real</Text>
@@ -492,8 +501,8 @@ export default function ExhibitorWebForm() {
               <View style={styles.emptyLeads}>
                 <Ionicons name="qr-code-outline" size={24} color={TEXT_FAINT} />
                 <Text style={styles.emptyLeadsText}>
-                  Nenhum lead captado ainda. Use o perfil do expositor no app para escanear o QR Code
-                  do crachá do visitante.
+                  Nenhum lead captado ainda. Toque em “Ler crachá / ingresso Sympla” para conhecer
+                  o visitante e salvar seu contato.
                 </Text>
               </View>
             ) : (

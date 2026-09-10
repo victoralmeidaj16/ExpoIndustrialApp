@@ -24,7 +24,7 @@ export function ScalePressable({
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ scale: scale.value }],
+      transform: [{ scale: scale.get() }],
     };
   });
 
@@ -32,20 +32,14 @@ export function ScalePressable({
     if (hapticStyle !== null) {
       Haptics.impactAsync(hapticStyle).catch(() => {});
     }
-    scale.value = withSpring(activeScale, {
-      stiffness: 300,
-      damping: 25,
-    });
+    scale.set(withSpring(activeScale, { stiffness: 300, damping: 25 }));
     if (onPressIn) {
       onPressIn(event);
     }
   };
 
   const handlePressOut = (event: GestureResponderEvent) => {
-    scale.value = withSpring(1, {
-      stiffness: 300,
-      damping: 25,
-    });
+    scale.set(withSpring(1, { stiffness: 300, damping: 25 }));
     if (onPressOut) {
       onPressOut(event);
     }

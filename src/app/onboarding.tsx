@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -21,7 +20,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Light, Radius, Spacing } from '@/constants/theme';
 import { AuthForm } from '@/features/auth/auth-form';
 import { useAuth } from '@/features/auth/use-auth';
-import { VISITATION_TICKET_URL } from '@/features/paid-events/paid-event';
+import { getVisitationTicketUrl } from '@/features/paid-events/paid-event';
+import { getImportedRegistrationProfile } from '@/features/visitor/imported-registration-profile';
 import {
   BOTTLENECK_OPTIONS,
   BUDGET_OPTIONS,
@@ -48,49 +48,46 @@ export default function OnboardingScreen() {
   const [saving, setSaving] = useState(false);
   const [initialized, setInitialized] = useState(false);
 
-  useEffect(() => {
-    if (!loading && !initialized) {
-      const initialForm = profile ? { ...profile } : { ...EMPTY_VISITOR_PROFILE };
-      if (!initialForm.email && user?.email) {
-        initialForm.email = user.email;
-      }
-
-      const fetchSymplaData = async () => {
-        if (!user?.email || !configured) return;
-        try {
-          const { doc, getDoc } = await import('firebase/firestore');
-          const { db } = await import('@/lib/firebase');
-          if (!db) return;
-
-          const cleanEmail = user.email.trim().toLowerCase();
-          const docRef = doc(db, 'paidEvents', 'sympla-3486582', 'attendees', cleanEmail);
-          const snap = await getDoc(docRef);
-          if (snap.exists()) {
-            const data = snap.data();
-            if (data) {
-              setForm((prev) => {
-                const next = { ...prev };
-                if (!next.name && data.fullName) next.name = data.fullName;
-                if (!next.phone && data.phone) next.phone = data.phone;
-                if (!next.company && data.company) next.company = data.company;
-                if (!next.role && (data.role || data.jobRole)) next.role = data.role || data.jobRole;
-                return next;
-              });
-            }
-          }
-        } catch (err) {
-          console.error('Erro ao preencher dados onboarding via Sympla:', err);
-        }
-      };
-
-      if (!profile) {
-        fetchSymplaData();
-      }
-
-      setForm(initialForm);
-      setInitialized(true);
+  // O perfil terminou de carregar: semeia o formulário já neste render. Fazer
+  // isso num efeito só provocava um segundo render em cascata.
+  if (!loading && !initialized) {
+    const initialForm = profile ? { ...profile } : { ...EMPTY_VISITOR_PROFILE };
+    if (!initialForm.email && user?.email) {
+      initialForm.email = user.email;
     }
-  }, [profile, loading, initialized, user, configured]);
+    setForm(initialForm);
+    setInitialized(true);
+  }
+
+  // Sem perfil salvo, tenta completar as lacunas com os dados importados da
+  // Sympla ou do R Gestor. É I/O, então continua num efeito — o `setForm` acontece na resposta,
+  // não no corpo do efeito.
+  useEffect(() => {
+    if (!initialized || !user?.email || !configured) return;
+
+    let active = true;
+    (async () => {
+      try {
+        const data = await getImportedRegistrationProfile();
+        if (!data || !active) return;
+
+        setForm((prev) => {
+          const next = { ...prev };
+          if (!next.name && data.name) next.name = data.name;
+          if (!next.phone && data.phone) next.phone = data.phone;
+          if (!next.company && data.company) next.company = data.company;
+          if (!next.role && data.role) next.role = data.role;
+          return next;
+        });
+      } catch (err) {
+        console.error('Erro ao preencher onboarding via Sympla/R Gestor:', err);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [initialized, user?.email, configured]);
 
   const set = <K extends keyof VisitorProfile>(key: K, value: VisitorProfile[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -267,7 +264,7 @@ export default function OnboardingScreen() {
 
               <Pressable
                 style={styles.ticketCard}
-                onPress={() => Linking.openURL(VISITATION_TICKET_URL)}>
+                onPress={() => Linking.openURL(getVisitationTicketUrl())}>
                 <View style={styles.ticketIcon}>
                   <Ionicons name="ticket-outline" size={20} color={Light.gold} />
                 </View>

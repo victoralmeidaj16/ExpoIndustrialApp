@@ -117,7 +117,7 @@ function buildAlerts(exhibitors: Exhibitor[], sessions: Session[]): Alert[] {
   const sessionsNoSchedule = sessions.filter((s) => !s.time.trim() || !s.location.trim()).length;
 
   const alerts: Alert[] = [
-    { label: 'expositores publicados sem logo', count: publishedNoLogo, href: '/croqui' },
+    { label: 'expositores publicados sem logo', count: publishedNoLogo, href: '/expositores' },
     { label: 'expositores publicados sem posição no croqui', count: publishedNoPlacement, href: '/croqui' },
     { label: 'sessões sem palestrante', count: sessionsNoSpeaker, href: '/agenda' },
     { label: 'sessões sem horário ou local', count: sessionsNoSchedule, href: '/agenda' },
@@ -159,8 +159,8 @@ export default function DashboardPage() {
           <EventStatusBanner config={config} />
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            <Metric label="Expositores" value={exhibitors.length} href="/croqui" tone="indigo" />
-            <Metric label="Publicados" value={published} href="/croqui" tone="green" />
+            <Metric label="Expositores" value={exhibitors.length} href="/expositores" tone="indigo" />
+            <Metric label="Publicados" value={published} href="/expositores" tone="green" />
             <Metric label="Sem posição no croqui" value={unplaced} href="/croqui" tone="amber" />
             <Metric label="Posicionados" value={placed} href="/croqui" tone="slate" />
             <Metric label="Sessões na agenda" value={sessions.length} href="/agenda" tone="slate" />

@@ -18,6 +18,32 @@ service cloud.firestore {
              && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
+    function hasAcceptedConnection(otherUid) {
+      return request.auth != null
+             && (
+               (exists(/databases/$(database)/documents/connections/$(request.auth.uid + '_' + otherUid))
+                && get(/databases/$(database)/documents/connections/$(request.auth.uid + '_' + otherUid)).data.status == 'accepted')
+               ||
+               (exists(/databases/$(database)/documents/connections/$(otherUid + '_' + request.auth.uid))
+                && get(/databases/$(database)/documents/connections/$(otherUid + '_' + request.auth.uid)).data.status == 'accepted')
+             );
+    }
+
+    function hasNoPrivateVisitorData(data) {
+      return !data.keys().hasAny([
+        'email',
+        'phone',
+        'linkedin',
+        'website',
+        'pushTokens',
+        'pushPlatform',
+        'pushTokenUpdatedAt',
+        'leadCapturedAt',
+        'leadSource',
+        'badgeLookupId'
+      ]);
+    }
+
     // Lista de admins — gerenciada fora do app (Console/Admin SDK). O próprio
     // admin pode ler para checar o papel; ninguém escreve pelo cliente.
     match /admins/{uid} {
@@ -27,8 +53,10 @@ service cloud.firestore {
 
     match /exhibitors/{id} {
       // Público lê só publicados; o dono lê o próprio rascunho; admin lê tudo.
-      allow read: if resource.data.status == 'published'
-                  || (request.auth != null && resource.data.ownerUid == request.auth.uid)
+      // `get()` com default evita erro (= negação) em docs sem o campo.
+      allow read: if resource.data.get('status', 'draft') == 'published'
+                  || (request.auth != null
+                      && resource.data.get('ownerUid', '') == request.auth.uid)
                   || isAdmin();
 
       // Admin cria/edita/remove sem restrição (moderação). Dono autenticado cria
@@ -44,30 +72,122 @@ service cloud.firestore {
 
       // Dono atualiza os campos da empresa, sem tocar nos campos do organizador
       // (dono, moderação, posição, score). `diff()` é seguro p/ campos ausentes.
+      // O dono é reconhecido pelo doc id == uid (cadastro self-service pelo app)
+      // OU por `ownerUid` (estandes criados pelo organizador e vinculados depois
+      // pela rota /api/portal/expositor/vincular do painel, via Admin SDK).
       allow update: if isAdmin()
                     || (request.auth != null
-                        && request.auth.uid == id
+                        && (request.auth.uid == id
+                            || resource.data.get('ownerUid', '') == request.auth.uid)
                         && !request.resource.data.diff(resource.data).affectedKeys()
-                             .hasAny(['ownerUid', 'status', 'point', 'fit', 'stand', 'area', 'category']));
+                             .hasAny([
+                               'ownerUid',
+                               'status',
+                               'point',
+                               'fit',
+                               'stand',
+                               'area',
+                               'category',
+                               'claimEmail',
+                               'linkedEmail',
+                               'linkedAt'
+                             ]));
 
       allow delete: if isAdmin();
     }
 
-    // Perfil do visitante — leitura privada do dono, se o perfil for público (discoverable) ou se for admin; escrita do dono ou do admin (o organizador precisa remover push tokens inválidos ao enviar avisos).
+    // Perfil público do visitante: identidade profissional e preferências de
+    // matchmaking. Contatos, tokens e metadados privados são proibidos aqui.
+    // Documentos legados que ainda tenham esses campos não são expostos pelo
+    // `discoverable` até passarem pela migração.
     match /visitors/{id} {
-      allow read: if request.auth != null && (request.auth.uid == id || resource.data.discoverable == true || isAdmin());
-      allow write: if request.auth != null && (request.auth.uid == id || isAdmin());
+      allow read: if request.auth != null
+                  && (request.auth.uid == id
+                      || isAdmin()
+                      || (resource.data.get('discoverable', false) == true
+                          && hasNoPrivateVisitorData(resource.data)));
+      allow create, update: if request.auth != null
+                            && (request.auth.uid == id || isAdmin())
+                            && hasNoPrivateVisitorData(request.resource.data);
+      allow delete: if request.auth != null && (request.auth.uid == id || isAdmin());
+    }
+
+    // Dados que nunca podem ser lidos por outros visitantes: contato original,
+    // tokens push e metadados operacionais. Somente o dono e administradores.
+    match /visitorPrivateProfiles/{id} {
+      allow read: if request.auth != null && (request.auth.uid == id || isAdmin());
+      allow create, update: if request.auth != null
+                            && (request.auth.uid == id || isAdmin())
+                            && request.resource.data.ownerUid == id;
+      allow delete: if request.auth != null && (request.auth.uid == id || isAdmin());
+    }
+
+    // Cópia controlada do contato. Outro visitante só lê quando o titular
+    // habilitou o compartilhamento E existe uma conexão aceita entre ambos.
+    match /visitorContactCards/{id} {
+      allow read: if request.auth != null
+                  && (request.auth.uid == id
+                      || isAdmin()
+                      || (resource.data.get('shareContact', false) == true
+                          && hasAcceptedConnection(id)));
+      allow create, update: if request.auth != null
+                            && (request.auth.uid == id || isAdmin())
+                            && request.resource.data.ownerUid == id
+                            && request.resource.data.keys().hasOnly([
+                              'ownerUid',
+                              'email',
+                              'phone',
+                              'linkedin',
+                              'website',
+                              'shareContact',
+                              'updatedAt'
+                            ]);
+      allow delete: if request.auth != null && (request.auth.uid == id || isAdmin());
     }
 
     // Conexões/matchmaking entre pessoas.
     match /connections/{id} {
-      allow read, update: if request.auth != null
-                          && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      allow read: if request.auth != null
+                  && (resource.data.fromUid == request.auth.uid
+                      || resource.data.toUid == request.auth.uid
+                      || isAdmin());
       allow create: if request.auth != null
                     && request.resource.data.fromUid == request.auth.uid
-                    && request.resource.data.status == 'pending';
-      allow delete: if request.auth != null
-                    && resource.data.fromUid == request.auth.uid;
+                    && request.resource.data.toUid != request.auth.uid
+                    && request.resource.data.status == 'pending'
+                    && id == request.resource.data.fromUid + '_' + request.resource.data.toUid;
+      // Somente quem recebeu o pedido pode aceitar/recusar. Identidades e demais
+      // campos permanecem imutáveis para não forjar uma conexão aceita.
+      allow update: if isAdmin()
+                    || (request.auth != null
+                        && resource.data.toUid == request.auth.uid
+                        && resource.data.status == 'pending'
+                        && request.resource.data.status in ['accepted', 'declined']
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                             .hasOnly(['status']));
+      allow delete: if isAdmin()
+                    || (request.auth != null
+                        && resource.data.fromUid == request.auth.uid);
+    }
+
+    // O identificador aleatório no QR funciona como capacidade: não é possível
+    // listar crachás, mas quem recebe fisicamente o código pode consultar o
+    // cartão necessário para a captação no estande.
+    match /visitorBadgeLookups/{id} {
+      allow get: if request.auth != null;
+      allow list: if false;
+      allow create, update: if request.auth != null
+                            && request.resource.data.ownerUid == request.auth.uid
+                            && request.resource.data.uid == request.auth.uid
+                            && request.resource.data.keys().hasOnly([
+                              'uid',
+                              'ownerUid',
+                              'profile',
+                              'updatedAt'
+                            ]);
+      allow delete: if isAdmin()
+                    || (request.auth != null
+                        && resource.data.ownerUid == request.auth.uid);
     }
 
     // Leads/contatos captados — privados de quem captou (`ownerUid`) e visíveis
@@ -100,12 +220,17 @@ service cloud.firestore {
                             ])
                             && request.resource.data.uid == request.auth.uid
                             && request.resource.data.ownerUid == request.auth.uid
-                            && request.resource.data.eventId == 'sympla-3486582'
                             && request.resource.data.ticketQrHash == ticketQrHash
                             && request.resource.data.userEmailLower == request.auth.token.email
                             && request.resource.data.source == 'sympla'
-                            && exists(/databases/$(database)/documents/paidEvents/sympla-3486582/attendees/$(request.auth.token.email))
-                            && get(/databases/$(database)/documents/paidEvents/sympla-3486582/attendees/$(request.auth.token.email)).data.ticketQrHash == ticketQrHash;
+                            // `eventId` deixou de ser fixo numa edição: a garantia
+                            // vem do `exists`/`get` abaixo — só passa quem tem, de
+                            // fato, ingresso naquele evento com este mesmo QR. Assim
+                            // uma nova edição não exige alterar regras em produção.
+                            // O formato restrito evita barra no meio do caminho.
+                            && request.resource.data.eventId.matches('^[A-Za-z0-9_-]+$')
+                            && exists(/databases/$(database)/documents/paidEvents/$(request.resource.data.eventId)/attendees/$(request.auth.token.email))
+                            && get(/databases/$(database)/documents/paidEvents/$(request.resource.data.eventId)/attendees/$(request.auth.token.email)).data.ticketQrHash == ticketQrHash;
       allow delete: if isAdmin()
                     || (request.auth != null && resource.data.ownerUid == request.auth.uid);
     }

@@ -16,6 +16,8 @@ export type ExhibitorStatus = 'draft' | 'published';
 export type Exhibitor = Booth & {
   ownerUid?: string;
   status?: ExhibitorStatus;
+  /** E-mail verificado que o organizador autorizou a reivindicar o estande. */
+  claimEmail?: string;
   logoUrl?: string;
   contactName?: string;
   contactRole?: string;
@@ -53,6 +55,7 @@ export const exhibitorConverter: FirestoreDataConverter<Exhibitor> = {
       point: data.point ?? { x: 0.5, y: 0.5 },
       ownerUid: data.ownerUid,
       status: data.status ?? 'draft',
+      claimEmail: data.claimEmail ?? '',
       logoUrl: data.logoUrl,
       contactName: data.contactName ?? '',
       contactRole: data.contactRole ?? '',

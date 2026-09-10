@@ -1,3 +1,7 @@
+# REDE DE SEGURANCA, nao o gatilho principal. Apesar do '*/5', o GitHub descarta a
+# maioria dos ticks: medido em 40 execucoes, o intervalo real ficou entre 92 e 340
+# min (mediana 167). O disparo pontual vem do cron-job.org, a cada minuto. Este
+# workflow so garante que um aviso perdido acabe saindo, ainda que atrasado.
 name: Scheduled notifications
 
 on:
@@ -14,13 +18,10 @@ jobs:
           CRON_URL: ${{ secrets.SCHEDULED_NOTIFICATIONS_URL || 'https://match365.vercel.app/api/cron/scheduled-notifications' }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          if [ -n "$CRON_SECRET" ]; then
-            curl --fail --show-error --silent \
-              -H "Authorization: Bearer $CRON_SECRET" \
-              -H "User-Agent: vercel-cron/1.0" \
-              "$CRON_URL"
-          else
-            curl --fail --show-error --silent \
-              -H "User-Agent: vercel-cron/1.0" \
-              "$CRON_URL"
+          if [ -z "$CRON_SECRET" ]; then
+            echo "CRON_SECRET nao configurado nos secrets do repositorio." >&2
+            exit 1
           fi
+          curl --fail --show-error --silent \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$CRON_URL"

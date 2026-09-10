@@ -14,8 +14,8 @@ import { applicationDefault, cert, getApps, initializeApp } from 'firebase-admin
 import { getFirestore, type WriteBatch } from 'firebase-admin/firestore';
 import { createHash } from 'node:crypto';
 
-const SYMPLA_API_BASE = 'https://api.sympla.com.br/public/v3';
-const PAGE_SIZE = 100;
+const SYMPLA_API_BASE = 'https://api.sympla.com.br/public/v1.6.0';
+const PAGE_SIZE = 500;
 
 type SymplaCustomField = {
   id: number;
@@ -24,8 +24,8 @@ type SymplaCustomField = {
 };
 
 type SymplaParticipant = {
-  id: number;
-  event_id: number;
+  id: string | number;
+  event_id: string | number;
   order_id: string;
   order_status: string; // "A" = Aprovado, etc.
   ticket_number: string;
@@ -38,17 +38,25 @@ type SymplaParticipant = {
 };
 
 type SymplaPagination = {
-  has_next: boolean;
-  has_prev: boolean;
+  next_cursor?: string;
   quantity: number;
-  offset: number;
-  page: number;
   page_size: number;
-  total_page: number;
 };
 
 type SymplaParticipantsResponse = {
   data?: SymplaParticipant[];
+  pagination?: SymplaPagination;
+  errors?: { detail?: string }[];
+};
+
+type SymplaEvent = {
+  id: string;
+  reference_id?: number | string;
+  name?: string;
+};
+
+type SymplaEventsResponse = {
+  data?: SymplaEvent[];
   pagination?: SymplaPagination;
   errors?: { detail?: string }[];
 };
@@ -64,7 +72,8 @@ function normalizeEmail(value: string | null | undefined): string {
 }
 
 function hashTicketQrCode(value: string | null | undefined): string {
-  return createHash('sha256').update((value ?? '').trim()).digest('hex');
+  const payload = (value ?? '').trim();
+  return payload ? createHash('sha256').update(payload).digest('hex') : '';
 }
 
 function maskEmail(email: string): string {
@@ -94,17 +103,52 @@ function initializeAdmin() {
   initializeApp({ credential: applicationDefault() });
 }
 
-async function fetchParticipants(eventId: string, page: number): Promise<{ data: SymplaParticipant[]; hasNext: boolean }> {
-  const url = new URL(`${SYMPLA_API_BASE}/events/${eventId}/participants`);
-  url.searchParams.set('page_size', String(PAGE_SIZE));
-  url.searchParams.set('page', String(page));
+function apiHeaders() {
+  return { s_token: requiredEnv('SYMPLA_API'), Accept: 'application/json' };
+}
 
-  const response = await fetch(url, {
-    headers: {
-      's_token': requiredEnv('SYMPLA_API'),
-      'Accept': 'application/json',
-    },
-  });
+async function resolveEventHash(referenceId: string): Promise<string> {
+  const configuredHash = process.env.SYMPLA_EVENT_HASH?.trim();
+  if (configuredHash) return configuredHash;
+
+  let cursor = '';
+  do {
+    const url = new URL(`${SYMPLA_API_BASE}/events`);
+    url.searchParams.set('published', 'all');
+    url.searchParams.set('timezone', 'America/Sao_Paulo');
+    url.searchParams.set('sort', 'asc');
+    url.searchParams.set('page_size', '200');
+    if (cursor) url.searchParams.set('cursor', cursor);
+    const response = await fetch(url, { headers: apiHeaders() });
+    const json = (await response.json()) as SymplaEventsResponse;
+    if (!response.ok) {
+      const detail = json.errors?.map((error) => error.detail).filter(Boolean).join('; ');
+      throw new Error(`Sympla respondeu ${response.status}: ${detail || response.statusText}`);
+    }
+    const found = (json.data ?? []).find(
+      (event) => String(event.reference_id ?? '') === referenceId || event.id === referenceId,
+    );
+    if (found) return found.id;
+    cursor = json.pagination?.next_cursor ?? '';
+  } while (cursor);
+
+  throw new Error(
+    `Evento Sympla ${referenceId} não encontrado. Confira SYMPLA_EVENT_ID ou informe SYMPLA_EVENT_HASH.`,
+  );
+}
+
+async function fetchParticipants(eventHash: string, cursor = ''): Promise<{ data: SymplaParticipant[]; nextCursor: string }> {
+  const url = new URL(`${SYMPLA_API_BASE}/events/${eventHash}/participants`);
+  url.searchParams.set('page_size', String(PAGE_SIZE));
+  url.searchParams.set('cancelled_filter', 'include');
+  url.searchParams.set('field_sort', 'ticket_updated_at');
+  url.searchParams.set('sort', 'asc');
+  url.searchParams.set('timezone', 'America/Sao_Paulo');
+  if (cursor) url.searchParams.set('cursor', cursor);
+
+  const response = await fetch(url, { headers: apiHeaders() });
+
+  if (response.status === 204) return { data: [], nextCursor: '' };
 
   if (!response.ok) {
     const text = await response.text();
@@ -114,7 +158,7 @@ async function fetchParticipants(eventId: string, page: number): Promise<{ data:
   const json = (await response.json()) as SymplaParticipantsResponse;
   return {
     data: json.data ?? [],
-    hasNext: json.pagination?.has_next ?? false,
+    nextCursor: json.pagination?.next_cursor ?? '',
   };
 }
 
@@ -125,14 +169,17 @@ async function commitBatch(batch: WriteBatch, count: number) {
 
 async function main() {
   const symplaEventId = process.env.SYMPLA_EVENT_ID?.trim() || '3486582';
+  const symplaEventHash = await resolveEventHash(symplaEventId);
   const paidEventId = process.env.PAID_EVENT_ID?.trim() || `sympla-${symplaEventId}`;
   const dryRun = process.env.SYMPLA_DRY_RUN === '1';
+  const verbose = process.env.SYNC_LOG_RECORDS === '1';
 
   if (!dryRun) {
     initializeAdmin();
   }
   const db = dryRun ? null : getFirestore();
 
+  let cursor = '';
   let page = 1;
   let fetched = 0;
   let written = 0;
@@ -163,20 +210,21 @@ async function main() {
 
   while (true) {
     console.log(`Buscando participantes da Sympla (página ${page})...`);
-    const { data: participants, hasNext } = await fetchParticipants(symplaEventId, page);
+    const { data: participants, nextCursor } = await fetchParticipants(symplaEventHash, cursor);
     fetched += participants.length;
 
     for (const participant of participants) {
       const email = normalizeEmail(participant.email);
-      // Status 'A' representa Aprovado (confirmado).
-      const isApproved = participant.order_status === 'A' || participant.order_status === 'approved';
+      const orderStatus = String(participant.order_status ?? '').trim().toLowerCase();
+      const isApproved = orderStatus === 'a' || orderStatus === 'approved';
+      const isRevoked = ['c', 'cancelled', 'canceled', 'r', 'refunded', 'declined'].includes(orderStatus);
 
       if (!email) {
         skippedNoEmail += 1;
         continue;
       }
 
-      if (!isApproved) {
+      if (!isApproved && !isRevoked) {
         skippedNotApproved += 1;
         continue;
       }
@@ -195,7 +243,8 @@ async function main() {
         .doc(email);
 
       const data = {
-        status: 'paid', // Como é o ingresso de acesso, liberado = paid
+        status: isRevoked ? 'cancelled' : 'paid',
+        orderStatus,
         userEmailLower: email,
         fullName: `${participant.first_name} ${participant.last_name}`.trim(),
         ticketNumber: participant.ticket_number,
@@ -214,12 +263,16 @@ async function main() {
       };
 
       if (dryRun) {
-        console.log(`[dry-run] ${maskEmail(email)} (${data.fullName}) -> ${data.ticketQrCode}`);
+        if (verbose) {
+          console.log(
+            `[dry-run] ${maskEmail(email)} -> ${isRevoked ? 'acesso revogado' : ticketQrHash ? 'QR disponível' : 'sem QR'}`,
+          );
+        }
       } else {
         if (!db || !batch || !docRef) throw new Error('Firestore Admin não inicializado.');
         batch.set(docRef, data, { merge: true });
         batchCount += 1;
-        if (ticketQrHash) {
+        if (ticketQrHash && !isRevoked) {
           batch.set(
             db.collection('ticketQrLookups').doc(ticketQrHash),
             {
@@ -227,10 +280,20 @@ async function main() {
               ticketQrHash,
               userEmailLower: email,
               source: 'sympla',
+              profile: {
+                name: data.fullName,
+                company,
+                role,
+                email,
+                phone: whatsapp,
+              },
               updatedAt: Date.now(),
             },
             { merge: true },
           );
+          batchCount += 1;
+        } else if (ticketQrHash && isRevoked) {
+          batch.delete(db.collection('ticketQrLookups').doc(ticketQrHash));
           batchCount += 1;
         }
         if (batchCount >= 450) {
@@ -243,7 +306,8 @@ async function main() {
       written += 1;
     }
 
-    if (!hasNext) break;
+    if (!nextCursor) break;
+    cursor = nextCursor;
     page += 1;
   }
 

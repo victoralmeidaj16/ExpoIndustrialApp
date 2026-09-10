@@ -8,6 +8,7 @@
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
+import { setSymplaEvent } from '@/features/paid-events/paid-event';
 import { db, isFirebaseConfigured } from '@/lib/firebase';
 
 export const EVENT_COLLECTION = 'event';
@@ -21,6 +22,9 @@ export type EventConfig = {
   endDate: string;
   venueName: string;
   venueAddress: string;
+  /** Edição na Sympla (id numérico + slug da URL). Vazio = padrão do build. */
+  symplaEventId: string;
+  symplaEventSlug: string;
 };
 
 /** Fallback = textos hoje hardcoded na home, para não quebrar sem o doc. */
@@ -32,6 +36,8 @@ export const EVENT_FALLBACK: EventConfig = {
   endDate: '',
   venueName: 'Expocentro Edmundo Doubrawa',
   venueAddress: 'Joinville - SC · 14h às 21h',
+  symplaEventId: '',
+  symplaEventSlug: '',
 };
 
 function normalize(data: Record<string, unknown> | undefined): EventConfig {
@@ -44,6 +50,8 @@ function normalize(data: Record<string, unknown> | undefined): EventConfig {
     endDate: (data.endDate as string) ?? '',
     venueName: (data.venueName as string)?.trim() || EVENT_FALLBACK.venueName,
     venueAddress: (data.venueAddress as string)?.trim() || EVENT_FALLBACK.venueAddress,
+    symplaEventId: (data.symplaEventId as string)?.trim() ?? '',
+    symplaEventSlug: (data.symplaEventSlug as string)?.trim() ?? '',
   };
 }
 
@@ -52,15 +60,19 @@ export function useEventConfig(): { event: EventConfig; loading: boolean } {
   const [loading, setLoading] = useState(isFirebaseConfigured);
 
   useEffect(() => {
-    if (!isFirebaseConfigured || !db) {
-      setLoading(false);
-      return;
-    }
+    // `loading` já nasce `false` sem Firebase (ver o useState acima), então não
+    // há estado a corrigir aqui — só não há o que assinar.
+    if (!isFirebaseConfigured || !db) return;
     const ref = doc(db, EVENT_COLLECTION, EVENT_CONFIG_ID);
     return onSnapshot(
       ref,
       (snap) => {
-        setEvent(normalize(snap.exists() ? snap.data() : undefined));
+        const next = normalize(snap.exists() ? snap.data() : undefined);
+        // Publica a edição da Sympla no módulo de eventos pagos, para o código
+        // fora do React (QR do ingresso, links de compra) enxergar a troca sem
+        // precisar de um novo build do app.
+        setSymplaEvent({ id: next.symplaEventId, slug: next.symplaEventSlug });
+        setEvent(next);
         setLoading(false);
       },
       () => setLoading(false),

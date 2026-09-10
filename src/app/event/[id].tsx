@@ -63,6 +63,7 @@ export default function EventDetailScreen() {
 
   const accentColor = getTrackColor(session.track);
   const sessionId = session.id;
+  const registrationUrl = session.registrationUrl;
   const isFav = favoriteIds.includes(session.id);
   const hasReminder = reminderIds.includes(session.id);
   const isRegistered = registeredIds.includes(session.id);
@@ -70,8 +71,8 @@ export default function EventDetailScreen() {
   const full = !isRegistered && seatsLeft === 0;
 
   async function onToggleRegistration() {
-    if (session.registrationUrl) {
-      await Linking.openURL(session.registrationUrl);
+    if (registrationUrl) {
+      await Linking.openURL(registrationUrl);
       return;
     }
     const result = await toggleRegistration(sessionId);

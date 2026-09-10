@@ -32,11 +32,19 @@ export function useVenueLocation(path: VenuePoint[]): VenueLocation {
   const progress = useRef({ seg: 0, t: 0 });
   const key = path.map((p) => `${p.x.toFixed(3)},${p.y.toFixed(3)}`).join('|');
 
+  // Trocou de rota: reinicia a simulação já neste render. Ajustar o estado
+  // durante o render é o caminho recomendado para "resetar quando a entrada
+  // muda" — o efeito abaixo cuida só do timer.
+  const [lastKey, setLastKey] = useState(key);
+  if (key !== lastKey) {
+    setLastKey(key);
+    setPoint(path[0] ?? { x: 0.5, y: 0.5 });
+    setMoving(true);
+  }
+
   useEffect(() => {
     if (path.length < 2) return;
     progress.current = { seg: 0, t: 0 };
-    setPoint(path[0]);
-    setMoving(true);
 
     const SPEED = 0.05; // fração do segmento por tick
     const id = setInterval(() => {

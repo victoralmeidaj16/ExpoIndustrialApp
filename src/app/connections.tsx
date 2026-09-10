@@ -22,6 +22,7 @@ import { useAuth } from '@/features/auth/use-auth';
 import {
   useConnections,
   useDiscoverableVisitors,
+  useSharedVisitorContacts,
 } from '@/features/connections/use-connections';
 import { rankPeople } from '@/features/matchmaking/people-score';
 import { isProfileUsable } from '@/features/matchmaking/score';
@@ -47,6 +48,19 @@ export default function ConnectionsScreen() {
     declineConnection,
   } = useConnections();
 
+  const visitorsMap = React.useMemo(() => {
+    const map = new Map<string, VisitorProfile>();
+    visitors.forEach((visitor) => map.set(visitor.uid, visitor.profile));
+    return map;
+  }, [visitors]);
+  const sharedContactUids = React.useMemo(
+    () => accepted
+      .map((connection) => connection.toUid === user?.uid ? connection.fromUid : connection.toUid)
+      .filter((uid) => visitorsMap.get(uid)?.shareContact),
+    [accepted, user?.uid, visitorsMap],
+  );
+  const sharedContacts = useSharedVisitorContacts(sharedContactUids);
+
   const [activeTab, setActiveTab] = useState<TabType>('suggestions');
 
   const [hasPermission, requestPermission] = useCameraPermissions();
@@ -71,7 +85,12 @@ export default function ConnectionsScreen() {
     try {
       const resolved = await resolveVisitorQrCode(data);
 
-      if (resolved) {
+      if (resolved && !resolved.uid) {
+        Alert.alert('Visitante identificado', `${resolved.profile.name} ainda não vinculou o ingresso ao app. Para conectar, peça que acesse o perfil no aplicativo.`);
+        return;
+      }
+
+      if (resolved?.uid) {
         if (resolved.uid === user?.uid) {
           Alert.alert('Atenção', 'Você escaneou o seu próprio QR Code.');
           return;
@@ -102,13 +121,6 @@ export default function ConnectionsScreen() {
   };
 
   const loading = loadingVisitors || loadingConnections;
-
-  // Mapear visitantes para acesso rápido
-  const visitorsMap = React.useMemo(() => {
-    const map = new Map<string, any>();
-    visitors.forEach((v) => map.set(v.uid, v.profile));
-    return map;
-  }, [visitors]);
 
   // Filtrar e ranquear sugestões
   const suggestions = React.useMemo(() => {
@@ -461,6 +473,7 @@ export default function ConnectionsScreen() {
                   const isIncoming = c.toUid === user?.uid;
                   const otherUid = isIncoming ? c.fromUid : c.toUid;
                   const otherProfile = visitorsMap.get(otherUid) as VisitorProfile | undefined;
+                  const sharedContact = sharedContacts[otherUid];
                   const displayName = isIncoming ? c.fromName : c.toName;
 
                   return (
@@ -478,28 +491,30 @@ export default function ConnectionsScreen() {
 
                       {otherProfile ? (
                         <View style={styles.contactDetails}>
-                          {otherProfile.shareContact ? (
+                          {otherProfile.shareContact && sharedContact ? (
                             <>
                               <View style={styles.contactRow}>
                                 <Ionicons name="mail-outline" size={13} color={Light.textMuted} />
-                                <Text style={styles.contactText}>{otherProfile.email || 'Não informado'}</Text>
+                                <Text style={styles.contactText}>{sharedContact.email || 'Não informado'}</Text>
                               </View>
-                              {otherProfile.phone ? (
+                              {sharedContact.phone ? (
                                 <View style={styles.contactRow}>
                                   <Ionicons name="call-outline" size={13} color={Light.textMuted} />
-                                  <Text style={styles.contactText}>{otherProfile.phone}</Text>
+                                  <Text style={styles.contactText}>{sharedContact.phone}</Text>
                                 </View>
                               ) : null}
                             </>
                           ) : (
                             <Text style={styles.lockText}>
-                              Compartilhamento de contatos desativado por esta pessoa.
+                              {otherProfile.shareContact
+                                ? 'Contato ainda não disponível. Aguarde a sincronização do perfil.'
+                                : 'Compartilhamento de contatos desativado por esta pessoa.'}
                             </Text>
                           )}
-                          {otherProfile.linkedin ? (
+                          {sharedContact?.linkedin ? (
                             <Pressable
                               style={styles.linkedinLink}
-                              onPress={() => Linking.openURL(otherProfile.linkedin!)}>
+                              onPress={() => Linking.openURL(sharedContact.linkedin!)}>
                               <Ionicons name="logo-linkedin" size={13} color="#2F6BFF" />
                               <Text style={styles.linkedinText}>Ver LinkedIn</Text>
                             </Pressable>
@@ -507,15 +522,15 @@ export default function ConnectionsScreen() {
                         </View>
                       ) : null}
 
-                      {otherProfile && otherProfile.shareContact && (
+                      {otherProfile && otherProfile.shareContact && sharedContact && (
                         <View style={styles.rowActions}>
                           <Pressable
                             style={styles.actionBtnOutline}
                             onPress={() =>
                               handleContactMessage(
                                 displayName || otherProfile.name,
-                                otherProfile.email || '',
-                                otherProfile.phone
+                                sharedContact.email || '',
+                                sharedContact.phone
                               )
                             }>
                             <Ionicons name="chatbubble-ellipses-outline" size={13} color={Light.gold} />
@@ -528,8 +543,8 @@ export default function ConnectionsScreen() {
                                 displayName || otherProfile.name,
                                 otherProfile.company,
                                 otherProfile.role,
-                                otherProfile.email || '',
-                                otherProfile.phone
+                                sharedContact.email || '',
+                                sharedContact.phone
                               )
                             }>
                             <Ionicons name="download-outline" size={13} color={Light.gold} />

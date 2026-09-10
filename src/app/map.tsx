@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
@@ -9,6 +9,7 @@ import { WebView } from 'react-native-webview';
 import { Light, Radius, Spacing } from '@/constants/theme';
 import { ExhibitorLogo } from '@/components/exhibitor-logo';
 import { useExhibitors } from '@/features/exhibitors/use-exhibitors';
+import { FloorPlanMap } from '@/features/floor-plan/floor-plan-map';
 import { htmlSource } from '@/features/floor-plan/floor-plan-html';
 import { CATEGORY_COLOR, type Booth, type BoothCategory } from '@/features/venue/venue';
 
@@ -25,6 +26,36 @@ type MapSelection = {
   name?: string;
   zone?: string;
 };
+
+/**
+ * O HTML do mapa 3D puxa Three.js, OrbitControls e Tween de CDN. No pavilhão a
+ * rede cai ou congestiona e esses scripts falham em silêncio — a WebView abre em
+ * tela preta. Esta sonda roda logo depois das tags de script (portanto já com o
+ * resultado do carregamento) e avisa o app se as libs vieram ou não, para cair
+ * no mapa nativo em vez de mostrar o vazio.
+ */
+const CDN_SCRIPTS_SOURCE =
+  '<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>';
+const CDN_SCRIPTS_TARGET = `${CDN_SCRIPTS_SOURCE}
+    <script>
+      (function () {
+        var ok = typeof THREE !== 'undefined'
+          && typeof THREE.OrbitControls !== 'undefined'
+          && typeof TWEEN !== 'undefined';
+        var payload = JSON.stringify({ type: ok ? 'MAP_ENGINE_READY' : 'MAP_ENGINE_UNAVAILABLE' });
+        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+          window.ReactNativeWebView.postMessage(payload);
+        } else if (window.parent && window.parent !== window) {
+          window.parent.postMessage(payload, '*');
+        }
+      })();
+    </script>`;
+
+/** Nada para assinar: o valor só muda entre servidor e cliente. */
+const subscribeNever = () => () => {};
+
+/** Sem resposta da sonda nesse prazo, tratamos o 3D como indisponível. */
+const MAP_ENGINE_TIMEOUT_MS = 7000;
 
 const EMBEDDED_DETECTION_SOURCE =
   'const isEmbedded = window.ReactNativeWebView !== undefined || navigator.userAgent.includes("ReactNativeWebView");';
@@ -120,6 +151,7 @@ const ROUTE_POINTS_TARGET = `const points = criarRotaCorredores(start, end);
 function createEmbeddedMapHtml() {
   return htmlSource
     .replace('<body>', '<body class="embedded">')
+    .replace(CDN_SCRIPTS_SOURCE, CDN_SCRIPTS_TARGET)
     .replace(EMBEDDED_DETECTION_SOURCE, EMBEDDED_DETECTION_TARGET)
     .replace(ROUTE_POINTS_SOURCE, ROUTE_POINTS_TARGET);
 }
@@ -172,9 +204,19 @@ export default function MapScreen() {
   const [selectedBoothId, setSelectedBoothId] = useState<string | undefined>();
   const [selectedMapStand, setSelectedMapStand] = useState<MapSelection | null>(null);
   const [mapReady, setMapReady] = useState(false);
-  const [clientReady, setClientReady] = useState(false);
+  // Hidratação: `useSyncExternalStore` já separa servidor de cliente, sem um
+  // efeito cujo único trabalho seria disparar um segundo render.
+  const clientReady = useSyncExternalStore(
+    subscribeNever,
+    () => true,
+    () => false,
+  );
+  /** `null` = ainda sondando; `false` = CDN do Three.js não veio (rede do pavilhão). */
+  const [engineAvailable, setEngineAvailable] = useState<boolean | null>(null);
+  /** Escolha manual do usuário pelo botão 2D/3D, quando existir. */
+  const [prefer2d, setPrefer2d] = useState(false);
 
-  const embeddedMapHtml = useMemo(createEmbeddedMapHtml, []);
+  const embeddedMapHtml = useMemo(() => createEmbeddedMapHtml(), []);
   const visibleExhibitors = clientReady ? exhibitors : [];
   const standParam = clientReady && typeof params.stand === 'string' ? normalizedStand(params.stand) : '';
   const normalizedQuery = normalizeSearch(query);
@@ -202,6 +244,12 @@ export default function MapScreen() {
     ? standNumber(selectedBooth.stand)
     : selectedMapStand?.number ?? standParam;
   const resultPreview = normalizedQuery ? filteredBooths.slice(0, 5) : [];
+  /** Mapa nativo (SVG, 100% offline) quando o 3D falhou ou o usuário pediu 2D. */
+  const useNativeMap = prefer2d || engineAvailable === false;
+  const occupants = useMemo(
+    () => new Set(visibleExhibitors.map((booth) => standNumber(booth.stand)).filter(Boolean)),
+    [visibleExhibitors],
+  );
 
   const postMapMessage = useCallback((message: MapBridgeMessage) => {
     const payload = JSON.stringify(message);
@@ -214,14 +262,22 @@ export default function MapScreen() {
     (mapRef.current as WebView | null)?.postMessage(payload);
   }, []);
 
+  // Rede congestionada: as tags de script podem ficar penduradas sem nunca
+  // falhar, então a sonda não responde. Passado o prazo, assume-se o mapa nativo.
   useEffect(() => {
-    setClientReady(true);
-  }, []);
+    if (!clientReady || engineAvailable !== null) return;
+    const timer = setTimeout(() => setEngineAvailable(false), MAP_ENGINE_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [clientReady, engineAvailable]);
 
-  useEffect(() => {
-    if (!clientReady || typeof params.search !== 'string') return;
-    setQuery(params.search);
-  }, [clientReady, params.search]);
+  // Busca vinda do deep link: aplicada durante o render quando o parâmetro
+  // muda, em vez de um efeito que só reescreve estado depois de montar.
+  const searchParam = clientReady && typeof params.search === 'string' ? params.search : '';
+  const [lastSearchParam, setLastSearchParam] = useState(searchParam);
+  if (searchParam !== lastSearchParam) {
+    setLastSearchParam(searchParam);
+    if (searchParam) setQuery(searchParam);
+  }
 
   const handleMapMessage = useCallback(
     (rawData: unknown) => {
@@ -229,6 +285,14 @@ export default function MapScreen() {
       if (!data || typeof data !== 'object') return;
 
       const message = data as { type?: string; number?: string; name?: string; zone?: string };
+      if (message.type === 'MAP_ENGINE_READY') {
+        setEngineAvailable(true);
+        return;
+      }
+      if (message.type === 'MAP_ENGINE_UNAVAILABLE') {
+        setEngineAvailable(false);
+        return;
+      }
       if (message.type === 'BOOTH_SELECTED') {
         const stand = normalizedStand(message.number);
         const booth = visibleExhibitors.find((item) => normalizedStand(item.stand) === stand);
@@ -311,6 +375,24 @@ export default function MapScreen() {
       <View style={styles.mapFrame}>
         {!clientReady ? (
           <View style={styles.mapPlaceholder} />
+        ) : useNativeMap ? (
+          <FloorPlanMap
+            highlightedStandNumber={highlightedStandNumber}
+            occupants={occupants}
+            showDetails={false}
+            style={styles.nativeMap}
+            zoomControlsStyle={{ top: insets.top + 180 }}
+            onStandPress={(number) => {
+              const stand = normalizedStand(number);
+              const booth = visibleExhibitors.find((item) => normalizedStand(item.stand) === stand);
+              setSelectedBoothId(booth?.id);
+              setSelectedMapStand({
+                number: standNumber(number),
+                name: booth?.company,
+                zone: booth?.industry,
+              });
+            }}
+          />
         ) : Platform.OS === 'web' ? (
           <iframe
             ref={(node) => {
@@ -370,6 +452,23 @@ export default function MapScreen() {
               </Pressable>
             ) : null}
           </View>
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={useNativeMap ? 'Ver mapa em 3D' : 'Ver planta em 2D'}
+            style={styles.engineToggle}
+            onPress={() => {
+              // Voltar pro 3D re-sonda a CDN: pode ser só a rede que oscilou.
+              if (useNativeMap) setEngineAvailable(null);
+              setPrefer2d((value) => !value);
+            }}>
+            <Ionicons
+              name={useNativeMap ? 'cube-outline' : 'map-outline'}
+              size={16}
+              color={Light.navyDeep}
+            />
+            <Text style={styles.engineToggleText}>{useNativeMap ? '3D' : '2D'}</Text>
+          </Pressable>
         </View>
 
         <ScrollView
@@ -508,6 +607,28 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     height: '100%',
     width: '100%',
+  },
+  nativeMap: {
+    flex: 1,
+    // Full-bleed como a WebView: os painéis da tela flutuam por cima.
+    paddingBottom: 0,
+  },
+  engineToggle: {
+    alignItems: 'center',
+    backgroundColor: Light.surface,
+    borderColor: Light.border,
+    borderRadius: Radius.pill,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
+    minHeight: 46,
+    paddingHorizontal: Spacing.three,
+  },
+  engineToggleText: {
+    color: Light.navyDeep,
+    fontSize: 13,
+    fontWeight: '800',
   },
   topOverlay: {
     gap: Spacing.two,

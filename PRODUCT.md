@@ -2,6 +2,8 @@
 
 Existem **dois produtos distintos** neste ecossistema. Não confundir.
 
+> Atualizado em 09/09/2026.
+
 ---
 
 ## 1. ExpoIndustrialApp — **o app DO EVENTO** (este repositório)
@@ -33,13 +35,37 @@ fora do período do evento).
 
 Dois front-ends:
 
-- **match-mobile** (Expo) — o **app da comunidade 365** para os participantes
-  (networking/matchmaking contínuo, fora do período da feira).
-- **match-web** (Next.js) — o **painel do organizador** (aprovar/publicar expositores,
-  posicionar estandes no croqui, gerir dados do evento).
+- **match-mobile** (Expo, em `../MatchIndustrial365/match-mobile/`) — o **app da
+  comunidade 365** para os participantes (networking/matchmaking contínuo, fora do
+  período da feira).
+- **match-web** (Next.js) — o **painel do organizador**. ⚠️ **Mora neste repositório**,
+  em `./match-web/` (ver seção abaixo).
 
-**Status:** match-mobile é só esqueleto (template + telas de auth); match-web está vazio
-(create-next-app intocado).
+**Status:** match-mobile continua só esqueleto (template Expo + telas de auth em
+`(auth)/`); match-web **não está mais vazio** — são 20 rotas em produção.
+
+---
+
+## 3. match-web — onde ele mora e o que já existe
+
+**Pasta oficial: `ExpoIndustrialApp/match-web/`** (este repositório). É de onde sai o
+deploy do projeto Vercel `match365` (Root Directory = `match-web`, deploy automático no
+`git push` da `main`); o `match-web/vercel.json` com `{"framework":"nextjs"}` é
+obrigatório, senão o build herda o `vercel.json` da raiz e quebra.
+
+⚠️ **`../MatchIndustrial365/match-web/` é uma cópia congelada em 30/06/2026** — um repo
+git local, sem remote, linkado ao mesmo projeto Vercel. Tudo o que ela tem já existe
+aqui, e o inverso não vale: avisos, eventos pagos, as API routes, o scanner de
+apresentação e vários ajustes só existem nesta pasta. **Não editar nem deployar de lá.**
+
+Rotas em produção (20):
+
+| Área | Rotas |
+|---|---|
+| Painel do organizador `(painel)` | dashboard, `agenda`, `avisos`, `croqui`, `evento`, `eventos-pagos`, `materiais`, `patrocinadores`, `visitantes` |
+| Portal do expositor `/portal/expositor` | dashboard, `cadastro`, `login`, `leads`, `perfil` |
+| Institucional | `/login`, `/apresentacao`, `/apresentacao-scanner` |
+| API (server-side, firebase-admin) | `/api/webhooks/sympla`, `/api/portal/expositor/vincular`, `/api/cron/scheduled-notifications` |
 
 ---
 
@@ -57,4 +83,7 @@ apps.** Uma coleção criada aqui aparece para o MatchIndustrial365 e vice-versa
 |---|---|---|---|
 | **ExpoIndustrialApp** | Expo | App do evento (visitante) | Durante a feira |
 | **match-mobile** | Expo | Comunidade B2B 365 | O ano todo |
-| **match-web** | Next.js | Painel do organizador | Gestão/admin |
+| **match-web** | Next.js | Painel do organizador + portal do expositor | Gestão/admin |
+
+> As pastas: `ExpoIndustrialApp/` (app do evento **e** `match-web/`) e
+> `../MatchIndustrial365/` (só o `match-mobile` é fonte viva).

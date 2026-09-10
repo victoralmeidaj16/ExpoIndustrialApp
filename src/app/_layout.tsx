@@ -34,7 +34,7 @@ function CustomTabBar({ state, navigation }: any) {
 
   if (!user) return null;
 
-  if (activeRoute === 'preencher' || activeRoute === 'expositor' || activeRoute === 'welcome') return null;
+  if (activeRoute === 'expositor' || activeRoute === 'welcome') return null;
 
   return (
     <View style={[styles.tabBarWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>
@@ -145,6 +145,7 @@ export default function TabLayout() {
             <Tabs.Screen name="paid-events" options={{ href: null }} />
             <Tabs.Screen name="portal" options={{ href: null }} />
             <Tabs.Screen name="expositor" options={{ href: null }} />
+            {/* Rota legada: só redireciona para /expositor. */}
             <Tabs.Screen name="preencher" options={{ href: null }} />
             <Tabs.Screen name="onboarding" options={{ href: null }} />
             <Tabs.Screen name="welcome" options={{ href: null }} />

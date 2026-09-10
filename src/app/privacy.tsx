@@ -60,7 +60,7 @@ export default function PrivacyScreen() {
         <Text style={styles.paragraph}>
           Você tem total controle sobre seus dados e pode:
           {'\n'}• Ativar ou desativar a sua visibilidade na rede de matchmaking a qualquer momento na aba Perfil.
-          {'\n'}• Solicitar a exclusão permanente de todos os seus dados e registro da conta de nossos servidores através da opção **"Excluir Minha Conta"** nas configurações do seu Perfil.
+          {'\n'}• Solicitar a exclusão permanente de todos os seus dados e registro da conta de nossos servidores através da opção {'**"Excluir Minha Conta"**'} nas configurações do seu Perfil.
         </Text>
 
         <Text style={styles.sectionTitle}>5. Contato</Text>

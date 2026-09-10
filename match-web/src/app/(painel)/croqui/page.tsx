@@ -160,6 +160,7 @@ function PlacementEditor({
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [logoUrl, setLogoUrl] = useState(exhibitor.logoUrl ?? '');
+  const [claimEmail, setClaimEmail] = useState(exhibitor.claimEmail ?? '');
 
   async function handleSave() {
     setBusy(true);
@@ -169,6 +170,7 @@ function PlacementEditor({
         area: area.trim(),
         category,
         fit: Number(fit) || 0,
+        claimEmail: claimEmail.trim().toLowerCase(),
       });
     } finally {
       setBusy(false);
@@ -231,6 +233,17 @@ function PlacementEditor({
               </option>
             ))}
           </Select>
+        </Field>
+        <Field
+          label="E-mail autorizado para vínculo"
+          hint="Somente uma conta com este e-mail verificado poderá reivindicar o estande."
+        >
+          <Input
+            type="email"
+            value={claimEmail}
+            onChange={(e) => setClaimEmail(e.target.value)}
+            placeholder="responsavel@empresa.com"
+          />
         </Field>
         <Field label="Score de compatibilidade (fit %)">
           <Input

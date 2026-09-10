@@ -76,6 +76,8 @@ export function authErrorMessage(err: unknown): string {
     case 'auth/wrong-password':
     case 'auth/user-not-found':
       return 'Email ou senha incorretos.';
+    case 'auth/email-already-in-use':
+      return 'Este e-mail já possui uma conta. Entre com a senha existente.';
     case 'auth/too-many-requests':
       return 'Muitas tentativas. Tente novamente em instantes.';
     case 'auth/network-request-failed':

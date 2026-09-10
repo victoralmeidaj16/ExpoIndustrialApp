@@ -5,13 +5,16 @@
  * Expo Push API. O match-web é um site estático (output: export), então não há
  * backend — o disparo é client-side, restrito ao perfil admin pela página.
  *
- * Fonte dos destinos: `visitors/{uid}.pushTokens` (o app grava o token só depois
+ * Fonte dos destinos: `visitorPrivateProfiles/{uid}.pushTokens` (o app grava o token só depois
  * que o usuário concede a permissão de notificação — presença do token = opt-in).
  * Tokens que a Expo reporta como `DeviceNotRegistered` são removidos do doc.
  */
 import { arrayRemove, collection, doc, getDocs, writeBatch } from 'firebase/firestore';
 
-import { VISITORS_COLLECTION, visitorConverter } from '@/domain/visitor';
+import {
+  VISITOR_PRIVATE_PROFILES_COLLECTION,
+  visitorPrivateConverter,
+} from '@/domain/visitor';
 import { db } from '@/lib/firebase';
 
 const EXPO_PUSH_ENDPOINT = 'https://exp.host/--/api/v2/push/send';
@@ -43,11 +46,11 @@ function chunk<T>(items: T[], size: number): T[][] {
 
 /**
  * Coleta todos os destinos (token + uid) dos visitantes que optaram por receber.
- * Só admins conseguem ler `visitors` inteira (Security Rules).
+ * Só o dono e admins conseguem ler perfis privados (Security Rules).
  */
 export async function collectPushTargets(): Promise<PushTarget[]> {
   if (!db) return [];
-  const ref = collection(db, VISITORS_COLLECTION).withConverter(visitorConverter);
+  const ref = collection(db, VISITOR_PRIVATE_PROFILES_COLLECTION).withConverter(visitorPrivateConverter);
   const snap = await getDocs(ref);
   const targets: PushTarget[] = [];
   for (const d of snap.docs) {
@@ -61,12 +64,12 @@ export async function collectPushTargets(): Promise<PushTarget[]> {
   return targets;
 }
 
-/** Remove tokens inválidos dos respectivos docs `visitors/{uid}` (em lote). */
+/** Remove tokens inválidos dos respectivos perfis privados (em lote). */
 async function pruneInvalidTokens(pairs: PushTarget[]): Promise<void> {
   if (!db || pairs.length === 0) return;
   const batch = writeBatch(db);
   for (const { uid, token } of pairs) {
-    batch.update(doc(db, VISITORS_COLLECTION, uid), { pushTokens: arrayRemove(token) });
+    batch.update(doc(db, VISITOR_PRIVATE_PROFILES_COLLECTION, uid), { pushTokens: arrayRemove(token) });
   }
   await batch.commit();
 }

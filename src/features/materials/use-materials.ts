@@ -40,10 +40,9 @@ export function useMaterials(): { materials: Material[]; loading: boolean } {
   const [loading, setLoading] = useState(isFirebaseConfigured);
 
   useEffect(() => {
-    if (!isFirebaseConfigured || !db) {
-      setLoading(false);
-      return;
-    }
+    // `loading` já nasce `false` sem Firebase (ver o useState acima), então não
+    // há estado a corrigir aqui — só não há o que assinar.
+    if (!isFirebaseConfigured || !db) return;
     const q = query(collection(db, MATERIALS_COLLECTION));
     return onSnapshot(
       q,

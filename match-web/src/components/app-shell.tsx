@@ -10,6 +10,7 @@ import { Button, Spinner } from '@/components/ui';
 
 const NAV = [
   { href: '/', label: 'Dashboard', icon: '▦' },
+  { href: '/expositores', label: 'Expositores', icon: '🏭' },
   { href: '/croqui', label: 'Croqui', icon: '🗺' },
   { href: '/agenda', label: 'Agenda', icon: '🗓' },
   { href: '/patrocinadores', label: 'Patrocinadores', icon: '★' },
@@ -34,7 +35,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     const saved = localStorage.getItem('sidebar_collapsed');
     if (saved === 'true') {
-      setCollapsed(true);
+      queueMicrotask(() => setCollapsed(true));
     }
   }, []);
 

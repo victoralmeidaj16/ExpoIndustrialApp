@@ -1,7 +1,45 @@
 export const PAID_EVENTS_COLLECTION = 'paidEvents';
 
-export const VISITATION_TICKET_URL =
-  'https://www.sympla.com.br/evento/expoindustrial-sul-2026/3486582';
+// ─── Evento da Sympla (ingresso de visitação) ─────────────────────────────────
+//
+// O id da edição não fica mais espalhado pelo código. A ordem de precedência é:
+//   1. `event/config.symplaEventId` no Firestore — trocar a edição pelo painel
+//      do organizador, sem republicar o app (ver `use-event-config.ts`);
+//   2. `EXPO_PUBLIC_SYMPLA_EVENT_*` no build;
+//   3. os valores da edição atual, abaixo.
+
+const DEFAULT_SYMPLA_EVENT_ID = process.env.EXPO_PUBLIC_SYMPLA_EVENT_ID?.trim() || '3486582';
+const DEFAULT_SYMPLA_EVENT_SLUG =
+  process.env.EXPO_PUBLIC_SYMPLA_EVENT_SLUG?.trim() || 'expoindustrial-sul-2026';
+
+let symplaEventId = DEFAULT_SYMPLA_EVENT_ID;
+let symplaEventSlug = DEFAULT_SYMPLA_EVENT_SLUG;
+
+/** Aplica a edição vinda de `event/config`; vazio volta pro padrão do build. */
+export function setSymplaEvent(config: { id?: string; slug?: string }): void {
+  symplaEventId = config.id?.trim() || DEFAULT_SYMPLA_EVENT_ID;
+  symplaEventSlug = config.slug?.trim() || DEFAULT_SYMPLA_EVENT_SLUG;
+}
+
+/** Id numérico do evento na Sympla (ex.: `3486582`). */
+export function getSymplaEventId(): string {
+  return symplaEventId;
+}
+
+/** Id do documento em `paidEvents` (ex.: `sympla-3486582`). */
+export function getSymplaPaidEventId(): string {
+  return `sympla-${symplaEventId}`;
+}
+
+/** Página do evento na Sympla — onde o visitante compra o ingresso. */
+export function getVisitationTicketUrl(): string {
+  return `https://www.sympla.com.br/evento/${symplaEventSlug}/${symplaEventId}`;
+}
+
+/** Link curto de checkout da Sympla (abre direto na compra). */
+export function getSymplaCheckoutUrl(): string {
+  return `https://www.sympla.com.br/${symplaEventSlug}__${symplaEventId}`;
+}
 
 export const OFFICIAL_PAID_EVENTS = [
   {

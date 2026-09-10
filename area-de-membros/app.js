@@ -1,6 +1,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// Config do Firebase Web: identificadores públicos, não segredo — o SDK do
+// navegador precisa deles em claro e eles já vão no bundle do app e do painel.
+// Quem protege os dados são as `firestore.rules` (ver raiz do repo): aqui só se
+// lê o que a rule marca como público (`exhibitors` publicados, `sponsors`,
+// `sessions`).
 const firebaseConfig = {
   apiKey: "AIzaSyAH39np25SikgJvUCdt8lXWqs03Ys-QS7A",
   authDomain: "movie-app-ddda3.firebaseapp.com",
@@ -935,32 +940,36 @@ function setupQrScanner() {
 async function syncWithFirestore() {
   try {
     // 1. Carrega Expositores do Firestore
-    const exhibitorsSnapshot = await getDocs(collection(db, "exhibitors"));
+    // A rule de `exhibitors` só libera leitura de quem está `published`. Uma
+    // query sem filtro é negada por inteiro (list precisa ser provavelmente
+    // restrita), o que derrubava todo este bloco no catch e deixava a página
+    // nos dados fake. Com o `where` explícito a leitura passa.
+    const exhibitorsSnapshot = await getDocs(
+      query(collection(db, "exhibitors"), where("status", "==", "published"))
+    );
     if (!exhibitorsSnapshot.empty) {
       const list = [];
       exhibitorsSnapshot.forEach((docSnap) => {
         const data = docSnap.data();
-        if (data.status === "published" || !data.status) {
-          let logoHtml = "";
-          if (data.logoUrl) {
-            logoHtml = `<img src="${data.logoUrl}" style="width:100%; height:100%; object-fit:contain;">`;
-          } else {
-            const initial = (data.name || "EX").substring(0, 2).toUpperCase();
-            logoHtml = `<svg viewBox="0 0 100 100" style="width:100%; height:100%;"><rect width="100" height="100" fill="var(--gold-light)" stroke="var(--gold-border)" stroke-width="2" rx="8"/><text x="50" y="62" font-family="sans-serif" font-weight="800" font-size="28" fill="var(--gold-primary)" text-anchor="middle">${initial}</text></svg>`;
-          }
-          list.push({
-            id: docSnap.id,
-            name: data.name || "Expositor",
-            stand: data.stand || "S-01",
-            category: data.category || "expositor",
-            tech: data.tech || "iot",
-            desc: data.desc || "Soluções e tecnologias industriais inovadoras.",
-            tags: data.tags || ["Indústria 4.0"],
-            products: data.products || ["Solução Integrada"],
-            logo: logoHtml,
-            logoUrl: data.logoUrl || ""
-          });
+        let logoHtml = "";
+        if (data.logoUrl) {
+          logoHtml = `<img src="${data.logoUrl}" style="width:100%; height:100%; object-fit:contain;">`;
+        } else {
+          const initial = (data.name || "EX").substring(0, 2).toUpperCase();
+          logoHtml = `<svg viewBox="0 0 100 100" style="width:100%; height:100%;"><rect width="100" height="100" fill="var(--gold-light)" stroke="var(--gold-border)" stroke-width="2" rx="8"/><text x="50" y="62" font-family="sans-serif" font-weight="800" font-size="28" fill="var(--gold-primary)" text-anchor="middle">${initial}</text></svg>`;
         }
+        list.push({
+          id: docSnap.id,
+          name: data.name || "Expositor",
+          stand: data.stand || "S-01",
+          category: data.category || "expositor",
+          tech: data.tech || "iot",
+          desc: data.desc || "Soluções e tecnologias industriais inovadoras.",
+          tags: data.tags || ["Indústria 4.0"],
+          products: data.products || ["Solução Integrada"],
+          logo: logoHtml,
+          logoUrl: data.logoUrl || ""
+        });
       });
       if (list.length > 0) {
         MOCK_EXHIBITORS = list;

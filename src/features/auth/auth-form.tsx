@@ -3,7 +3,7 @@
  * Usado tanto pelo portal do expositor quanto pelo gate do perfil do visitante.
  */
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -17,6 +17,7 @@ import {
 
 import { Brand, Light, Radius, Spacing } from '@/constants/theme';
 import { authErrorMessage, useAuth } from '@/features/auth/use-auth';
+import { getSymplaCheckoutUrl } from '@/features/paid-events/paid-event';
 import { captureLeadProfile } from '@/features/visitor/visitor-profile';
 
 type Mode = 'login' | 'signup';
@@ -47,48 +48,15 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Busca credencial da Sympla pelo email para auto-preencher os dados de cadastro
-  useEffect(() => {
-    if (!showSymplaSignup || mode !== 'signup' || !email || !configured) return;
-    const cleanEmail = email.trim().toLowerCase();
-    
-    // Validar se o email tem um formato básico antes de buscar no firestore
-    if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) return;
-
-    const timer = setTimeout(async () => {
-      try {
-        const { doc, getDoc } = await import('firebase/firestore');
-        const { db } = await import('@/lib/firebase');
-        if (!db) return;
-        
-        const docRef = doc(db, 'paidEvents', 'sympla-3486582', 'attendees', cleanEmail);
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const data = snap.data();
-          if (data) {
-            if (data.fullName) setName(data.fullName);
-            if (data.phone) setPhone(data.phone);
-            if (data.company) setCompany(data.company);
-            if (data.role) setJobRole(data.role);
-          }
-        }
-      } catch (err) {
-        console.error('Erro ao preencher dados pelo email da Sympla:', err);
-      }
-    }, 600); // 600ms debounce
-
-    return () => clearTimeout(timer);
-  }, [email, mode, showSymplaSignup, configured]);
-
   async function handleOpenSympla() {
     try {
       const WebBrowser = await import('expo-web-browser');
-      await WebBrowser.openBrowserAsync('https://www.sympla.com.br/expoindustrial-sul-2026__3486582', {
+      await WebBrowser.openBrowserAsync(getSymplaCheckoutUrl(), {
         toolbarColor: '#0A192F',
         enableBarCollapsing: true,
         showTitle: true,
       });
-    } catch (err) {
+    } catch {
       Alert.alert('Erro', 'Não foi possível abrir o link de inscrição.');
     }
   }
@@ -105,7 +73,7 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
   async function onSubmit() {
     setError(null);
 
-    if (mode === 'signup') {
+    if (mode === 'signup' && !showSymplaSignup) {
       const problem = validateSignup();
       if (problem) {
         setError(problem);
@@ -119,18 +87,14 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
         await signIn(email, password);
       } else {
         await signUp(email, password);
-        // Captação de lead (obrigatória): grava nome, WhatsApp, e-mail, empresa e
-        // cargo assim que a conta é criada. Best-effort — não bloqueia o acesso.
-        try {
-          await captureLeadProfile({
-            name,
-            company,
-            role: jobRole,
-            phone,
-            email,
-          });
-        } catch {
-          // Se a gravação do lead falhar, o usuário ainda entra; o onboarding recaptura.
+        // No cadastro do visitante, o perfil só é criado depois da autenticação:
+        // assim o onboarding pode reaproveitar com segurança Sympla/R Gestor.
+        if (!showSymplaSignup) {
+          try {
+            await captureLeadProfile({ name, company, role: jobRole, phone, email });
+          } catch {
+            // Se a gravação falhar, o usuário ainda entra; o onboarding recaptura.
+          }
         }
       }
       onSuccess();
@@ -169,7 +133,7 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
         </View>
       )}
 
-      {mode === 'signup' && (
+      {mode === 'signup' && !showSymplaSignup && (
         <>
           <View style={styles.field}>
             <Text style={styles.label}>Nome completo</Text>
@@ -231,6 +195,13 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
             />
           </View>
         </>
+      )}
+
+      {mode === 'signup' && showSymplaSignup && (
+        <Text style={styles.importHint}>
+          Use o mesmo e-mail da inscrição. Depois de criar a conta, recuperaremos os dados
+          disponíveis da Sympla ou do R Gestor para você apenas revisar e complementar.
+        </Text>
       )}
 
       <View style={styles.field}>
@@ -337,6 +308,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   error: { color: Brand.danger, fontSize: 13.5 },
+  importHint: { color: Light.textMuted, fontSize: 13, lineHeight: 19 },
 
   submit: {
     backgroundColor: Brand.gold,

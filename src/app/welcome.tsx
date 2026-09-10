@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Light, Radius, Spacing } from '@/constants/theme';
+import { getSymplaCheckoutUrl } from '@/features/paid-events/paid-event';
 
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
@@ -22,7 +23,7 @@ export default function WelcomeScreen() {
   async function handleOpenSympla() {
     try {
       const WebBrowser = await import('expo-web-browser');
-      await WebBrowser.openBrowserAsync('https://www.sympla.com.br/expoindustrial-sul-2026__3486582', {
+      await WebBrowser.openBrowserAsync(getSymplaCheckoutUrl(), {
         toolbarColor: '#0A192F',
         enableBarCollapsing: true,
         showTitle: true,

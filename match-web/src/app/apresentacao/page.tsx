@@ -56,10 +56,6 @@ const MapIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
 );
 
-const UserCheck = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>
-);
-
 const Calendar = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
 );
@@ -96,6 +92,7 @@ export default function PresentationPage() {
           </div>
           <nav className="hidden md:flex items-center gap-8 font-semibold text-slate-600 text-sm">
             <a href="#ecossistema" className="hover:text-[#0c1527] transition-colors">Visão Geral</a>
+            <a href="#atualizacoes" className="hover:text-[#0c1527] transition-colors">Atualizações</a>
             <a href="#jornadas" className="hover:text-[#0c1527] transition-colors">Jornadas</a>
             <a href="#admin" className="hover:text-[#0c1527] transition-colors">Painel Organizador</a>
             <a href="#beneficios" className="hover:text-[#0c1527] transition-colors">Benefícios</a>
@@ -140,6 +137,69 @@ export default function PresentationPage() {
             >
               Sanar Dúvidas Frequentes
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Resumo executivo desde a última reunião */}
+      <section id="atualizacoes" className="scroll-mt-20 px-6 pb-20">
+        <div className="max-w-7xl mx-auto overflow-hidden rounded-[2rem] border border-slate-200 bg-[#0c1527] text-white shadow-[0_32px_90px_-48px_rgba(12,21,39,0.75)]">
+          <div className="relative px-6 py-10 md:px-12 md:py-14">
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_85%_15%,#c5a85c_0,transparent_28%),linear-gradient(to_right,#ffffff0d_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0d_1px,transparent_1px)] bg-[size:auto,28px_28px,28px_28px]" />
+            <div className="relative">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                <div className="max-w-3xl">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#c5a85c]/30 bg-[#c5a85c]/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#ddc77f]">
+                    <Calendar className="h-3.5 w-3.5" />
+                    Atualização pós-reunião · 10 set 2026
+                  </div>
+                  <h2 className="text-3xl font-black tracking-tight md:text-5xl">
+                    O que evoluiu desde<br className="hidden md:block" /> nossa última conversa
+                  </h2>
+                  <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-300 md:text-base">
+                    A estrutura principal foi reforçada em segurança, privacidade e operação. Os itens abaixo estão concluídos e validados localmente; publicação e configurações externas permanecem separadas para uma entrada controlada em produção.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 lg:min-w-[390px]">
+                  {[["45/45", "testes"], ["24", "rotas web"], ["0", "envios reais"]].map(([value, label]) => (
+                    <div key={label} className="bg-[#111d32]/90 px-4 py-5 text-center">
+                      <div className="text-2xl font-black text-[#ddc77f]">{value}</div>
+                      <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {[
+                  { icon: ShieldCheck, eyebrow: "Segurança", title: "Vínculo de estande protegido", text: "O expositor só reivindica o estande autorizado para seu e-mail verificado. Todo novo vínculo nasce como rascunho e depende da publicação do organizador." },
+                  { icon: Users, eyebrow: "Privacidade", title: "Dados de visitantes separados", text: "Perfil profissional e contatos privados passaram a ter controles distintos. Telefone, e-mail e tokens não ficam expostos na base pública do visitante." },
+                  { icon: Layers, eyebrow: "Integrações", title: "Cadastro Sympla e R Gestor", text: "Após entrar com o mesmo e-mail da inscrição, o visitante reaproveita nome, WhatsApp, empresa e cargo disponíveis, sem preencher tudo novamente." },
+                  { icon: CheckCircle2, eyebrow: "Credenciamento", title: "Leitura de crachá mais robusta", text: "O scanner reconhece o ingresso Sympla mesmo quando o participante ainda não abriu o aplicativo, com validação de evento e deduplicação dos leads." },
+                  { icon: BarChart3, eyebrow: "Organização", title: "Moderação no painel", text: "O organizador ganhou uma fila para revisar, aprovar, devolver para rascunho e acompanhar a completude dos cadastros de expositores." },
+                  { icon: Calendar, eyebrow: "Confiabilidade", title: "Agendamentos protegidos", text: "A rota de avisos agora falha fechada sem segredo e recupera processamentos interrompidos. A ativação externa continua pendente e controlada." },
+                ].map(({ icon: Icon, eyebrow, title, text }) => (
+                  <article key={title} className="group rounded-2xl border border-white/10 bg-white/[0.045] p-5 transition-colors hover:bg-white/[0.075]">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#c5a85c]/12 text-[#ddc77f] ring-1 ring-[#c5a85c]/20"><Icon className="h-5 w-5" /></div>
+                      <span className="rounded-full bg-emerald-400/10 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wider text-emerald-300 ring-1 ring-emerald-300/15">Pronto em código</span>
+                    </div>
+                    <div className="mt-5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#c5a85c]">{eyebrow}</div>
+                    <h3 className="mt-2 text-lg font-extrabold text-white">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-400">{text}</p>
+                  </article>
+                ))}
+              </div>
+
+              <div className="mt-6 grid gap-4 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] p-5 md:grid-cols-[auto_1fr] md:items-center md:p-6">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-300/10 text-[#ddc77f]"><Sparkles className="h-5 w-5" /></div>
+                <div>
+                  <div className="text-sm font-extrabold text-amber-100">Próxima etapa: publicação controlada</div>
+                  <p className="mt-1 text-sm leading-6 text-slate-300">O código está validado localmente, mas ainda requer deploy, publicação das regras e configuração dos segredos. Sincronizações de produção e qualquer contato com visitantes ou expositores só serão executados após autorização expressa.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -321,9 +381,9 @@ export default function PresentationPage() {
                       <span className="text-xs font-bold text-slate-700 block">Total de Leads Coletados</span>
                       <span className="text-2xl font-black text-[#0c1527] mt-1 block">142</span>
                     </div>
-                    <button className="h-9 px-3 rounded bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs font-bold flex items-center gap-1.5">
-                      <Download className="h-3.5 w-3.5" /> Exportar CSV
-                    </button>
+                    <div className="h-9 px-3 rounded bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs font-bold flex items-center gap-1.5" aria-label="Exemplo visual da exportação disponível no Portal do Expositor">
+                      <Download className="h-3.5 w-3.5" /> Exportação CSV disponível
+                    </div>
                   </div>
                 </div>
               </div>
@@ -342,7 +402,7 @@ export default function PresentationPage() {
                       <div className="h-6 w-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
                       <div>
                         <h5 className="font-bold text-slate-800 text-sm">Cadastro Integrado da Inscrição</h5>
-                        <p className="text-xs text-slate-500 mt-0.5">O acesso do visitante parte da inscrição feita no Simpla/R Gestor. Os dados principais são reaproveitados no app para reduzir retrabalho, ficando apenas validações ou complementos rápidos quando necessário.</p>
+                        <p className="text-xs text-slate-500 mt-0.5">O acesso do visitante usa uma conta do aplicativo. Após o login com o mesmo e-mail da inscrição na Sympla ou no R Gestor, os dados importados disponíveis são reaproveitados e podem ser revisados ou complementados no onboarding.</p>
                       </div>
                     </div>
 
@@ -467,7 +527,7 @@ export default function PresentationPage() {
       </section>
 
       {/* Funcionalidades do App */}
-      <section id="funcionalidades" className="py-20 px-6 max-w-7xl mx-auto">
+      <section id="beneficios" className="scroll-mt-20 py-20 px-6 max-w-7xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-xs font-bold uppercase tracking-widest text-[#c5a85c] mb-2">Recursos Práticos</h2>
           <h3 className="text-3xl font-extrabold text-[#0c1527]">O que estará no aplicativo da feira</h3>
@@ -500,8 +560,8 @@ export default function PresentationPage() {
 
           <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-xs flex flex-col">
             <FileText className="h-8 w-8 text-[#0c1527] mb-4" />
-            <h5 className="font-bold text-[#0c1527] text-sm">Materiais dos Palestrantes</h5>
-            <p className="text-xs text-slate-500 mt-2 leading-relaxed">Acesso aos conteúdos e materiais das palestras diretamente no app, para consultar e baixar as apresentações a qualquer momento.</p>
+            <h5 className="font-bold text-[#0c1527] text-sm">Materiais do Evento</h5>
+            <p className="text-xs text-slate-500 mt-2 leading-relaxed">Acesso aos materiais gerais publicados pela organização e a conteúdos exclusivos vinculados a eventos pagos.</p>
           </div>
         </div>
       </section>
@@ -522,8 +582,8 @@ export default function PresentationPage() {
                   <BarChart3 className="h-4.5 w-4.5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-white">Relatório Consolidado de Geração de Negócios</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Veja quantos leads totais foram gerados e filtre contatos qualificados por segmento industrial.</p>
+                  <h4 className="font-bold text-sm text-white">Acompanhamento Operacional</h4>
+                  <p className="text-xs text-slate-400 mt-0.5">Acompanhe cadastros, publicações e pendências do evento em um único painel.</p>
                 </div>
               </div>
 
@@ -532,8 +592,8 @@ export default function PresentationPage() {
                   <Users className="h-4.5 w-4.5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-white">Dashboard de Demografia do Público</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Identifique a distribuição de cargos e as principais empresas tomadoras de decisão presentes na feira.</p>
+                  <h4 className="font-bold text-sm text-white">Perfis dos Visitantes</h4>
+                  <p className="text-xs text-slate-400 mt-0.5">Consulte os dados autorizados, cargos, empresas e respostas de matchmaking dos participantes cadastrados.</p>
                 </div>
               </div>
 
@@ -543,7 +603,7 @@ export default function PresentationPage() {
                 </div>
                 <div>
                   <h4 className="font-bold text-sm text-white">Destaque de Patrocinadores</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Gerencie os logotipos das marcas patrocinadoras nos cabeçalhos e menus do app com efeito imediato.</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Gerencie as marcas patrocinadoras exibidas na área de patrocinadores da página inicial do aplicativo.</p>
                 </div>
               </div>
 
@@ -553,14 +613,17 @@ export default function PresentationPage() {
                 </div>
                 <div>
                   <h4 className="font-bold text-sm text-white">Disparo de Notificações Push</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Dispare comunicados em tempo real, avisos importantes e atualizações da feira diretamente para os smartphones de todos os visitantes que possuem o aplicativo instalado.</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Prepare comunicados para visitantes que autorizaram notificações e possuem um token válido registrado no aplicativo.</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="bg-white/5 rounded-2xl border border-white/10 p-8">
-            <h4 className="text-lg font-bold text-[#c5a85c] mb-4">Pré-visualização do Relatório</h4>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h4 className="text-lg font-bold text-[#c5a85c]">Pré-visualização do Relatório</h4>
+              <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300">Dados ilustrativos</span>
+            </div>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-xs text-slate-400 mb-1">
@@ -675,7 +738,7 @@ export default function PresentationPage() {
               </button>
               {openFaq === 8 && (
                 <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                  A proposta é evitar um novo cadastro completo. O app deve aproveitar as informações já preenchidas na inscrição pelo Simpla/R Gestor, como nome, e-mail, telefone, empresa e cargo. Quando algum dado estiver incompleto, o visitante poderá apenas revisar ou complementar o perfil dentro do aplicativo.
+                  O visitante cria a conta usando apenas e-mail e senha. Ao entrar com o mesmo e-mail usado na Sympla ou no R Gestor, o app reaproveita nome, WhatsApp, empresa e cargo que estiverem disponíveis; informações ausentes podem ser preenchidas ou revisadas no onboarding.
                 </div>
               )}
             </div>
@@ -690,7 +753,7 @@ export default function PresentationPage() {
               </button>
               {openFaq === 9 && (
                 <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                  O fluxo previsto é integrar a confirmação do R Gestor/Simpla com a base do evento. Após a inscrição validada, o visitante passa a existir na lista oficial de participantes e pode acessar o app com os dados vinculados à inscrição. O link de pagamento e a liberação após confirmação ainda devem ser validados no fluxo do R Gestor.
+                  As integrações disponíveis importam participantes da Sympla e do R Gestor para a base do evento e reconhecem o acesso autenticado pelo mesmo e-mail. A execução automática das sincronizações e a liberação baseada em pagamento ainda dependem de validação e configuração operacional.
                 </div>
               )}
             </div>
@@ -720,7 +783,7 @@ export default function PresentationPage() {
               </button>
               {openFaq === 11 && (
                 <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                  Visitantes entram pelo fluxo de inscrição do evento, via Simpla/R Gestor. Já os expositores são tratados pela organização através de contrato direto. Depois da contratação, cada expositor recebe acesso ao Portal do Expositor para preencher ou revisar os dados da empresa, logotipo, links e informações do estande.
+                  Visitantes criam uma conta no aplicativo e podem ter dados reaproveitados da inscrição importada da Sympla. Já os expositores são tratados pela organização através de contrato direto e usam o Portal do Expositor para preencher ou revisar a ficha da empresa.
                 </div>
               )}
             </div>
@@ -750,7 +813,7 @@ export default function PresentationPage() {
               </button>
               {openFaq === 13 && (
                 <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                  Sim. O painel administrativo deve permitir cadastrar avisos com título, mensagem e horário de disparo. Assim, a organização pode preparar comunicações com antecedência, como contagem regressiva, lembretes de programação, avisos operacionais e comunicados importantes durante os dias da feira.
+                  Sim. O painel permite cadastrar avisos com título, mensagem e horário previsto. A entrega depende do serviço de agendamento estar publicado e alcança somente visitantes que autorizaram notificações e possuem token válido.
                 </div>
               )}
             </div>

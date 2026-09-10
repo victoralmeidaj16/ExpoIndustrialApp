@@ -1,16 +1,25 @@
 /**
  * Perfil do visitante (auto-serviço, autenticado).
  *
- * Cada visitante logado é dono do documento `visitors/{uid}`: dados do crachá
- * (nome/cargo/empresa) e as preferências que alimentam o matchmaking
- * (área, budget, gargalos). A leitura/escrita é restrita ao próprio dono.
+ * `visitors/{uid}` guarda somente identidade profissional e preferências de
+ * matchmaking. Contatos, tokens e metadados operacionais ficam separados em
+ * `visitorPrivateProfiles`, com uma cópia consentida em `visitorContactCards`.
  */
-import { doc, getDoc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
+import {
+  deleteField,
+  doc,
+  getDoc,
+  onSnapshot,
+  serverTimestamp,
+  writeBatch,
+} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 
 export const VISITORS_COLLECTION = 'visitors';
+export const VISITOR_PRIVATE_PROFILES_COLLECTION = 'visitorPrivateProfiles';
+export const VISITOR_CONTACT_CARDS_COLLECTION = 'visitorContactCards';
 
 export type VisitorProfile = {
   name: string;
@@ -206,30 +215,85 @@ export const SECTORS = [
   'Serviços (treinamento, consultoria, assessoria, diagnósticos, etc)',
 ] as const;
 
-function fromDoc(data: Record<string, unknown>): VisitorProfile {
+export function visitorProfileFromData(
+  publicData: Record<string, unknown>,
+  privateData: Record<string, unknown> = {},
+): VisitorProfile {
   return {
-    name: (data.name as string) ?? '',
-    role: (data.role as string) ?? '',
-    company: (data.company as string) ?? '',
-    area: (data.area as string) ?? '',
-    budget: (data.budget as string) ?? '',
-    bottlenecks: Array.isArray(data.bottlenecks) ? (data.bottlenecks as string[]) : [],
-    phone: (data.phone as string) ?? '',
-    email: (data.email as string) ?? '',
-    linkedin: (data.linkedin as string) ?? '',
-    website: (data.website as string) ?? '',
-    roleType: (data.roleType as VisitorProfile['roleType']) ?? '',
-    sector: Array.isArray(data.sector) ? (data.sector as string[]) : [],
-    marketRole: (data.marketRole as VisitorProfile['marketRole']) ?? '',
-    objectives: Array.isArray(data.objectives) ? (data.objectives as string[]) : [],
-    interests: Array.isArray(data.interests) ? (data.interests as string[]) : [],
-    lookingFor: (data.lookingFor as string) ?? '',
-    offering: (data.offering as string) ?? '',
-    photoUrl: (data.photoUrl as string) ?? '',
-    discoverable: (data.discoverable as boolean) ?? false,
-    shareContact: (data.shareContact as boolean) ?? false,
-    onboardingCompleted: (data.onboardingCompleted as boolean) ?? false,
-    onboardingSkipped: (data.onboardingSkipped as boolean) ?? false,
+    name: (publicData.name as string) ?? '',
+    role: (publicData.role as string) ?? '',
+    company: (publicData.company as string) ?? '',
+    area: (publicData.area as string) ?? '',
+    budget: (publicData.budget as string) ?? '',
+    bottlenecks: Array.isArray(publicData.bottlenecks) ? (publicData.bottlenecks as string[]) : [],
+    phone: (privateData.phone as string) ?? '',
+    email: (privateData.email as string) ?? '',
+    linkedin: (privateData.linkedin as string) ?? '',
+    website: (privateData.website as string) ?? '',
+    roleType: (publicData.roleType as VisitorProfile['roleType']) ?? '',
+    sector: Array.isArray(publicData.sector) ? (publicData.sector as string[]) : [],
+    marketRole: (publicData.marketRole as VisitorProfile['marketRole']) ?? '',
+    objectives: Array.isArray(publicData.objectives) ? (publicData.objectives as string[]) : [],
+    interests: Array.isArray(publicData.interests) ? (publicData.interests as string[]) : [],
+    lookingFor: (publicData.lookingFor as string) ?? '',
+    offering: (publicData.offering as string) ?? '',
+    photoUrl: (publicData.photoUrl as string) ?? '',
+    discoverable: (publicData.discoverable as boolean) ?? false,
+    shareContact: (publicData.shareContact as boolean) ?? false,
+    onboardingCompleted: (publicData.onboardingCompleted as boolean) ?? false,
+    onboardingSkipped: (publicData.onboardingSkipped as boolean) ?? false,
+  };
+}
+
+function publicProfilePayload(data: VisitorProfile, uid: string) {
+  return {
+    name: data.name.trim(),
+    role: data.role.trim(),
+    company: data.company.trim(),
+    area: data.area.trim(),
+    budget: data.budget,
+    bottlenecks: data.bottlenecks.filter((item) => item.trim().length > 0),
+    roleType: data.roleType ?? '',
+    sector: data.sector ?? [],
+    marketRole: data.marketRole ?? '',
+    objectives: data.objectives ?? [],
+    interests: data.interests ?? [],
+    lookingFor: data.lookingFor ?? '',
+    offering: data.offering ?? '',
+    photoUrl: data.photoUrl ?? '',
+    discoverable: data.discoverable ?? false,
+    shareContact: data.shareContact ?? false,
+    onboardingCompleted: data.onboardingCompleted ?? false,
+    onboardingSkipped: data.onboardingSkipped ?? false,
+    ownerUid: uid,
+    // Remove os campos legados do documento público durante qualquer salvamento.
+    phone: deleteField(),
+    email: deleteField(),
+    linkedin: deleteField(),
+    website: deleteField(),
+    pushTokens: deleteField(),
+    pushPlatform: deleteField(),
+    pushTokenUpdatedAt: deleteField(),
+    leadCapturedAt: deleteField(),
+    leadSource: deleteField(),
+  };
+}
+
+function privateProfilePayload(data: VisitorProfile, uid: string) {
+  return {
+    ownerUid: uid,
+    phone: data.phone?.trim() ?? '',
+    email: (data.email || auth?.currentUser?.email || '').trim().toLowerCase(),
+    linkedin: data.linkedin?.trim() ?? '',
+    website: data.website?.trim() ?? '',
+    updatedAt: serverTimestamp(),
+  };
+}
+
+function contactCardPayload(data: VisitorProfile, uid: string) {
+  return {
+    ...privateProfilePayload(data, uid),
+    shareContact: data.shareContact ?? false,
   };
 }
 
@@ -241,36 +305,87 @@ export type UseVisitorProfileResult = {
 
 /** Assina o documento do visitante logado em tempo real. */
 export function useVisitorProfile(): UseVisitorProfileResult {
-  const [profile, setProfile] = useState<VisitorProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
   const uid = auth?.currentUser?.uid;
+  const canSubscribe = isFirebaseConfigured && Boolean(db) && Boolean(uid);
+
+  // O uid é guardado junto do dado: ao trocar de conta o resultado volta a
+  // `loading` em vez de exibir por um instante o perfil da conta anterior.
+  const [state, setState] = useState<{
+    uid?: string;
+    publicLoaded: boolean;
+    privateLoaded: boolean;
+    publicData: Record<string, unknown> | null;
+    privateData: Record<string, unknown> | null;
+    error: Error | null;
+  }>({
+    publicLoaded: false,
+    privateLoaded: false,
+    publicData: null,
+    privateData: null,
+    error: null,
+  });
 
   useEffect(() => {
-    if (!isFirebaseConfigured || !db || !uid) {
-      setLoading(false);
-      return;
-    }
+    if (!canSubscribe || !db || !uid) return;
 
-    const ref = doc(db, VISITORS_COLLECTION, uid);
-    const unsubscribe = onSnapshot(
-      ref,
-      (snap) => {
-        setProfile(snap.exists() ? fromDoc(snap.data()) : null);
-        setLoading(false);
-        setError(null);
-      },
-      (err) => {
-        setError(err);
-        setLoading(false);
-      },
+    const publicRef = doc(db, VISITORS_COLLECTION, uid);
+    const privateRef = doc(db, VISITOR_PRIVATE_PROFILES_COLLECTION, uid);
+    const update = (patch: Partial<typeof state>) =>
+      setState((previous) => ({
+        ...(previous.uid === uid
+          ? previous
+          : {
+              publicLoaded: false,
+              privateLoaded: false,
+              publicData: null,
+              privateData: null,
+              error: null,
+            }),
+        ...patch,
+        uid,
+      }));
+
+    const unsubscribePublic = onSnapshot(
+      publicRef,
+      (snap) => update({
+        publicLoaded: true,
+        publicData: snap.exists() ? snap.data() : null,
+        error: null,
+      }),
+      (err) => update({ publicLoaded: true, publicData: null, error: err }),
+    );
+    const unsubscribePrivate = onSnapshot(
+      privateRef,
+      (snap) => update({
+        privateLoaded: true,
+        privateData: snap.exists() ? snap.data() : null,
+        error: null,
+      }),
+      (err) => update({ privateLoaded: true, privateData: null, error: err }),
     );
 
-    return unsubscribe;
-  }, [uid]);
+    return () => {
+      unsubscribePublic();
+      unsubscribePrivate();
+    };
+  }, [canSubscribe, uid]);
 
-  return { profile, loading, error };
+  // Sem Firebase ou sem login não há o que assinar — isso é vazio, não
+  // "carregando". Derivar aqui evita o efeito que só existia para corrigir o
+  // estado inicial depois da montagem.
+  if (!canSubscribe) return { profile: null, loading: false, error: null };
+  if (state.uid !== uid || !state.publicLoaded || !state.privateLoaded) {
+    return { profile: null, loading: true, error: null };
+  }
+  const profile = state.publicData
+    ? visitorProfileFromData(
+        state.publicData,
+        // Compatibilidade temporária: antes da migração, os contatos ainda
+        // podem existir apenas no documento público do próprio usuário.
+        state.privateData ?? state.publicData,
+      )
+    : null;
+  return { profile, loading: false, error: state.error };
 }
 
 /**
@@ -287,28 +402,40 @@ export type LeadCapture = {
 };
 
 /**
- * Grava os dados de lead captados no momento do cadastro em `visitors/{uid}`
- * (visível ao organizador no painel match-web). Faz `merge`, então não sobrescreve
- * o que o onboarding preencher depois. Best-effort: nunca deve bloquear o login.
+ * Grava identidade no perfil público e contato na coleção privada. O cartão de
+ * contato nasce fechado e só será liberado se o visitante ativar `shareContact`.
  */
 export async function captureLeadProfile(lead: LeadCapture): Promise<void> {
   if (!db || !auth?.currentUser) return;
   const uid = auth.currentUser.uid;
-  await setDoc(
-    doc(db, VISITORS_COLLECTION, uid),
-    {
-      name: lead.name.trim(),
-      company: lead.company.trim(),
-      role: lead.role.trim(),
-      phone: lead.phone.trim(),
-      email: lead.email.trim().toLowerCase(),
-      ownerUid: uid,
-      leadCapturedAt: serverTimestamp(),
-      leadSource: 'signup',
-      onboardingSkipped: true,
-    },
-    { merge: true },
-  );
+  const batch = writeBatch(db);
+  batch.set(doc(db, VISITORS_COLLECTION, uid), {
+    name: lead.name.trim(),
+    company: lead.company.trim(),
+    role: lead.role.trim(),
+    ownerUid: uid,
+    onboardingSkipped: true,
+    phone: deleteField(),
+    email: deleteField(),
+  }, { merge: true });
+  batch.set(doc(db, VISITOR_PRIVATE_PROFILES_COLLECTION, uid), {
+    ownerUid: uid,
+    phone: lead.phone.trim(),
+    email: lead.email.trim().toLowerCase(),
+    leadCapturedAt: serverTimestamp(),
+    leadSource: 'signup',
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+  batch.set(doc(db, VISITOR_CONTACT_CARDS_COLLECTION, uid), {
+    ownerUid: uid,
+    phone: lead.phone.trim(),
+    email: lead.email.trim().toLowerCase(),
+    linkedin: '',
+    website: '',
+    shareContact: false,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+  await batch.commit();
 }
 
 /** Cria/atualiza o perfil do visitante logado. */
@@ -317,28 +444,40 @@ export async function saveVisitorProfile(data: VisitorProfile): Promise<void> {
     throw new Error('É preciso estar autenticado para salvar o perfil.');
   }
   const uid = auth.currentUser.uid;
-  const ref = doc(db, VISITORS_COLLECTION, uid);
-  await setDoc(
-    ref,
-    {
-      ...data,
-      bottlenecks: data.bottlenecks.filter((b) => b.trim().length > 0),
-      ownerUid: uid,
-    },
+  const batch = writeBatch(db);
+  batch.set(doc(db, VISITORS_COLLECTION, uid), publicProfilePayload(data, uid), { merge: true });
+  batch.set(
+    doc(db, VISITOR_PRIVATE_PROFILES_COLLECTION, uid),
+    privateProfilePayload(data, uid),
     { merge: true },
   );
+  batch.set(
+    doc(db, VISITOR_CONTACT_CARDS_COLLECTION, uid),
+    contactCardPayload(data, uid),
+    { merge: true },
+  );
+  await batch.commit();
 }
 
 /** Lê o perfil uma única vez (sem assinar) — útil fora de componentes. */
 export async function getVisitorProfileOnce(): Promise<VisitorProfile | null> {
   if (!db || !auth?.currentUser) return null;
-  const snap = await getDoc(doc(db, VISITORS_COLLECTION, auth.currentUser.uid));
-  return snap.exists() ? fromDoc(snap.data()) : null;
+  const uid = auth.currentUser.uid;
+  const [publicSnap, privateSnap] = await Promise.all([
+    getDoc(doc(db, VISITORS_COLLECTION, uid)),
+    getDoc(doc(db, VISITOR_PRIVATE_PROFILES_COLLECTION, uid)),
+  ]);
+  if (!publicSnap.exists()) return null;
+  return visitorProfileFromData(
+    publicSnap.data(),
+    privateSnap.exists() ? privateSnap.data() : publicSnap.data(),
+  );
 }
 
 /** Lê o perfil de qualquer visitante pelo seu UID (uma única vez). */
 export async function getVisitorProfileByUid(uid: string): Promise<VisitorProfile | null> {
   if (!db || !auth?.currentUser) return null;
+  if (uid === auth.currentUser.uid) return getVisitorProfileOnce();
   const snap = await getDoc(doc(db, VISITORS_COLLECTION, uid));
-  return snap.exists() ? fromDoc(snap.data()) : null;
+  return snap.exists() ? visitorProfileFromData(snap.data()) : null;
 }

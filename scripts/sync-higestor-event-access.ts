@@ -30,6 +30,9 @@ type HigestorRegistration = {
     nome?: string;
     email?: string;
     cpf_cnpj?: string;
+    telefone?: string;
+    empresa?: string;
+    cargo?: string;
     presenca_confirmada?: boolean;
     responsavel?: {
       id_responsavel?: number | string;
@@ -38,6 +41,8 @@ type HigestorRegistration = {
       cpf_cnpj?: string;
       email?: string;
       telefone?: string;
+      empresa?: string;
+      cargo?: string;
       descricao_ingresso?: string;
       valor_pago?: string;
     };
@@ -108,6 +113,15 @@ function isPaidRegistration(registration: HigestorRegistration): boolean {
   if (hasPaidInvoice(attributes?.faturas)) return true;
   if (moneyToNumber(attributes?.responsavel?.valor_pago) > 0) return true;
   return false;
+}
+
+function registrationStatus(registration: HigestorRegistration): 'paid' | 'pending' | 'cancelled' {
+  if (isPaidRegistration(registration)) return 'paid';
+  const revoked = (registration.attributes?.faturas ?? []).some((invoice) => {
+    const status = (invoice.situacao ?? '').trim().toLowerCase();
+    return ['cancel', 'estorn', 'reembols', 'refund'].some((term) => status.includes(term));
+  });
+  return revoked ? 'cancelled' : 'pending';
 }
 
 function initializeAdmin() {
@@ -187,7 +201,7 @@ async function main() {
 
   const paidEventId = process.env.PAID_EVENT_ID?.trim() || `higestor-${higestorEventId}`;
   const dryRun = process.env.HIGESTOR_DRY_RUN === '1';
-  const includeUnpaid = process.env.HIGESTOR_SYNC_INCLUDE_UNPAID === '1';
+  const verbose = process.env.SYNC_LOG_RECORDS === '1';
 
   if (!dryRun) {
     initializeAdmin();
@@ -229,17 +243,14 @@ async function main() {
     for (const registration of registrations) {
       const attributes = registration.attributes ?? {};
       const email = normalizeEmail(attributes.email || attributes.responsavel?.email);
-      const paid = isPaidRegistration(registration);
+      const status = registrationStatus(registration);
 
       if (!email) {
         skippedNoEmail += 1;
         continue;
       }
 
-      if (!paid && !includeUnpaid) {
-        skippedUnpaid += 1;
-        continue;
-      }
+      if (status !== 'paid') skippedUnpaid += 1;
 
       const cpf = onlyDigits(attributes.cpf_cnpj || attributes.responsavel?.cpf_cnpj);
       const docRef = db
@@ -249,9 +260,12 @@ async function main() {
         .doc(email);
 
       const data = {
-        status: paid ? 'paid' : 'pending',
+        status,
         userEmailLower: email,
         fullName: attributes.nome || attributes.responsavel?.nome || '',
+        phone: attributes.telefone || attributes.responsavel?.telefone || '',
+        company: attributes.empresa || attributes.responsavel?.empresa || '',
+        role: attributes.cargo || attributes.responsavel?.cargo || '',
         cpfLast4: cpf ? cpf.slice(-4) : '',
         source: 'higestor',
         higestorEventId,
@@ -263,7 +277,7 @@ async function main() {
       };
 
       if (dryRun) {
-        console.log(`[dry-run] ${maskEmail(email)} -> ${data.status}`);
+        if (verbose) console.log(`[dry-run] ${maskEmail(email)} -> ${data.status}`);
       } else {
         if (!db || !batch || !docRef) throw new Error('Firestore Admin não inicializado.');
         batch.set(docRef, data, { merge: true });

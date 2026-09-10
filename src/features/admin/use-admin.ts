@@ -9,7 +9,12 @@ import {
   type ExhibitorStatus,
 } from '@/features/exhibitors/exhibitor';
 import { db, isFirebaseConfigured } from '@/lib/firebase';
-import { VISITORS_COLLECTION, type VisitorProfile } from '@/features/visitor/visitor-profile';
+import {
+  VISITOR_PRIVATE_PROFILES_COLLECTION,
+  VISITORS_COLLECTION,
+  visitorProfileFromData,
+  type VisitorProfile,
+} from '@/features/visitor/visitor-profile';
 
 export type AdminRoleResult = {
   isAdmin: boolean;
@@ -139,23 +144,46 @@ export function useAdminVisitors(enabled: boolean): AdminVisitorsResult {
       };
     }
 
-    const ref = collection(db, VISITORS_COLLECTION);
-    return onSnapshot(
-      ref,
+    let publicProfiles = new Map<string, Record<string, unknown>>();
+    let privateProfiles = new Map<string, Record<string, unknown>>();
+    let publicLoaded = false;
+    let privateLoaded = false;
+    const publish = () => {
+      if (!publicLoaded || !privateLoaded) return;
+      const docs = [...publicProfiles].map(([uid, publicData]) => ({
+        uid,
+        profile: visitorProfileFromData(publicData, privateProfiles.get(uid)),
+      })).sort((a, b) => (a.profile.name || '').localeCompare(b.profile.name || '', 'pt-BR'));
+      setVisitors(docs);
+      setLoading(false);
+      setError(null);
+    };
+    const fail = (err: Error) => {
+      setError(err);
+      setLoading(false);
+    };
+    const unsubscribePublic = onSnapshot(
+      collection(db, VISITORS_COLLECTION),
       (snap) => {
-        const docs = snap.docs.map((doc) => ({
-          uid: doc.id,
-          profile: doc.data() as VisitorProfile,
-        })).sort((a, b) => (a.profile.name || '').localeCompare(b.profile.name || '', 'pt-BR'));
-        setVisitors(docs);
-        setLoading(false);
-        setError(null);
+        publicProfiles = new Map(snap.docs.map((item) => [item.id, item.data()]));
+        publicLoaded = true;
+        publish();
       },
-      (err) => {
-        setError(err);
-        setLoading(false);
-      }
+      fail,
     );
+    const unsubscribePrivate = onSnapshot(
+      collection(db, VISITOR_PRIVATE_PROFILES_COLLECTION),
+      (snap) => {
+        privateProfiles = new Map(snap.docs.map((item) => [item.id, item.data()]));
+        privateLoaded = true;
+        publish();
+      },
+      fail,
+    );
+    return () => {
+      unsubscribePublic();
+      unsubscribePrivate();
+    };
   }, [enabled]);
 
   return { visitors, loading, error };

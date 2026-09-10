@@ -140,7 +140,8 @@ export default function ExpositorDashboardPage() {
             {leads.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 text-slate-500 text-center gap-2">
                 <span className="text-3xl">👥</span>
-                <p className="text-sm font-medium">Nenhum visitante escaneou seu estande ainda.</p>
+                <p className="text-sm font-medium">Nenhum contato foi captado pela equipe do estande ainda.</p>
+                <p className="max-w-md text-xs">Os leads aparecem aqui depois que um representante autorizado escaneia o crachá do visitante e confirma o salvamento.</p>
               </div>
             ) : (
               <div className="divide-y divide-slate-800">

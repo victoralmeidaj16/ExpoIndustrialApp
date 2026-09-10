@@ -7,12 +7,15 @@ import {
   where,
   setDoc,
   updateDoc,
-  deleteDoc,
-  getDocs,
 } from 'firebase/firestore';
 
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
-import { type VisitorProfile, DEMO_VISITOR_PROFILE } from '@/features/visitor/visitor-profile';
+import {
+  type VisitorProfile,
+  DEMO_VISITOR_PROFILE,
+  VISITOR_CONTACT_CARDS_COLLECTION,
+  visitorProfileFromData,
+} from '@/features/visitor/visitor-profile';
 import { type Connection, connectionConverter } from './connection';
 
 const VISITORS_COLLECTION = 'visitors';
@@ -23,114 +26,172 @@ export type DiscoverableVisitor = {
   profile: VisitorProfile;
 };
 
-export function useDiscoverableVisitors() {
-  const [visitors, setVisitors] = useState<DiscoverableVisitor[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+export type SharedVisitorContact = Pick<VisitorProfile, 'email' | 'phone' | 'linkedin' | 'website'>;
 
+/** Conexões fake do modo demo (sem Firebase / sem login): dado estático. */
+const DEMO_CONNECTIONS: Connection[] = [
+  {
+    id: 'demo-user_demo-visitor-2',
+    fromUid: 'demo-user',
+    toUid: 'demo-visitor-2',
+    status: 'pending',
+    createdAt: new Date(),
+    fromName: 'Victor Almeida',
+    toName: 'Ana Silva',
+  },
+];
+
+/** Visitantes fake do modo demo (sem Firebase): dado estático, não estado. */
+const DEMO_DISCOVERABLE_VISITORS: DiscoverableVisitor[] = [
+  {
+    uid: 'demo-visitor-2',
+    profile: {
+      ...DEMO_VISITOR_PROFILE,
+      name: 'Ana Silva',
+      role: 'Gerente de PPCP',
+      company: 'Tech Componentes',
+      marketRole: 'Fornecedor',
+      objectives: ['Gerar leads', 'Networking'],
+      interests: ['Robótica Industrial', 'S&OP / S&OE / IBP', 'IoT Industrial'],
+      lookingFor: 'Parcerias com montadoras de painéis',
+      offering: 'CLPs importados e sensores industriais de alta precisão',
+      phone: '(47) 99999-2222',
+      email: 'ana.silva@techcomponentes.com.br',
+      linkedin: 'https://linkedin.com',
+      discoverable: true,
+      shareContact: true,
+    },
+  },
+  {
+    uid: 'demo-visitor-3',
+    profile: {
+      ...DEMO_VISITOR_PROFILE,
+      name: 'Carlos Santos',
+      role: 'Supervisor de Manutenção',
+      company: 'Fábrica Sul',
+      marketRole: 'Comprador',
+      objectives: ['Encontrar fornecedores', 'Tendências'],
+      interests: ['Manutenção', 'IoT', 'Energia'],
+      lookingFor: 'Soluções de monitoramento de vibração preditiva',
+      offering: 'Indicação de serviços de calibração metal-mecânica',
+      phone: '(47) 97777-3333',
+      email: 'carlos@fabricasul.com.br',
+      linkedin: 'https://linkedin.com',
+      discoverable: true,
+      shareContact: true,
+    },
+  },
+];
+
+export function useDiscoverableVisitors() {
   const uid = auth?.currentUser?.uid;
+  const canSubscribe = isFirebaseConfigured && Boolean(db);
+
+  const [state, setState] = useState<{
+    visitors: DiscoverableVisitor[];
+    loading: boolean;
+    error: Error | null;
+  }>({ visitors: [], loading: true, error: null });
 
   useEffect(() => {
-    if (!isFirebaseConfigured || !db) {
-      // No modo demo, retornamos um visitante demo fake
-      setVisitors([
-        {
-          uid: 'demo-visitor-2',
-          profile: {
-            ...DEMO_VISITOR_PROFILE,
-            name: 'Ana Silva',
-            role: 'Gerente de PPCP',
-            company: 'Tech Componentes',
-            marketRole: 'Fornecedor',
-            objectives: ['Gerar leads', 'Networking'],
-            interests: ['Robótica Industrial', 'S&OP / S&OE / IBP', 'IoT Industrial'],
-            lookingFor: 'Parcerias com montadoras de painéis',
-            offering: 'CLPs importados e sensores industriais de alta precisão',
-            phone: '(47) 99999-2222',
-            email: 'ana.silva@techcomponentes.com.br',
-            linkedin: 'https://linkedin.com',
-            discoverable: true,
-            shareContact: true,
-          },
-        },
-        {
-          uid: 'demo-visitor-3',
-          profile: {
-            ...DEMO_VISITOR_PROFILE,
-            name: 'Carlos Santos',
-            role: 'Supervisor de Manutenção',
-            company: 'Fábrica Sul',
-            marketRole: 'Comprador',
-            objectives: ['Encontrar fornecedores', 'Tendências'],
-            interests: ['Manutenção', 'IoT', 'Energia'],
-            lookingFor: 'Soluções de monitoramento de vibração preditiva',
-            offering: 'Indicação de serviços de calibração metal-mecânica',
-            phone: '(47) 97777-3333',
-            email: 'carlos@fabricasul.com.br',
-            linkedin: 'https://linkedin.com',
-            discoverable: true,
-            shareContact: true,
-          },
-        },
-      ]);
-      setLoading(false);
-      return;
-    }
+    if (!canSubscribe || !db) return;
 
     const q = query(collection(db, VISITORS_COLLECTION), where('discoverable', '==', true));
-    const unsubscribe = onSnapshot(
+    return onSnapshot(
       q,
       (snap) => {
         const list: DiscoverableVisitor[] = [];
         snap.forEach((doc) => {
           if (doc.id !== uid) {
-            list.push({
-              uid: doc.id,
-              profile: doc.data() as VisitorProfile,
-            });
+            list.push({ uid: doc.id, profile: visitorProfileFromData(doc.data()) });
           }
         });
-        setVisitors(list);
-        setLoading(false);
-        setError(null);
+        setState({ visitors: list, loading: false, error: null });
       },
       (err) => {
         console.error('Error fetching discoverable visitors:', err);
-        setError(err);
-        setLoading(false);
-      }
+        setState({ visitors: [], loading: false, error: err });
+      },
+    );
+  }, [canSubscribe, uid]);
+
+  // Modo demo é derivado, não empurrado por efeito: sem Firebase o retorno já
+  // sai pronto no primeiro render, sem o setState em cascata.
+  if (!canSubscribe) return { visitors: DEMO_DISCOVERABLE_VISITORS, loading: false, error: null };
+  return state;
+}
+
+/**
+ * Assina somente os cartões de contatos de conexões aceitas. As Security Rules
+ * fazem a autorização real; a lista de UIDs serve apenas para limitar leituras.
+ */
+export function useSharedVisitorContacts(visitorUids: string[]) {
+  const uid = auth?.currentUser?.uid;
+  const idsKey = [...new Set(visitorUids)].sort().join('|');
+  const [state, setState] = useState<{
+    key: string;
+    contacts: Record<string, SharedVisitorContact>;
+  }>({ key: '', contacts: {} });
+
+  useEffect(() => {
+    if (!isFirebaseConfigured || !db || !uid || !idsKey) return;
+    const ids = idsKey.split('|');
+    const removeContact = (visitorUid: string) => {
+      setState((previous) => {
+        if (previous.key !== idsKey) return { key: idsKey, contacts: {} };
+        const contacts = { ...previous.contacts };
+        delete contacts[visitorUid];
+        return { key: idsKey, contacts };
+      });
+    };
+    const unsubscribers = ids.map((visitorUid) =>
+      onSnapshot(
+        doc(db!, VISITOR_CONTACT_CARDS_COLLECTION, visitorUid),
+        (snap) => {
+          if (!snap.exists()) {
+            removeContact(visitorUid);
+            return;
+          }
+          setState((previous) => ({
+            key: idsKey,
+            contacts: {
+              ...(previous.key === idsKey ? previous.contacts : {}),
+              [visitorUid]: snap.data() as SharedVisitorContact,
+            },
+          }));
+        },
+        // Ausência de consentimento resulta em permission-denied e deve ser
+        // exibida como contato fechado, não como falha da tela de networking.
+        () => removeContact(visitorUid),
+      ),
     );
 
-    return unsubscribe;
-  }, [uid]);
+    return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
+  }, [idsKey, uid]);
 
-  return { visitors, loading, error };
+  return state.key === idsKey ? state.contacts : {};
 }
 
 export function useConnections() {
-  const [connections, setConnections] = useState<Connection[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
   const uid = auth?.currentUser?.uid;
+  const canSubscribe = isFirebaseConfigured && Boolean(db) && Boolean(uid);
+
+  // O uid acompanha o dado: ao trocar de conta o retorno volta a `loading` em
+  // vez de mostrar por um instante as conexões da conta anterior.
+  const [state, setState] = useState<{
+    uid?: string;
+    connections: Connection[];
+    error: Error | null;
+  }>({ connections: [], error: null });
+
+  const setConnections = (connections: Connection[]) =>
+    setState((prev) => ({ ...prev, uid, connections }));
+  // Carimba o uid também no erro: uma falha de permissão encerra o `loading`
+  // em vez de deixar a tela girando pra sempre.
+  const setError = (error: Error) => setState((prev) => ({ ...prev, uid, error }));
 
   useEffect(() => {
-    if (!isFirebaseConfigured || !db || !uid) {
-      // Modo demo - conexões de teste
-      setConnections([
-        {
-          id: 'demo-user_demo-visitor-2',
-          fromUid: 'demo-user',
-          toUid: 'demo-visitor-2',
-          status: 'pending',
-          createdAt: new Date(),
-          fromName: 'Victor Almeida',
-          toName: 'Ana Silva',
-        },
-      ]);
-      setLoading(false);
-      return;
-    }
+    if (!canSubscribe || !db || !uid) return;
 
     // Como o Firestore não suporta OR composto de forma simples nas subscrições,
     // assinamos duas queries: conexões enviadas (fromUid == uid) e recebidas (toUid == uid)
@@ -155,7 +216,6 @@ export function useConnections() {
         }
       });
       setConnections(merged);
-      setLoading(false);
     };
 
     const unsubSent = onSnapshot(
@@ -186,7 +246,7 @@ export function useConnections() {
       unsubSent();
       unsubReceived();
     };
-  }, [uid]);
+  }, [canSubscribe, uid]);
 
   // Ações de conexão
   const requestConnection = async (toUid: string, toName: string, fromName: string) => {
@@ -216,6 +276,16 @@ export function useConnections() {
     const ref = doc(db, CONNECTIONS_COLLECTION, connectionId);
     await updateDoc(ref, { status: 'declined' });
   };
+
+  // Modo demo derivado, não empurrado por efeito; e enquanto o snapshot da conta
+  // atual não chega, a lista fica vazia em vez de repetir a da conta anterior.
+  const connections = !canSubscribe
+    ? DEMO_CONNECTIONS
+    : state.uid === uid
+      ? state.connections
+      : [];
+  const loading = canSubscribe && state.uid !== uid;
+  const error = canSubscribe ? state.error : null;
 
   const pendingReceived = connections.filter((c) => c.toUid === uid && c.status === 'pending');
   const pendingSent = connections.filter((c) => c.fromUid === uid && c.status === 'pending');

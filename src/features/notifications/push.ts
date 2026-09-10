@@ -2,9 +2,9 @@
  * Push notifications (Expo Notifications).
  *
  * Fluxo: quando há um usuário logado, o app pede permissão, obtém o Expo push
- * token do device e o grava em `visitors/{uid}.pushTokens` (array — um usuário
+ * token do device e o grava em `visitorPrivateProfiles/{uid}.pushTokens` (array — um usuário
  * pode ter vários aparelhos). O organizador, no painel match-web, lê esses
- * tokens (é admin em `visitors`) e dispara mensagens/alertas para os leads via
+ * tokens (é admin no Firestore) e dispara mensagens/alertas para os leads via
  * Expo Push API. Ver `docs/push-envio.md` para o lado do envio.
  *
  * Sem device físico (emulador/web) ou sem projectId EAS o registro é ignorado
@@ -17,7 +17,7 @@ import { Platform } from 'react-native';
 import { arrayUnion, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
-import { VISITORS_COLLECTION } from '@/features/visitor/visitor-profile';
+import { VISITOR_PRIVATE_PROFILES_COLLECTION } from '@/features/visitor/visitor-profile';
 
 const ANDROID_CHANNEL_ID = 'default';
 
@@ -90,7 +90,7 @@ export async function savePushToken(token: string): Promise<void> {
   if (!isFirebaseConfigured || !db || !auth?.currentUser) return;
   const uid = auth.currentUser.uid;
   await setDoc(
-    doc(db, VISITORS_COLLECTION, uid),
+    doc(db, VISITOR_PRIVATE_PROFILES_COLLECTION, uid),
     {
       ownerUid: uid,
       pushTokens: arrayUnion(token),

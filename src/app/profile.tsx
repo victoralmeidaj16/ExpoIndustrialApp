@@ -27,6 +27,7 @@ import { Light, LightGradient, Radius, Spacing } from '@/constants/theme';
 import { AuthForm } from '@/features/auth/auth-form';
 import { useAuth } from '@/features/auth/use-auth';
 import { useExhibitors } from '@/features/exhibitors/use-exhibitors';
+import { getSymplaPaidEventId } from '@/features/paid-events/paid-event';
 import {
   BOTTLENECK_OPTIONS,
   BUDGET_OPTIONS,
@@ -52,7 +53,10 @@ import {
   useSavedLeads,
 } from '@/features/visitor/leads';
 import { useSavedExhibitors } from '@/features/visitor/saved-exhibitors';
-import { publishSymplaTicketQrLookup } from '@/features/visitor/visitor-ticket-qr';
+import {
+  publishSymplaTicketQrLookup,
+  publishVisitorBadgeLookup,
+} from '@/features/visitor/visitor-ticket-qr';
 
 
 import { db } from '@/lib/firebase';
@@ -73,6 +77,7 @@ export default function ProfileScreen() {
   const [hydrated, setHydrated] = useState(false);
   const [saving, setSaving] = useState(false);
   const [symplaTicketCode, setSymplaTicketCode] = useState<string | null>(null);
+  const [visitorBadgePayload, setVisitorBadgePayload] = useState<string | null>(null);
 
   useEffect(() => {
     const firestore = db;
@@ -80,7 +85,7 @@ export default function ProfileScreen() {
     const fetchSymplaTicket = async () => {
       try {
         const email = user.email!.toLowerCase().trim();
-        const docRef = doc(firestore, 'paidEvents', 'sympla-3486582', 'attendees', email);
+        const docRef = doc(firestore, 'paidEvents', getSymplaPaidEventId(), 'attendees', email);
         const snap = await getDoc(docRef);
         if (snap.exists()) {
           const data = snap.data();
@@ -100,7 +105,14 @@ export default function ProfileScreen() {
     publishSymplaTicketQrLookup(symplaTicketCode, form).catch((err) => {
       console.error('Erro ao vincular QR Sympla ao perfil:', err);
     });
-  }, [symplaTicketCode, form.name, form.role, form.company, form.email, form.phone]);
+  }, [symplaTicketCode, form]);
+
+  useEffect(() => {
+    if (demoMode || symplaTicketCode || !form.name) return;
+    publishVisitorBadgeLookup(form)
+      .then(setVisitorBadgePayload)
+      .catch((err) => console.error('Erro ao publicar cartão seguro do crachá:', err));
+  }, [demoMode, symplaTicketCode, form]);
 
   async function handleDeleteAccount() {
     if (!configured) {
@@ -119,11 +131,21 @@ export default function ProfileScreen() {
           onPress: async () => {
             setSaving(true);
             try {
-              const { deleteDoc, doc } = await import('firebase/firestore');
+              const { doc, getDoc, writeBatch } = await import('firebase/firestore');
               const { db, auth } = await import('@/lib/firebase');
               if (auth?.currentUser && db) {
                 const uid = auth.currentUser.uid;
-                await deleteDoc(doc(db, 'visitors', uid));
+                const privateRef = doc(db, 'visitorPrivateProfiles', uid);
+                const privateSnap = await getDoc(privateRef);
+                const badgeLookupId = privateSnap.exists() ? privateSnap.data().badgeLookupId : null;
+                const batch = writeBatch(db);
+                batch.delete(doc(db, 'visitors', uid));
+                batch.delete(privateRef);
+                batch.delete(doc(db, 'visitorContactCards', uid));
+                if (typeof badgeLookupId === 'string' && badgeLookupId.length >= 16) {
+                  batch.delete(doc(db, 'visitorBadgeLookups', badgeLookupId));
+                }
+                await batch.commit();
                 await auth.currentUser.delete();
                 Alert.alert('Conta excluída', 'Sua conta e dados foram completamente removidos de nossa base.');
               }
@@ -331,7 +353,9 @@ export default function ProfileScreen() {
               <Image
                 source={{
                   uri: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                    symplaTicketCode || `expoindustrialsul://visitor/${user?.uid || 'demo-user'}`
+                    symplaTicketCode
+                      || visitorBadgePayload
+                      || `expoindustrialsul://visitor/${user?.uid || 'demo-user'}`
                   )}`,
                 }}
                 style={styles.qrCodeImage}
@@ -367,7 +391,9 @@ export default function ProfileScreen() {
               <Image
                 source={{
                   uri: `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(
-                    symplaTicketCode || `expoindustrialsul://visitor/${user?.uid || 'demo-user'}`
+                    symplaTicketCode
+                      || visitorBadgePayload
+                      || `expoindustrialsul://visitor/${user?.uid || 'demo-user'}`
                   )}`,
                 }}
                 style={styles.zoomQrImage}

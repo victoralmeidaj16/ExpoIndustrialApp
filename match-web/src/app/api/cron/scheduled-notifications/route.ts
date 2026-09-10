@@ -23,13 +23,13 @@ type PushSendResult = {
 
 function isAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET?.trim();
-  if (secret) {
-    const auth = request.headers.get('authorization') ?? '';
-    const provided = auth.startsWith('Bearer ') ? auth.slice('Bearer '.length) : '';
-    return provided === secret || new URL(request.url).searchParams.get('secret') === secret;
-  }
+  // Sem segredo o endpoint fica fechado: antes qualquer requisição com
+  // User-Agent "vercel-cron/1.0" disparava avisos para todos os aparelhos.
+  if (!secret) return false;
 
-  return (request.headers.get('user-agent') ?? '').includes('vercel-cron/1.0');
+  const auth = request.headers.get('authorization') ?? '';
+  const provided = auth.startsWith('Bearer ') ? auth.slice('Bearer '.length) : '';
+  return provided === secret || new URL(request.url).searchParams.get('secret') === secret;
 }
 
 function chunk<T>(items: T[], size: number): T[][] {
@@ -40,7 +40,7 @@ function chunk<T>(items: T[], size: number): T[][] {
 
 async function collectPushTargets(): Promise<PushTarget[]> {
   const db = getAdminDb();
-  const snap = await db.collection('visitors').get();
+  const snap = await db.collection('visitorPrivateProfiles').get();
   const targets: PushTarget[] = [];
 
   for (const docSnap of snap.docs) {
@@ -61,7 +61,7 @@ async function pruneInvalidTokens(pairs: PushTarget[]): Promise<void> {
   const db = getAdminDb();
   const batch = db.batch();
   for (const { uid, token } of pairs) {
-    batch.update(db.collection('visitors').doc(uid), {
+    batch.update(db.collection('visitorPrivateProfiles').doc(uid), {
       pushTokens: FieldValue.arrayRemove(token),
     });
   }
@@ -137,6 +137,49 @@ async function lockNotification(id: string, runId: string): Promise<boolean> {
   });
 }
 
+// Se a run morre entre o lock e o envio, o aviso fica preso em 'processing' para
+// sempre — nunca envia e nunca tenta de novo. Passado esse prazo a próxima run
+// devolve ele para a fila; o teto de tentativas evita um aviso em laço infinito.
+const STALE_LOCK_MS = 10 * 60 * 1000;
+const MAX_ATTEMPTS = 3;
+
+async function reclaimStaleLocks(now: number): Promise<number> {
+  const db = getAdminDb();
+  const snap = await db.collection('notifications').where('status', '==', 'processing').limit(50).get();
+  const stale = snap.docs.filter(
+    (docSnap) => now - (Number(docSnap.data().processingStartedAt) || 0) > STALE_LOCK_MS,
+  );
+  if (stale.length === 0) return 0;
+
+  const batch = db.batch();
+  for (const docSnap of stale) {
+    const attempts = (Number(docSnap.data().attempts) || 0) + 1;
+    batch.update(
+      docSnap.ref,
+      attempts >= MAX_ATTEMPTS
+        ? {
+            status: 'failed',
+            failedAt: now,
+            attempts,
+            errorMessage: 'Envio travou em processamento apos varias tentativas.',
+            processingRunId: FieldValue.delete(),
+            processingStartedAt: FieldValue.delete(),
+            updatedAt: now,
+          }
+        : {
+            status: 'pending',
+            attempts,
+            reclaimedAt: now,
+            processingRunId: FieldValue.delete(),
+            processingStartedAt: FieldValue.delete(),
+            updatedAt: now,
+          },
+    );
+  }
+  await batch.commit();
+  return stale.length;
+}
+
 export async function GET(request: Request) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Nao autorizado' }, { status: 401 });
@@ -145,6 +188,9 @@ export async function GET(request: Request) {
   const db = getAdminDb();
   const now = Date.now();
   const runId = `${now}-${Math.random().toString(36).slice(2, 8)}`;
+
+  // Antes da consulta de pendentes, para o aviso recuperado sair nesta mesma run.
+  const reclaimed = await reclaimStaleLocks(now);
 
   const snap = await db
     .collection('notifications')
@@ -201,6 +247,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ok: true,
+    reclaimed,
     due: due.length,
     processed: results.length,
     targets: targets.length,

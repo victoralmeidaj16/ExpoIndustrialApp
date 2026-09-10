@@ -18,12 +18,14 @@ import {
   getDocs,
   onSnapshot,
   query,
+  setDoc,
   where,
   type QueryDocumentSnapshot,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
+import { sha256Hex } from '@/lib/sha256';
 
 export type SavedLead = {
   id: string;
@@ -102,6 +104,36 @@ function byNewest(a: SavedLead, b: SavedLead): number {
   return (b.createdAt ?? 0) - (a.createdAt ?? 0);
 }
 
+/**
+ * Chave de deduplicação do contato: e-mail, senão telefone, senão nome+empresa.
+ * Vazia quando o crachá não trouxe nada identificável — aí não dá pra deduplicar
+ * e cada leitura vira um contato novo.
+ */
+function leadDedupKey(lead: Pick<SavedLead, 'name' | 'company' | 'email' | 'phone'>): string {
+  const email = lead.email?.trim().toLowerCase();
+  if (email) return `email:${email}`;
+
+  const phone = lead.phone?.replace(/\D/g, '');
+  if (phone) return `phone:${phone}`;
+
+  const name = lead.name?.trim().toLowerCase().replace(/\s+/g, ' ');
+  if (name) return `name:${name}|${lead.company?.trim().toLowerCase() ?? ''}`;
+
+  return '';
+}
+
+/**
+ * Id determinístico do doc de lead: `<uid do captador>_<sha256 da chave>`.
+ * Com ele a deduplicação vira uma propriedade do id — a captura é 1 escrita
+ * (`setDoc` com merge), sem baixar o acervo de leads a cada crachá lido. O uid
+ * entra no id porque dois expositores que leem o mesmo visitante precisam de
+ * documentos separados. Retorna `null` quando não há como deduplicar.
+ */
+function leadDocId(uid: string, lead: Pick<SavedLead, 'name' | 'company' | 'email' | 'phone'>): string | null {
+  const key = leadDedupKey(lead);
+  return key ? `${uid}_${sha256Hex(key)}` : null;
+}
+
 // ─── Armazenamento local (modo demo / sem login) ──────────────────────────────
 
 async function getLocalLeads(): Promise<SavedLead[]> {
@@ -120,12 +152,18 @@ async function getLocalLeads(): Promise<SavedLead[]> {
 
 async function addLocalLead(lead: Omit<SavedLead, 'id' | 'createdAt'>): Promise<SavedLead> {
   const leads = await getLocalLeads();
-  const existing = leads.find((l) => l.email === lead.email);
-  if (existing) return existing;
+  const key = leadDedupKey(lead);
+  const existing = key ? leads.find((l) => leadDedupKey(l) === key) : undefined;
 
-  const newLead: SavedLead = { ...lead, id: `l-${Date.now()}`, createdAt: Date.now() };
-  await AsyncStorage.setItem(LEADS_KEY, JSON.stringify([newLead, ...leads]));
-  return newLead;
+  // Espelha o upsert do Firestore: relê o mesmo crachá atualiza o contato.
+  const upserted: SavedLead = {
+    ...lead,
+    id: existing?.id ?? `l-${Date.now()}`,
+    createdAt: Date.now(),
+  };
+  const rest = existing ? leads.filter((l) => l.id !== existing.id) : leads;
+  await AsyncStorage.setItem(LEADS_KEY, JSON.stringify([upserted, ...rest]));
+  return upserted;
 }
 
 // ─── API pública ──────────────────────────────────────────────────────────────
@@ -141,18 +179,31 @@ export async function getSavedLeads(): Promise<SavedLead[]> {
   return snap.docs.map(fromDoc).sort(byNewest);
 }
 
-/** Captura um lead, deduplicando por e-mail dentro do mesmo dono. */
+/**
+ * Captura um lead, deduplicando dentro do mesmo dono (ver `leadDocId`).
+ *
+ * É uma única escrita: o id do doc já carrega a deduplicação, então não há
+ * leitura prévia da coleção — o que mantinha a câmera do leitor de crachá lenta
+ * e gastava centenas de leituras por bip num estande com muitos leads. Reler o
+ * mesmo crachá atualiza o contato (o visitante pode ter corrigido o perfil) e
+ * renova `createdAt` para a captação mais recente, em vez de ser ignorado.
+ */
 export async function addSavedLead(lead: Omit<SavedLead, 'id' | 'createdAt'>): Promise<SavedLead> {
   if (!canUseFirestore()) return addLocalLead(lead);
 
   const uid = auth!.currentUser!.uid;
-  const owned = await getDocs(query(collection(db!, LEADS_COLLECTION), where('ownerUid', '==', uid)));
-  const dup = owned.docs.map(fromDoc).find((l) => l.email === lead.email);
-  if (dup) return dup;
-
   const createdAt = Date.now();
-  const created = await addDoc(collection(db!, LEADS_COLLECTION), { ...lead, ownerUid: uid, createdAt });
-  return { ...lead, ownerUid: uid, id: created.id, createdAt };
+  const payload = { ...lead, ownerUid: uid, createdAt };
+
+  const id = leadDocId(uid, lead);
+  if (!id) {
+    // Crachá sem e-mail, telefone nem nome: sem chave de deduplicação possível.
+    const created = await addDoc(collection(db!, LEADS_COLLECTION), payload);
+    return { ...payload, id: created.id };
+  }
+
+  await setDoc(doc(db!, LEADS_COLLECTION, id), payload, { merge: true });
+  return { ...payload, id };
 }
 
 /** Remove um lead do dono logado (no Firestore) ou do armazenamento local. */

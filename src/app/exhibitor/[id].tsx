@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { BadgeScanner } from '@/features/visitor/badge-scanner';
+import { useAuth } from '@/features/auth/use-auth';
 
 import { ExhibitorLogo } from '@/components/exhibitor-logo';
 import { ScoreRing } from '@/components/score-ring';
@@ -11,9 +12,7 @@ import { Card, HeaderIconButton, ScreenBody, ScreenHeader, TAB_BAR_CLEARANCE } f
 import { Light, Radius, Spacing } from '@/constants/theme';
 import { useExhibitor } from '@/features/exhibitors/use-exhibitors';
 import { CATEGORY_COLOR } from '@/features/venue/venue';
-import { addSavedLead } from '@/features/visitor/leads';
 import { useSavedExhibitors } from '@/features/visitor/saved-exhibitors';
-import { resolveVisitorQrCode } from '@/features/visitor/visitor-ticket-qr';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -25,65 +24,8 @@ export default function ExhibitorScreen() {
   const saved = booth ? isSaved(booth.id) : false;
   const toggleSaved = () => booth && toggle(booth.id);
 
-  const [hasPermission, requestPermission] = useCameraPermissions();
+  const { user } = useAuth();
   const [scannerVisible, setScannerVisible] = useState(false);
-  const [scanned, setScanned] = useState(false);
-
-  const startScanning = async () => {
-    if (!hasPermission || !hasPermission.granted) {
-      const result = await requestPermission();
-      if (!result.granted) {
-        Alert.alert('Câmera necessária', 'Permissão para usar a câmera é necessária para escanear contatos.');
-        return;
-      }
-    }
-    setScanned(false);
-    setScannerVisible(true);
-  };
-
-  const handleBarcodeScanned = async ({ data }: { data: string }) => {
-    setScanned(true);
-    setScannerVisible(false);
-    try {
-      const resolved = await resolveVisitorQrCode(data);
-      if (resolved) {
-        const visitorInfo = resolved.profile;
-        await addSavedLead({
-          name: visitorInfo.name,
-          role: visitorInfo.role || 'Visitante',
-          company: visitorInfo.company || 'Empresa',
-          email: visitorInfo.email || '',
-          phone: visitorInfo.phone || '',
-          source: `Estande: ${booth?.company ?? 'não identificado'}`,
-          exhibitorId: booth?.id,
-          exhibitorName: booth?.company,
-          stand: booth?.stand,
-        });
-        Alert.alert('Sucesso!', `Contato de ${visitorInfo.name} salvo com sucesso!`);
-      } else {
-        // Fallback para o formato JSON legado
-        const visitorInfo = JSON.parse(data);
-        if (visitorInfo.name && visitorInfo.email) {
-          await addSavedLead({
-            name: visitorInfo.name,
-            role: visitorInfo.role || 'Visitante',
-            company: visitorInfo.company || 'Empresa',
-            email: visitorInfo.email,
-            phone: visitorInfo.phone || '',
-            source: `Estande: ${booth?.company ?? 'não identificado'}`,
-            exhibitorId: booth?.id,
-            exhibitorName: booth?.company,
-            stand: booth?.stand,
-          });
-          Alert.alert('Sucesso!', `Contato de ${visitorInfo.name} salvo com sucesso!`);
-        } else {
-          Alert.alert('QR Code Inválido', 'Os dados do QR Code não estão no formato esperado.');
-        }
-      }
-    } catch {
-      Alert.alert('Erro ao escanear', 'Não foi possível ler os dados do QR Code.');
-    }
-  };
 
   if (!booth) {
     if (loading) {
@@ -224,9 +166,11 @@ export default function ExhibitorScreen() {
           )}
 
           {/* Ações */}
-          <View style={styles.actionRow}>
-            <ActionButton icon="qr-code-outline" label="Captar lead" primary onPress={startScanning} />
-          </View>
+          {user && booth.ownerUid === user.uid ? (
+            <View style={styles.actionRow}>
+              <ActionButton icon="qr-code-outline" label="Ler crachá" primary onPress={() => setScannerVisible(true)} />
+            </View>
+          ) : null}
           <Pressable style={styles.saveBtn} onPress={toggleSaved}>
             <Ionicons
               name={saved ? 'checkmark-circle' : 'bookmark-outline'}
@@ -240,29 +184,7 @@ export default function ExhibitorScreen() {
         </ScreenBody>
       </ScrollView>
 
-      {/* Modal de Scanner */}
-      <Modal
-        visible={scannerVisible}
-        animationType="slide"
-        onRequestClose={() => setScannerVisible(false)}>
-        <View style={styles.scannerContainer}>
-          <CameraView
-            style={StyleSheet.absoluteFill}
-            facing="back"
-            barcodeScannerSettings={{
-              barcodeTypes: ['qr'],
-            }}
-            onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
-          />
-          <View style={styles.scannerOverlay}>
-            <Text style={styles.scannerInstruction}>Aponte a câmera para o QR Code do Crachá</Text>
-            <View style={styles.scannerTarget} />
-            <Pressable style={styles.cancelScannerBtn} onPress={() => setScannerVisible(false)}>
-              <Text style={styles.cancelScannerText}>Cancelar</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+      {scannerVisible ? <BadgeScanner exhibitor={booth} onClose={() => setScannerVisible(false)} /> : null}
     </View>
   );
 }
@@ -498,48 +420,4 @@ const styles = StyleSheet.create({
   },
   saveBtnText: { color: Light.gold, fontSize: 13.5, fontWeight: '700' },
 
-  // Scanner Styles
-  scannerContainer: {
-    flex: 1,
-    backgroundColor: '#000000',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scannerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 50,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  scannerInstruction: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-  scannerTarget: {
-    width: 220,
-    height: 220,
-    borderWidth: 3,
-    borderColor: Light.gold,
-    borderRadius: Radius.md,
-    backgroundColor: 'transparent',
-  },
-  cancelScannerBtn: {
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    paddingHorizontal: 30,
-    paddingVertical: 12,
-    borderRadius: Radius.pill,
-  },
-  cancelScannerText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-  },
 });
