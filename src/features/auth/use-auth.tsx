@@ -8,6 +8,7 @@
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  signInWithCustomToken,
   signInWithEmailAndPassword,
   signOut as fbSignOut,
   type User,
@@ -23,6 +24,7 @@ type AuthContextValue = {
   configured: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
+  signInWithSymplaTicket: (email: string, ticketCode: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -56,6 +58,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async signUp(email, password) {
         if (!auth) throw NOT_CONFIGURED;
         await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+      },
+      async signInWithSymplaTicket(email, ticketCode) {
+        if (!auth) throw NOT_CONFIGURED;
+        const apiBase = process.env.EXPO_PUBLIC_MATCH_WEB_URL?.trim()
+          || 'https://match365.vercel.app';
+        const response = await fetch(`${apiBase}/api/auth/sympla-ticket`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim().toLowerCase(), ticketCode: ticketCode.trim() }),
+        });
+        const body = (await response.json().catch(() => null)) as { token?: string; error?: string } | null;
+        if (!response.ok || !body?.token) {
+          throw new Error(body?.error || 'Não foi possível validar o ingresso.');
+        }
+        await signInWithCustomToken(auth, body.token);
       },
       async signOut() {
         if (!auth) throw NOT_CONFIGURED;

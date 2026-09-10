@@ -13,8 +13,8 @@
 | `npx tsc --noEmit` (app) | ✅ limpo |
 | `npx tsc --noEmit` (match-web) | ✅ limpo |
 | `npx eslint src/` | ✅ 0 erros (31 warnings — item 13) |
-| `npx next build` (match-web) | ✅ 24 rotas |
-| Testes (`tests/*.test.cjs`) | ✅ 43/43 |
+| `npx next build` (match-web) | ✅ 25 rotas |
+| Testes (`tests/*.test.cjs`) | ✅ 50/50 |
 
 **Nenhum dos problemas abaixo é detectável por linter ou compilador.** Todos foram encontrados
 por leitura de código, inspeção do Firestore e medição do comportamento em produção.
@@ -130,9 +130,11 @@ por leitura de código, inspeção do Firestore e medição do comportamento em 
   o evento `EXPOINDUSTRIAL SUL 2026` foi localizado pela referência `3486582` e hash `s353376`.
   O dry-run leu 87 participantes aprovados: todos com nome, e-mail, WhatsApp, empresa e QR; 83
   com cargo e 4 sem cargo. Nenhum documento foi gravado.
-- **Ainda a fazer (operação):** com credencial Firebase Admin e autorização explícita, executar o
-  sincronizador sem `SYMPLA_DRY_RUN=1` para criar/backfill dos documentos. O script é idempotente
-  e não sobrescreve `uid`/`ownerUid` de quem já vinculou o ingresso pelo app.
+- **Operação ativada em 10/09/2026:** após autorização do Victor, o novo importador
+  `integrations/sympla-sync` foi publicado no Cloud Run, com agendamento a cada
+  cinco minutos pelo Cloud Scheduler. Importação inicial: 91 ingressos de 81
+  e-mails; repetição com zero gravações. Preserva `uid`/`ownerUid`, trata
+  cancelamentos e não envia mensagens nem cria contas de login.
 
 ---
 
@@ -326,8 +328,8 @@ Pendências que sobreviveram àqueles itens e continuam válidas:
 2. **Item 1 (operação)** — configurar `SYMPLA_WEBHOOK_SECRET` na Vercel e na origem do webhook;
    o código já falha fechado.
 3. **Item 5 (operação)** — apagar o doc `e3b0c442…` no Firestore.
-4. **Item 4 (operação)** — configurar Firebase Admin e, somente com autorização, rodar o sync
-   Sympla sem dry-run para backfill dos 87 participantes já validados.
+4. **Item 4 (operação concluída)** — sincronização Sympla automática ativa; acompanhar
+   execuções do job `sympla-sync` e homologar o scanner com ingresso de teste.
 5. **Itens 11 e 8** — `android.package`, depois o build EAS para provar a cadeia de push ponta a ponta.
 6. **Item 9** — revisar e publicar as rules.
 7. **Itens 3, 10, 12, 13** — antes da feira, na medida do tempo.

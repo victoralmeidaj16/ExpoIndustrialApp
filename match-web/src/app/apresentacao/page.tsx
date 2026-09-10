@@ -1,7 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import React, { useState } from "react";
+
+import styles from "./presentation.module.css";
+
+const EXHIBITOR_PORTAL_URL = "https://match365.vercel.app/portal/expositor/login";
+const EXHIBITOR_PROFILE_URL = "https://match365.vercel.app/portal/expositor/perfil";
+const ORGANIZER_PANEL_URL = "https://match365.vercel.app/login";
 
 // Inline SVG Icon components to avoid external dependencies
 const Sparkles = (props: React.SVGProps<SVGSVGElement>) => (
@@ -73,7 +78,7 @@ export default function PresentationPage() {
   };
 
   return (
-    <div className="bg-[#fcfdfd] text-[#0f172a] font-sans antialiased min-h-screen">
+    <div className={`${styles.page} bg-[#fcfdfd] text-[#0f172a] font-sans antialiased min-h-screen`}>
       
       {/* Decorative Top Accent */}
       <div className="h-1.5 w-full bg-gradient-to-r from-[#0c1527] via-[#c5a85c] to-[#0c1527]" />
@@ -100,7 +105,9 @@ export default function PresentationPage() {
           </nav>
           <div>
             <a 
-              href="/portal/expositor/login" 
+              href={EXHIBITOR_PORTAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold uppercase tracking-wider text-white bg-[#0c1527] rounded-lg shadow-sm hover:bg-[#162545] transition-all"
             >
               Portal do Expositor
@@ -162,7 +169,7 @@ export default function PresentationPage() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 lg:min-w-[390px]">
-                  {[["45/45", "testes"], ["24", "rotas web"], ["0", "envios reais"]].map(([value, label]) => (
+                  {[["50/50", "testes"], ["25", "rotas web"], ["0", "envios reais"]].map(([value, label]) => (
                     <div key={label} className="bg-[#111d32]/90 px-4 py-5 text-center">
                       <div className="text-2xl font-black text-[#ddc77f]">{value}</div>
                       <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</div>
@@ -175,7 +182,7 @@ export default function PresentationPage() {
                 {[
                   { icon: ShieldCheck, eyebrow: "Segurança", title: "Vínculo de estande protegido", text: "O expositor só reivindica o estande autorizado para seu e-mail verificado. Todo novo vínculo nasce como rascunho e depende da publicação do organizador." },
                   { icon: Users, eyebrow: "Privacidade", title: "Dados de visitantes separados", text: "Perfil profissional e contatos privados passaram a ter controles distintos. Telefone, e-mail e tokens não ficam expostos na base pública do visitante." },
-                  { icon: Layers, eyebrow: "Integrações", title: "Cadastro Sympla e R Gestor", text: "Após entrar com o mesmo e-mail da inscrição, o visitante reaproveita nome, WhatsApp, empresa e cargo disponíveis, sem preencher tudo novamente." },
+                  { icon: Layers, eyebrow: "Integrações", title: "Cadastro Sympla e R Gestor", text: "Após entrar com o mesmo e-mail da inscrição, dados importados da Sympla ou R Gestor são reaproveitados no onboarding. O QR do crachá não substitui a senha." },
                   { icon: CheckCircle2, eyebrow: "Credenciamento", title: "Leitura de crachá mais robusta", text: "O scanner reconhece o ingresso Sympla mesmo quando o participante ainda não abriu o aplicativo, com validação de evento e deduplicação dos leads." },
                   { icon: BarChart3, eyebrow: "Organização", title: "Moderação no painel", text: "O organizador ganhou uma fila para revisar, aprovar, devolver para rascunho e acompanhar a completude dos cadastros de expositores." },
                   { icon: Calendar, eyebrow: "Confiabilidade", title: "Agendamentos protegidos", text: "A rota de avisos agora falha fechada sem segredo e recupera processamentos interrompidos. A ativação externa continua pendente e controlada." },
@@ -251,7 +258,9 @@ export default function PresentationPage() {
               Acesso exclusivo para as marcas cadastrarem seus perfis, logotipos, contatos comerciais, emitirem o QR Code do estande e acompanharem os leads captados no evento.
             </p>
             <a 
-              href="/portal/expositor/perfil" 
+              href={EXHIBITOR_PROFILE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 mb-4"
             >
               Acessar o Portal <ArrowRight className="h-3 w-3" />
@@ -276,7 +285,9 @@ export default function PresentationPage() {
               A cabine de controle administrativo da organização. Permite revisar perfis de expositores, acompanhar o preenchimento de estandes, controlar patrocinadores, agenda, visitantes e dados gerais do evento.
             </p>
             <a 
-              href="/login" 
+              href={ORGANIZER_PANEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-800 hover:text-slate-900 mb-4"
             >
               Acessar o Painel Admin <ArrowRight className="h-3 w-3" />
@@ -402,7 +413,7 @@ export default function PresentationPage() {
                       <div className="h-6 w-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
                       <div>
                         <h5 className="font-bold text-slate-800 text-sm">Cadastro Integrado da Inscrição</h5>
-                        <p className="text-xs text-slate-500 mt-0.5">O acesso do visitante usa uma conta do aplicativo. Após o login com o mesmo e-mail da inscrição na Sympla ou no R Gestor, os dados importados disponíveis são reaproveitados e podem ser revisados ou complementados no onboarding.</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Crie sua conta ou entre com e-mail e senha usando o mesmo e-mail da inscrição. Depois do acesso, dados importados da Sympla ou do R Gestor são reaproveitados no onboarding.</p>
                       </div>
                     </div>
 
@@ -738,7 +749,7 @@ export default function PresentationPage() {
               </button>
               {openFaq === 8 && (
                 <div className="px-6 pb-4 pt-1 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 bg-slate-50/50">
-                  O visitante cria a conta usando apenas e-mail e senha. Ao entrar com o mesmo e-mail usado na Sympla ou no R Gestor, o app reaproveita nome, WhatsApp, empresa e cargo que estiverem disponíveis; informações ausentes podem ser preenchidas ou revisadas no onboarding.
+                  No primeiro acesso, crie sua conta com senha usando o mesmo e-mail da inscrição. O QR compartilhado no crachá não substitui a senha. Depois do acesso, nome, WhatsApp, empresa e cargo importados da Sympla ou do R Gestor são reaproveitados no onboarding.
                 </div>
               )}
             </div>
@@ -890,17 +901,21 @@ export default function PresentationPage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <a 
-              href="/portal/expositor/login" 
+              href={EXHIBITOR_PORTAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-6 py-3.5 text-sm font-extrabold text-white bg-[#0c1527] rounded-xl shadow-md hover:bg-[#162545] transition-all"
             >
               Acessar Portal do Expositor
             </a>
-            <Link 
-              href="/" 
+            <a
+              href={ORGANIZER_PANEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-6 py-3.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all"
             >
               Ver Painel Organizador
-            </Link>
+            </a>
           </div>
         </div>
       </section>

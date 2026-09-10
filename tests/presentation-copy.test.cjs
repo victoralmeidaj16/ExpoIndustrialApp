@@ -23,3 +23,21 @@ test('presentation and portal no longer repeat known misleading labels', () => {
   assert.doesNotMatch(exhibitorPortal, /Nenhum visitante escaneou seu estande/);
   assert.match(exhibitorPortal, /representante autorizado escaneia o crachá/);
 });
+
+test('presentation always opens the online exhibitor portal', () => {
+  assert.match(
+    presentation,
+    /https:\/\/match365\.vercel\.app\/portal\/expositor\/login/,
+  );
+  assert.match(
+    presentation,
+    /https:\/\/match365\.vercel\.app\/portal\/expositor\/perfil/,
+  );
+  assert.doesNotMatch(presentation, /href="\/portal\/expositor\//);
+});
+
+test('presentation always opens the online organizer panel', () => {
+  assert.match(presentation, /https:\/\/match365\.vercel\.app\/login/);
+  assert.doesNotMatch(presentation, /href="\/login"/);
+  assert.doesNotMatch(presentation, /href="\/"/);
+});

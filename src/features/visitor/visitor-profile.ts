@@ -438,6 +438,29 @@ export async function captureLeadProfile(lead: LeadCapture): Promise<void> {
   await batch.commit();
 }
 
+/**
+ * Cadastro por e-mail da inscrição: guarda só o nome digitado e o e-mail da
+ * conta. Diferente de `captureLeadProfile`, NÃO marca `onboardingSkipped` —
+ * a pessoa segue para o onboarding, que completa empresa, cargo e WhatsApp
+ * com o que a Sympla/R Gestor já tem para esse mesmo e-mail.
+ */
+export async function captureSignupIdentity(identity: { name: string; email: string }): Promise<void> {
+  if (!db || !auth?.currentUser) return;
+  const uid = auth.currentUser.uid;
+  const email = identity.email.trim().toLowerCase();
+  const batch = writeBatch(db);
+  batch.set(doc(db, VISITORS_COLLECTION, uid), {
+    name: identity.name.trim(),
+    ownerUid: uid,
+  }, { merge: true });
+  batch.set(doc(db, VISITOR_PRIVATE_PROFILES_COLLECTION, uid), {
+    ownerUid: uid,
+    email,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+  await batch.commit();
+}
+
 /** Cria/atualiza o perfil do visitante logado. */
 export async function saveVisitorProfile(data: VisitorProfile): Promise<void> {
   if (!db || !auth?.currentUser) {

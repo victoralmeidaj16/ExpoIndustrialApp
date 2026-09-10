@@ -7,6 +7,14 @@
 
 ## 1. Definir a responsabilidade de cada plataforma
 
+**Automação ativada em 10/09/2026, com autorização do Victor:** sincronizador
+isolado em [`integrations/sympla-sync`](integrations/sympla-sync/README.md),
+publicado no Cloud Run com Cloud Scheduler a cada cinco minutos. Primeira
+importação concluída: 91 ingressos de 81 e-mails. A chave está no Secret Manager
+e a identidade exclusiva tem acesso ao Firestore. Nenhum envio de mensagens,
+notificações ou criação de contas faz parte dessa rotina. O webhook é opcional;
+a importação periódica já usa diretamente a API Sympla existente.
+
 - **Sympla:** inscrição gratuita da visitação, dados básicos do visitante e QR
   do ingresso usado pelo leitor de crachás.
 - **HiGestor/R Gestor:** inscrição e confirmação de pagamento dos eventos

@@ -18,9 +18,12 @@ import {
 import { Brand, Light, Radius, Spacing } from '@/constants/theme';
 import { authErrorMessage, useAuth } from '@/features/auth/use-auth';
 import { getSymplaCheckoutUrl } from '@/features/paid-events/paid-event';
-import { captureLeadProfile } from '@/features/visitor/visitor-profile';
+import { captureLeadProfile, captureSignupIdentity } from '@/features/visitor/visitor-profile';
 
-type Mode = 'login' | 'signup';
+type Mode = 'login' | 'signup' | 'ticket';
+
+// QR compartilhado não deve funcionar como senha da conta.
+const TICKET_LOGIN_ENABLED = false;
 
 type Props = {
   title: string;
@@ -36,7 +39,7 @@ function phoneDigits(value: string) {
 }
 
 export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, showSymplaSignup }: Props) {
-  const { configured, signIn, signUp } = useAuth();
+  const { configured, signIn, signUp, signInWithSymplaTicket } = useAuth();
 
   const [mode, setMode] = useState<Mode>('login');
   const [name, setName] = useState('');
@@ -45,6 +48,7 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [ticketCode, setTicketCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -73,8 +77,12 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
   async function onSubmit() {
     setError(null);
 
-    if (mode === 'signup' && !showSymplaSignup) {
-      const problem = validateSignup();
+    if (mode === 'signup') {
+      // No cadastro por inscrição só o nome é digitado: empresa, cargo e
+      // WhatsApp vêm da Sympla/R Gestor pelo mesmo e-mail, no onboarding.
+      const problem = showSymplaSignup
+        ? (name.trim() ? null : 'Informe seu nome completo, igual ao da inscrição.')
+        : validateSignup();
       if (problem) {
         setError(problem);
         return;
@@ -83,18 +91,27 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
 
     setBusy(true);
     try {
-      if (mode === 'login') {
+      if (mode === 'ticket') {
+        if (!email.trim() || !ticketCode.trim()) {
+          setError('Informe o e-mail e o código do ingresso.');
+          return;
+        }
+        await signInWithSymplaTicket(email, ticketCode);
+      } else if (mode === 'login') {
         await signIn(email, password);
       } else {
         await signUp(email, password);
-        // No cadastro do visitante, o perfil só é criado depois da autenticação:
-        // assim o onboarding pode reaproveitar com segurança Sympla/R Gestor.
-        if (!showSymplaSignup) {
-          try {
+        // O perfil só é criado depois da autenticação: as Security Rules só
+        // liberam a inscrição de `attendees/{email}` para o dono daquele e-mail,
+        // então nada da Sympla é lido antes do login.
+        try {
+          if (showSymplaSignup) {
+            await captureSignupIdentity({ name, email });
+          } else {
             await captureLeadProfile({ name, company, role: jobRole, phone, email });
-          } catch {
-            // Se a gravação falhar, o usuário ainda entra; o onboarding recaptura.
           }
+        } catch {
+          // Se a gravação falhar, o usuário ainda entra; o onboarding recaptura.
         }
       }
       onSuccess();
@@ -111,7 +128,13 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
         <Ionicons name={icon} size={24} color={Brand.gold} />
       </View>
       <Text style={styles.title}>{title}</Text>
-      {subtitle && <Text style={styles.subtitle}>{subtitle[mode]}</Text>}
+      {subtitle && (
+        <Text style={styles.subtitle}>
+          {mode === 'ticket'
+            ? 'Use o mesmo e-mail da inscrição e o código individual exibido no ingresso Sympla.'
+            : subtitle[mode]}
+        </Text>
+      )}
 
       {showSymplaSignup && (
         <Pressable style={styles.symplaCard} onPress={handleOpenSympla}>
@@ -198,10 +221,26 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
       )}
 
       {mode === 'signup' && showSymplaSignup && (
-        <Text style={styles.importHint}>
-          Use o mesmo e-mail da inscrição. Depois de criar a conta, recuperaremos os dados
-          disponíveis da Sympla ou do R Gestor para você apenas revisar e complementar.
-        </Text>
+        <>
+          <View style={styles.field}>
+            <Text style={styles.label}>Nome completo</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Igual ao nome da sua inscrição"
+              placeholderTextColor={Brand.textMuted}
+              autoCapitalize="words"
+              autoComplete="name"
+              textContentType="name"
+              editable={!busy}
+            />
+          </View>
+          <Text style={styles.importHint}>
+            Use o mesmo e-mail da inscrição. Empresa, cargo e WhatsApp que você já preencheu
+            na Sympla ou no R Gestor aparecem sozinhos no próximo passo — é só revisar.
+          </Text>
+        </>
       )}
 
       <View style={styles.field}>
@@ -219,7 +258,24 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
         />
       </View>
 
-      <View style={styles.field}>
+      {mode === 'ticket' && (
+        <View style={styles.field}>
+          <Text style={styles.label}>Código do ingresso Sympla</Text>
+          <TextInput
+            style={styles.input}
+            value={ticketCode}
+            onChangeText={setTicketCode}
+            placeholder="Cole ou digite o código do QR Code"
+            placeholderTextColor={Brand.textMuted}
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!busy}
+          />
+          <Text style={styles.fieldHelp}>O código fica abaixo do QR Code no ingresso.</Text>
+        </View>
+      )}
+
+      {mode !== 'ticket' && <View style={styles.field}>
         <Text style={styles.label}>Senha</Text>
         <TextInput
           style={styles.input}
@@ -231,7 +287,7 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
           autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
           editable={!busy}
         />
-      </View>
+      </View>}
 
       {error && <Text style={styles.error}>{error}</Text>}
 
@@ -242,9 +298,23 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
         {busy ? (
           <ActivityIndicator color="#0A1021" />
         ) : (
-          <Text style={styles.submitText}>{mode === 'login' ? 'Entrar' : 'Criar conta'}</Text>
+          <Text style={styles.submitText}>
+            {mode === 'login' ? 'Entrar' : mode === 'ticket' ? 'Entrar com ingresso' : 'Criar conta'}
+          </Text>
         )}
       </Pressable>
+
+      {TICKET_LOGIN_ENABLED && showSymplaSignup && mode !== 'ticket' && (
+        <Pressable
+          style={styles.ticketLogin}
+          onPress={() => {
+            setError(null);
+            setMode('ticket');
+          }}>
+          <Ionicons name="qr-code-outline" size={18} color="#FF5A00" />
+          <Text style={styles.ticketLoginText}>Entrar sem senha com ingresso Sympla</Text>
+        </Pressable>
+      )}
 
       <Pressable
         style={styles.switch}
@@ -253,7 +323,7 @@ export function AuthForm({ title, subtitle, icon = 'person-circle', onSuccess, s
           setMode((m) => (m === 'login' ? 'signup' : 'login'));
         }}>
         <Text style={styles.switchText}>
-          {mode === 'login' ? 'Ainda não tem conta? ' : 'Já tem conta? '}
+          {mode === 'login' ? 'Ainda não tem conta? ' : mode === 'ticket' ? 'Prefere usar sua senha? ' : 'Já tem conta? '}
           <Text style={styles.switchLink}>{mode === 'login' ? 'Cadastre-se' : 'Entrar'}</Text>
         </Text>
       </Pressable>
@@ -309,6 +379,18 @@ const styles = StyleSheet.create({
   },
   error: { color: Brand.danger, fontSize: 13.5 },
   importHint: { color: Light.textMuted, fontSize: 13, lineHeight: 19 },
+  fieldHelp: { color: Light.textMuted, fontSize: 12, lineHeight: 17 },
+  ticketLogin: {
+    minHeight: 48,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 90, 0, 0.35)',
+    borderRadius: Radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  ticketLoginText: { color: '#D94C00', fontSize: 14, fontWeight: '800' },
 
   submit: {
     backgroundColor: Brand.gold,

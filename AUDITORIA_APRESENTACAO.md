@@ -134,9 +134,16 @@ Referencias:
 
 ### Reaproveitamento do cadastro Sympla/R Gestor
 
-**Status:** corrigido em codigo; depende da sincronizacao das inscricoes e da publicacao das regras.
+**Status:** sincronizacao Sympla automatica ativada em 10/09/2026 com autorizacao
+do Victor. Cloud Scheduler executa o importador no Cloud Run a cada cinco minutos.
+Primeira importacao: 91 ingressos de 81 e-mails; repeticao sem novas gravacoes.
+Publicacao/homologacao do login por ingresso no app e na API continuam separadas.
+HiGestor nao faz parte deste agendamento. Detalhes em
+[`integrations/sympla-sync/README.md`](integrations/sympla-sync/README.md).
 
-O visitante continua criando uma conta Firebase com e-mail e senha, mas nao precisa mais informar novamente nome, WhatsApp, empresa e cargo no formulario de criacao da conta. Depois da autenticacao com o mesmo e-mail da inscricao, o onboarding procura de forma segura os cadastros importados da Sympla e de todos os eventos R Gestor e preenche os dados disponiveis para revisao.
+O prototipo de login por ingresso foi bloqueado na revisao de publicacao: o QR do cracha e compartilhavel e nao comprova a posse do e-mail. A API responde 403 sem criar contas nem emitir sessoes; a opcao fica oculta no app. O login com senha, o reaproveitamento da inscricao e o scanner continuam disponiveis. Nenhuma comunicacao e enviada nesta publicacao.
+
+Depois da autenticacao, o onboarding procura os cadastros importados da Sympla e de todos os eventos R Gestor e preenche nome, WhatsApp, empresa e cargo disponiveis para revisao. Se a pessoa estiver em mais de um evento, os registros sao combinados sem substituir campos preenchidos por valores vazios.
 
 A consulta anonima anterior foi removida. A leitura agora ocorre apenas depois do login e somente para o e-mail da propria conta, preservando a regra de privacidade. Se a pessoa estiver em mais de um evento, os registros sao combinados sem substituir campos preenchidos por valores vazios. Dados ausentes continuam sendo solicitados no onboarding.
 
@@ -146,6 +153,7 @@ Referencias:
 - [`src/features/auth/auth-form.tsx`](src/features/auth/auth-form.tsx#L97)
 - [`src/app/onboarding.tsx`](src/app/onboarding.tsx#L62)
 - [`src/features/visitor/imported-registration-profile.ts`](src/features/visitor/imported-registration-profile.ts)
+- [`match-web/src/app/api/auth/sympla-ticket/route.ts`](match-web/src/app/api/auth/sympla-ticket/route.ts)
 - [`scripts/sync-higestor-event-access.ts`](scripts/sync-higestor-event-access.ts)
 - [`firestore.rules`](firestore.rules#L163)
 
@@ -338,7 +346,7 @@ Referencia: [`match-web/src/app/apresentacao/page.tsx`](match-web/src/app/aprese
 | Build do `match-web` | Aprovado; 24 rotas geradas |
 | Export web do aplicativo Expo | Aprovado; 29 rotas geradas |
 | TypeScript do aplicativo | Aprovado |
-| Testes automatizados, incluindo reaproveitamento Sympla/R Gestor | 45/45 aprovados |
+| Testes automatizados, incluindo login por ingresso e reaproveitamento Sympla/R Gestor | 50/50 aprovados |
 | Lint do aplicativo | 0 erros e 31 avisos |
 | Lint do `match-web` | 17 erros e 19 avisos |
 | Renderizacao local da apresentacao | Aprovada |

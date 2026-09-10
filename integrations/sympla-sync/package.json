@@ -1,0 +1,7 @@
+{
+  "name": "expoindustrial-sympla-sync",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node run.mjs", "test": "node --test sync.test.mjs" },
+  "dependencies": { "firebase-admin": "14.1.0" }
+}

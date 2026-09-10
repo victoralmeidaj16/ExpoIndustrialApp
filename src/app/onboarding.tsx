@@ -47,6 +47,7 @@ export default function OnboardingScreen() {
   const [form, setForm] = useState<VisitorProfile>(EMPTY_VISITOR_PROFILE);
   const [saving, setSaving] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [importedSource, setImportedSource] = useState<'sympla' | 'higestor' | null>(null);
 
   // O perfil terminou de carregar: semeia o formulário já neste render. Fazer
   // isso num efeito só provocava um segundo render em cascata.
@@ -77,6 +78,15 @@ export default function OnboardingScreen() {
           if (!next.phone && data.phone) next.phone = data.phone;
           if (!next.company && data.company) next.company = data.company;
           if (!next.role && data.role) next.role = data.role;
+          // Só avisa se algo mudou de fato — senão o aviso mente para quem
+          // digitou tudo à mão ou cuja inscrição não trouxe esses campos.
+          const filled = next.phone !== prev.phone
+            || next.company !== prev.company
+            || next.role !== prev.role
+            || next.name !== prev.name;
+          if (filled && (data.source === 'sympla' || data.source === 'higestor')) {
+            setImportedSource(data.source);
+          }
           return next;
         });
       } catch (err) {
@@ -261,6 +271,17 @@ export default function OnboardingScreen() {
             <View style={styles.stepContent}>
               <Text style={styles.stepTitle}>Quem é você?</Text>
               <Text style={styles.stepSubtitle}>Dados obrigatórios para acesso ao app e crachá do evento.</Text>
+
+              {importedSource && (
+                <View style={styles.importedCard}>
+                  <Ionicons name="checkmark-circle" size={18} color={Light.navy} />
+                  <Text style={styles.importedText}>
+                    Recuperamos os dados da sua inscrição
+                    {importedSource === 'sympla' ? ' na Sympla' : ' no R Gestor'} pelo mesmo
+                    e-mail. Confira e ajuste se algo mudou.
+                  </Text>
+                </View>
+              )}
 
               <Pressable
                 style={styles.ticketCard}
@@ -634,6 +655,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  importedCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.two,
+    backgroundColor: '#EEF4FB',
+    borderRadius: Radius.md,
+    padding: Spacing.three,
+  },
+  importedText: { flex: 1, color: Light.textNavy, fontSize: 12.5, lineHeight: 18 },
+
   ticketTitle: { color: Light.navyDeep, fontSize: 14, fontWeight: '800' },
   ticketText: { color: Light.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 2 },
 

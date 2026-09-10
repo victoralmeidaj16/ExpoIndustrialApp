@@ -1,0 +1,83 @@
+.page {
+  min-width: 0;
+}
+
+/*
+ * A apresentação também é usada em monitores de reunião e telas ultrawide.
+ * Acima de 1440 px, aproveita melhor a largura disponível e estabelece um
+ * tamanho mínimo confortável para textos que originalmente eram legendas.
+ */
+@media (min-width: 1440px) {
+  .page :global(.max-w-7xl) {
+    max-width: 94rem;
+  }
+
+  .page :global(.max-w-4xl) {
+    max-width: 70rem;
+  }
+
+  .page :global(.max-w-3xl) {
+    max-width: 56rem;
+  }
+
+  .page :global(.max-w-2xl) {
+    max-width: 48rem;
+  }
+
+  .page p {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .page nav {
+    font-size: 0.95rem;
+  }
+
+  .page h5 {
+    font-size: 1.05rem;
+    line-height: 1.45;
+  }
+
+  .page button {
+    font-size: 1rem;
+  }
+
+  .page :global(.text-xs) {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .page :global(.text-sm) {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .page :global(.text-lg) {
+    font-size: 1.25rem;
+  }
+
+  .page :global(.text-\[9px\]),
+  .page :global(.text-\[10px\]),
+  .page :global(.text-\[11px\]) {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+}
+
+@media (min-width: 1900px) {
+  .page :global(.max-w-7xl) {
+    max-width: 100rem;
+  }
+
+  .page p {
+    font-size: 1.0625rem;
+  }
+
+  .page :global(.text-xs) {
+    font-size: 0.925rem;
+  }
+
+  .page :global(.text-sm) {
+    font-size: 1.0625rem;
+  }
+}
